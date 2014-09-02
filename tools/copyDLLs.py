@@ -40,7 +40,10 @@ def assembleBuild(buildname, dllHome, dllList):
 		src = dllHome + f[0] + f[1] + f[2]
 		dst = dllDest + f[2]
 		print "  copy\n    ",src,"\n    ",dst
-		shutil.copyfile(src, dst)
+		try:
+			shutil.copyfile(src, dst)
+		except IOError as e:
+			print e
 
 assembleBuild("Debug", dllHome, dllList+debugDllList)
 assembleBuild("Release", dllHome, dllList+releaseDllList)
