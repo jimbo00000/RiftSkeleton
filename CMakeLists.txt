@@ -77,11 +77,6 @@ IF( WIN32 )
         ADD_DEFINITIONS( -DUSE_ANTTWEAKBAR )
     ENDIF( USE_ANTTWEAKBAR )
 
-    # OVR SDK 0.4.0 apparently introduced a new library dependency on atlsd.lib
-    SET( WINDDK_ROOT "C:/WinDDK/7600.16385.1" CACHE STRING "WinDDK root(needed for ATL)" )
-    INCLUDE_DIRECTORIES( "${WINDDK_ROOT}/inc/atl71" )
-    LINK_DIRECTORIES   ( "${WINDDK_ROOT}/lib/ATL/i386" )
-
     SET( PLATFORM_LIBS
         ${FRAMEWORK_LIBS}
         opengl32.lib glu32.lib glew32s.lib
