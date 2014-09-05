@@ -80,6 +80,7 @@ protected:
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);
     void _resetGLState() const;
     void _drawSceneMono() const;
+    void _DrawScenes(const float* pMview, const float* pPersp) const;
 
     ovrHmd m_Hmd;
     ovrFovPort m_EyeFov[2];

@@ -484,6 +484,20 @@ void RiftAppSkeleton::timestep(float dt)
     m_hyif.updateHydraData(m_fm, 1.0f);
 }
 
+void RiftAppSkeleton::_DrawScenes(const float* pMview, const float* pPersp) const
+{
+    for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
+        it != m_scenes.end();
+        ++it)
+    {
+        const IScene* pScene = *it;
+        if (pScene != NULL)
+        {
+            pScene->RenderForOneEye(pMview, pPersp);
+        }
+    }
+}
+
 void RiftAppSkeleton::_drawSceneMono() const
 {
     _resetGLState();
@@ -509,18 +523,7 @@ void RiftAppSkeleton::_drawSceneMono() const
         0.004f,
         500.0f);
 
-    for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
-        it != m_scenes.end();
-        ++it)
-    {
-        const IScene* pScene = *it;
-        if (pScene != NULL)
-        {
-            pScene->RenderForOneEye(
-                glm::value_ptr(lookat),
-                glm::value_ptr(persp));
-        }
-    }
+    _DrawScenes(glm::value_ptr(lookat), glm::value_ptr(persp));
 }
 
 void RiftAppSkeleton::display_raw() const
@@ -610,19 +613,7 @@ void RiftAppSkeleton::display_stereo_undistorted() //const
 
         _resetGLState();
 
-        // Draw the scene for the given eye
-        for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
-            it != m_scenes.end();
-            ++it)
-        {
-            const IScene* pScene = *it;
-            if (pScene != NULL)
-            {
-                pScene->RenderForOneEye(
-                    &eyeview.Transposed().M[0][0],
-                    &proj.Transposed().M[0][0]);
-            }
-        }
+        _DrawScenes(&eyeview.Transposed().M[0][0], &proj.Transposed().M[0][0]);
     }
     unbindFBO();
 
@@ -697,19 +688,7 @@ void RiftAppSkeleton::display_sdk() //const
 
         _resetGLState();
 
-        // Draw the scene for the given eye
-        for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
-            it != m_scenes.end();
-            ++it)
-        {
-            const IScene* pScene = *it;
-            if (pScene != NULL)
-            {
-                pScene->RenderForOneEye(
-                    &l_ModelViewMatrix.Transposed().M[0][0],
-                    &l_ProjectionMatrix.Transposed().M[0][0]);
-            }
-        }
+        _DrawScenes(&l_ModelViewMatrix.Transposed().M[0][0], &l_ProjectionMatrix.Transposed().M[0][0]);
 
         renderPose[l_EyeIndex] = l_EyePose;
         eyeTexture[l_EyeIndex] = l_EyeTexture[l_Eye].Texture;
@@ -769,19 +748,7 @@ void RiftAppSkeleton::display_client() //const
 
         _resetGLState();
 
-        // Draw the scene for the given eye
-        for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
-            it != m_scenes.end();
-            ++it)
-        {
-            const IScene* pScene = *it;
-            if (pScene != NULL)
-            {
-                pScene->RenderForOneEye(
-                    &view.Transposed().M[0][0],
-                    &proj.Transposed().M[0][0]);
-            }
-        }
+        _DrawScenes(&view.Transposed().M[0][0], &proj.Transposed().M[0][0]);
     }
     unbindFBO();
 
