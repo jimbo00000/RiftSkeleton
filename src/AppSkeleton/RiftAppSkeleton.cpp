@@ -472,8 +472,10 @@ void RiftAppSkeleton::timestep(float dt)
     kbm.y = move_dt.y;
     kbm.z = move_dt.z;
 
-    // Move in the direction the chassis is facing.
+    // Move in the direction the viewer is facing.
     OVR::Vector3f kbmVec = OVR::Matrix4f::RotationY(-m_chassisYaw).Transform(OVR::Vector3f(kbm));
+    const OVR::Matrix4f rotmtx(m_eyeOri);
+    kbmVec = rotmtx.Transform(kbmVec);
     m_chassisPos.x += kbmVec.x;
     m_chassisPos.y += kbmVec.y;
     m_chassisPos.z += kbmVec.z;
@@ -664,6 +666,7 @@ void RiftAppSkeleton::display_sdk() //const
     {
         ovrEyeType l_Eye = hmd->EyeRenderOrder[l_EyeIndex];
         ovrPosef l_EyePose = ovrHmd_GetEyePose(m_Hmd, l_Eye);
+        m_eyeOri = l_EyePose.Orientation; // cache this for movement direction
 
         glViewport(
             l_EyeTexture[l_Eye].OGL.Header.RenderViewport.Pos.x,
@@ -720,6 +723,7 @@ void RiftAppSkeleton::display_client() //const
     {
         ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
         ovrPosef eyePose = ovrHmd_GetEyePose(hmd, eye);
+        m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
         const ovrGLTexture& otex = l_EyeTexture[eye];
         const ovrRecti& rvp = otex.OGL.Header.RenderViewport;

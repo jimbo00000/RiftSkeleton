@@ -92,6 +92,7 @@ protected:
     ovrRecti m_RenderViewports[2];
     ovrVector2f m_uvScaleOffsetOut[4];
     ovrDistortionMesh m_DistMeshes[2];
+    ovrQuatf m_eyeOri;
 
 public:
     // This public section is for exposing state variables to AntTweakBar
