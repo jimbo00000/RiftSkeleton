@@ -296,18 +296,18 @@ int RiftAppSkeleton::ConfigureSDKRendering()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glUseProgram(0);
 
-    l_EyeTexture[0].OGL.Header.API = ovrRenderAPI_OpenGL;
-    l_EyeTexture[0].OGL.Header.TextureSize.w = l_TextureSize.w;
-    l_EyeTexture[0].OGL.Header.TextureSize.h = l_TextureSize.h;
-    l_EyeTexture[0].OGL.Header.RenderViewport.Pos.x = 0;
-    l_EyeTexture[0].OGL.Header.RenderViewport.Pos.y = 0;
-    l_EyeTexture[0].OGL.Header.RenderViewport.Size.w = l_TextureSize.w/2;
-    l_EyeTexture[0].OGL.Header.RenderViewport.Size.h = l_TextureSize.h;
-    l_EyeTexture[0].OGL.TexId = m_renderBuffer.tex;
+    m_EyeTexture[0].OGL.Header.API = ovrRenderAPI_OpenGL;
+    m_EyeTexture[0].OGL.Header.TextureSize.w = l_TextureSize.w;
+    m_EyeTexture[0].OGL.Header.TextureSize.h = l_TextureSize.h;
+    m_EyeTexture[0].OGL.Header.RenderViewport.Pos.x = 0;
+    m_EyeTexture[0].OGL.Header.RenderViewport.Pos.y = 0;
+    m_EyeTexture[0].OGL.Header.RenderViewport.Size.w = l_TextureSize.w/2;
+    m_EyeTexture[0].OGL.Header.RenderViewport.Size.h = l_TextureSize.h;
+    m_EyeTexture[0].OGL.TexId = m_renderBuffer.tex;
 
     // Right eye the same, except for the x-position in the texture...
-    l_EyeTexture[1] = l_EyeTexture[0];
-    l_EyeTexture[1].OGL.Header.RenderViewport.Pos.x = (l_TextureSize.w+1) / 2;
+    m_EyeTexture[1] = m_EyeTexture[0];
+    m_EyeTexture[1].OGL.Header.RenderViewport.Pos.x = (l_TextureSize.w+1) / 2;
 
     return 0;
 }
@@ -328,21 +328,21 @@ int RiftAppSkeleton::ConfigureClientRendering()
     allocateFBO(m_renderBuffer, l_TextureSize.w, l_TextureSize.h);
 
 
-    l_EyeTexture[0].OGL.Header.API = ovrRenderAPI_OpenGL;
-    l_EyeTexture[0].OGL.Header.TextureSize.w = l_TextureSize.w;
-    l_EyeTexture[0].OGL.Header.TextureSize.h = l_TextureSize.h;
-    l_EyeTexture[0].OGL.Header.RenderViewport.Pos.x = 0;
-    l_EyeTexture[0].OGL.Header.RenderViewport.Pos.y = 0;
-    l_EyeTexture[0].OGL.Header.RenderViewport.Size.w = l_TextureSize.w/2;
-    l_EyeTexture[0].OGL.Header.RenderViewport.Size.h = l_TextureSize.h;
-    l_EyeTexture[0].OGL.TexId = m_renderBuffer.tex;
+    m_EyeTexture[0].OGL.Header.API = ovrRenderAPI_OpenGL;
+    m_EyeTexture[0].OGL.Header.TextureSize.w = l_TextureSize.w;
+    m_EyeTexture[0].OGL.Header.TextureSize.h = l_TextureSize.h;
+    m_EyeTexture[0].OGL.Header.RenderViewport.Pos.x = 0;
+    m_EyeTexture[0].OGL.Header.RenderViewport.Pos.y = 0;
+    m_EyeTexture[0].OGL.Header.RenderViewport.Size.w = l_TextureSize.w/2;
+    m_EyeTexture[0].OGL.Header.RenderViewport.Size.h = l_TextureSize.h;
+    m_EyeTexture[0].OGL.TexId = m_renderBuffer.tex;
 
     // Right eye the same, except for the x-position in the texture...
-    l_EyeTexture[1] = l_EyeTexture[0];
-    l_EyeTexture[1].OGL.Header.RenderViewport.Pos.x = (l_TextureSize.w+1) / 2;
+    m_EyeTexture[1] = m_EyeTexture[0];
+    m_EyeTexture[1].OGL.Header.RenderViewport.Pos.x = (l_TextureSize.w+1) / 2;
 
-    m_RenderViewports[0] = l_EyeTexture[0].OGL.Header.RenderViewport;
-    m_RenderViewports[1] = l_EyeTexture[1].OGL.Header.RenderViewport;
+    m_RenderViewports[0] = m_EyeTexture[0].OGL.Header.RenderViewport;
+    m_RenderViewports[1] = m_EyeTexture[1].OGL.Header.RenderViewport;
 
     const int distortionCaps =
         ovrDistortionCap_Chromatic |
@@ -593,7 +593,7 @@ void RiftAppSkeleton::display_stereo_undistorted() //const
         ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
         ovrPosef eyePose = ovrHmd_GetEyePose(hmd, eye);
 
-        const ovrGLTexture& otex = l_EyeTexture[eye];
+        const ovrGLTexture& otex = m_EyeTexture[eye];
         const ovrRecti& rvp = otex.OGL.Header.RenderViewport;
         glViewport(
             static_cast<int>(m_fboScale * rvp.Pos.x),
@@ -668,7 +668,7 @@ void RiftAppSkeleton::display_sdk() //const
         const ovrPosef eyePose = ovrHmd_GetEyePose(m_Hmd, eye);
         m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
-        const ovrGLTexture& otex = l_EyeTexture[eye];
+        const ovrGLTexture& otex = m_EyeTexture[eye];
         const ovrRecti& rvp = otex.OGL.Header.RenderViewport;
         glViewport(
             rvp.Pos.x,
@@ -696,7 +696,7 @@ void RiftAppSkeleton::display_sdk() //const
         _DrawScenes(&l_ModelViewMatrix.Transposed().M[0][0], &l_ProjectionMatrix.Transposed().M[0][0]);
 
         renderPose[eyeIndex] = eyePose;
-        eyeTexture[eyeIndex] = l_EyeTexture[eye].Texture;
+        eyeTexture[eyeIndex] = m_EyeTexture[eye].Texture;
     }
     unbindFBO();
 
@@ -727,7 +727,7 @@ void RiftAppSkeleton::display_client() //const
         ovrPosef eyePose = ovrHmd_GetEyePose(hmd, eye);
         m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
-        const ovrGLTexture& otex = l_EyeTexture[eye];
+        const ovrGLTexture& otex = m_EyeTexture[eye];
         const ovrRecti& rvp = otex.OGL.Header.RenderViewport;
         glViewport(
             static_cast<int>(m_fboScale * rvp.Pos.x),
