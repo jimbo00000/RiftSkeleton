@@ -662,29 +662,31 @@ void RiftAppSkeleton::display_sdk() //const
     ovrPosef renderPose[2];
     ovrTexture eyeTexture[2];
 
-    for (int l_EyeIndex=0; l_EyeIndex<ovrEye_Count; l_EyeIndex++)
+    for (int eyeIndex=0; eyeIndex<ovrEye_Count; eyeIndex++)
     {
-        ovrEyeType l_Eye = hmd->EyeRenderOrder[l_EyeIndex];
-        ovrPosef l_EyePose = ovrHmd_GetEyePose(m_Hmd, l_Eye);
-        m_eyeOri = l_EyePose.Orientation; // cache this for movement direction
+        const ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
+        const ovrPosef eyePose = ovrHmd_GetEyePose(m_Hmd, eye);
+        m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
+        const ovrGLTexture& otex = l_EyeTexture[eye];
+        const ovrRecti& rvp = otex.OGL.Header.RenderViewport;
         glViewport(
-            l_EyeTexture[l_Eye].OGL.Header.RenderViewport.Pos.x,
-            l_EyeTexture[l_Eye].OGL.Header.RenderViewport.Pos.y,
-            l_EyeTexture[l_Eye].OGL.Header.RenderViewport.Size.w,
-            l_EyeTexture[l_Eye].OGL.Header.RenderViewport.Size.h
+            rvp.Pos.x,
+            rvp.Pos.y,
+            rvp.Size.w,
+            rvp.Size.h
             );
 
         // Get Projection and ModelView matrici from the device...
-        OVR::Matrix4f l_ProjectionMatrix = ovrMatrix4f_Projection(
-            m_EyeRenderDesc[l_Eye].Fov, 0.3f, 100.0f, true);
+        const OVR::Matrix4f l_ProjectionMatrix = ovrMatrix4f_Projection(
+            m_EyeRenderDesc[eye].Fov, 0.3f, 100.0f, true);
 
-        OVR::Matrix4f eyePoseMatrix =
-            OVR::Matrix4f::Translation(l_EyePose.Position)
-            * OVR::Matrix4f(OVR::Quatf(l_EyePose.Orientation));
+        const OVR::Matrix4f eyePoseMatrix =
+            OVR::Matrix4f::Translation(eyePose.Position)
+            * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
 
-        OVR::Matrix4f l_ModelViewMatrix =
-            OVR::Matrix4f::Translation(-OVR::Vector3f(m_EyeRenderDesc[l_Eye].ViewAdjust)) // not sure why negative...
+        const OVR::Matrix4f l_ModelViewMatrix =
+            OVR::Matrix4f::Translation(-OVR::Vector3f(m_EyeRenderDesc[eye].ViewAdjust)) // not sure why negative...
             * eyePoseMatrix.Inverted()
             * OVR::Matrix4f::RotationY(m_chassisYaw)
             * OVR::Matrix4f::Translation(-OVR::Vector3f(m_chassisPos));
@@ -693,8 +695,8 @@ void RiftAppSkeleton::display_sdk() //const
 
         _DrawScenes(&l_ModelViewMatrix.Transposed().M[0][0], &l_ProjectionMatrix.Transposed().M[0][0]);
 
-        renderPose[l_EyeIndex] = l_EyePose;
-        eyeTexture[l_EyeIndex] = l_EyeTexture[l_Eye].Texture;
+        renderPose[eyeIndex] = eyePose;
+        eyeTexture[eyeIndex] = l_EyeTexture[eye].Texture;
     }
     unbindFBO();
 
