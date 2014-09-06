@@ -258,7 +258,7 @@ void joystick()
         glm::vec3(0.0f, -1.0f, 0.0f),
     };
 
-    for (int i=0; i<numButtons; ++i)
+    for (int i=0; i<std::min(8,numButtons); ++i)
     {
         if (pButtonStates[i] == GLFW_PRESS)
         {
