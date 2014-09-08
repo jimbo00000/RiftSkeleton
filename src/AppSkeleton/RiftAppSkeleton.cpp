@@ -43,6 +43,8 @@ RiftAppSkeleton::RiftAppSkeleton()
 , m_joystickYaw(0.0f)
 , m_mouseDeltaYaw(0.0f)
 {
+    m_eyeOri = OVR::Quatf();
+
     // Add as many scenes here as you like. They will share color and depth buffers,
     // so drawing one after the other should just result in pixel-perfect integration -
     // provided they all do forward rendering. Per-scene deferred render passes will
