@@ -473,9 +473,10 @@ void RiftAppSkeleton::timestep(float dt)
     kbm.z = move_dt.z;
 
     // Move in the direction the viewer is facing.
-    OVR::Vector3f kbmVec = OVR::Matrix4f::RotationY(-m_chassisYaw).Transform(OVR::Vector3f(kbm));
-    const OVR::Matrix4f rotmtx(m_eyeOri);
-    kbmVec = rotmtx.Transform(kbmVec);
+    const OVR::Matrix4f rotmtx = 
+          OVR::Matrix4f::RotationY(-m_chassisYaw)
+        * OVR::Matrix4f(m_eyeOri);
+    const OVR::Vector3f kbmVec = rotmtx.Transform(OVR::Vector3f(kbm));
     m_chassisPos.x += kbmVec.x;
     m_chassisPos.y += kbmVec.y;
     m_chassisPos.z += kbmVec.z;
