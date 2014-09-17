@@ -197,6 +197,7 @@ void HydraScene::DrawScene(
             glUniformMatrix4fv(m_basic.GetUniLoc("prmtx"), 1, false, glm::value_ptr(projection));
             const glm::mat4 mv = glm::translate(modelview, sumOffset);
 
+#if 0
             // Draw a unit origin at the base
             if(0)
             {
@@ -204,7 +205,7 @@ void HydraScene::DrawScene(
                 glUniformMatrix4fv(m_basic.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(id));
                 _DrawOrigin(6);
             }
-
+#endif
 
             // Flip the left handle's lines in its local frame
             const glm::mat4 mL = mv * glm::scale(glm::make_mat4(m_pFm->mtxL), glm::vec3(-1.0f, 1.0f, 1.0f));
