@@ -43,6 +43,7 @@ public:
     ovrVector2i getHmdWindowPos() const;
     GLuint getRenderBufferTex() const { return m_renderBuffer.tex; }
     float GetFboScale() const { return m_fboScale; }
+    bool UsingDebugHmd() const { return m_usingDebugHmd; }
 
     int ConfigureSDKRendering();
     int ConfigureClientRendering();
@@ -87,6 +88,7 @@ protected:
     ovrGLConfig m_Cfg;
     ovrEyeRenderDesc m_EyeRenderDesc[2];
     ovrGLTexture m_EyeTexture[2];
+    bool m_usingDebugHmd;
 
     // For client rendering
     ovrRecti m_RenderViewports[2];
