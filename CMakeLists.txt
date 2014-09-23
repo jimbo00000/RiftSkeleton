@@ -89,9 +89,10 @@ IF( WIN32 )
 
     ADD_DEFINITIONS( /W4 )
 
-    # Silence some linker warnings on VS2010
-    SET( CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\"libcmt.lib\" )
-    SET( CMAKE_EXE_LINKER_FLAGS_DEBUG /NODEFAULTLIB:\"msvcrt.lib\" )
+    # These lines will silence some linker warnings on VS2010,
+    # but also remove debug info from the debug build.
+    #SET( CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\"libcmt.lib\" )
+    #SET( CMAKE_EXE_LINKER_FLAGS_DEBUG /NODEFAULTLIB:\"msvcrt.lib\" )
 
 ELSEIF( APPLE )
     ADD_DEFINITIONS( -D_MACOS )
