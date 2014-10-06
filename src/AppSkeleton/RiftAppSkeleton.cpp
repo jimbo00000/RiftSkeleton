@@ -231,27 +231,31 @@ void RiftAppSkeleton::_initPresentDistMesh(ShaderWithVariables& shader, int eyeI
     glBindBuffer(GL_ARRAY_BUFFER, vertVbo);
     glBufferData(GL_ARRAY_BUFFER, mesh.VertexCount * sizeof(ovrDistortionVertex), &mesh.pVertexData[0].ScreenPosNDC.x, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(shader.GetAttrLoc("vPosition"), 4, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex), NULL);
-    glEnableVertexAttribArray(shader.GetAttrLoc("vPosition"));
+    const int a_pos = shader.GetAttrLoc("vPosition");
+    glVertexAttribPointer(a_pos, 4, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex), NULL);
+    glEnableVertexAttribArray(a_pos);
 
     const int a_texR = shader.GetAttrLoc("vTexR");
     if (a_texR > -1)
     {
-        glVertexAttribPointer(a_texR, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex), NULL);
+        glVertexAttribPointer(a_texR, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex),
+            reinterpret_cast<void*>(4*sizeof(float)));//&mesh.pVertexData[0].TanEyeAnglesR);
         glEnableVertexAttribArray(a_texR);
     }
 
     const int a_texG = shader.GetAttrLoc("vTexG");
     if (a_texG > -1)
     {
-        glVertexAttribPointer(a_texG, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex), NULL);
+        glVertexAttribPointer(a_texG, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex),
+            reinterpret_cast<void*>(6*sizeof(float)));//&mesh.pVertexData[0].TanEyeAnglesG);
         glEnableVertexAttribArray(a_texG);
     }
 
     const int a_texB = shader.GetAttrLoc("vTexB");
     if (a_texB > -1)
     {
-        glVertexAttribPointer(a_texB, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex), NULL);
+        glVertexAttribPointer(a_texB, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex),
+            reinterpret_cast<void*>(8*sizeof(float)));//&mesh.pVertexData[0].TanEyeAnglesB);
         glEnableVertexAttribArray(a_texB);
     }
 
@@ -785,35 +789,6 @@ void RiftAppSkeleton::display_client() //const
         eyeShader.bindVAO();
         {
             const ovrDistortionMesh& mesh = m_DistMeshes[eyeNum];
-            glBindBuffer(GL_ARRAY_BUFFER, eyeShader.GetVboLoc("vPosition"));
-
-            const int a_pos =  glGetAttribLocation(prog, "vPosition");
-            glVertexAttribPointer(a_pos, 4, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex), NULL);
-            glEnableVertexAttribArray(a_pos);
-
-            const int a_texR =  glGetAttribLocation(prog, "vTexR");
-            if (a_texR > -1)
-            {
-                glVertexAttribPointer(a_texR, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex),
-                    reinterpret_cast<void*>(4*sizeof(float)));//&mesh.pVertexData[0].TanEyeAnglesR);
-                glEnableVertexAttribArray(a_texR);
-            }
-
-            const int a_texG =  glGetAttribLocation(prog, "vTexG");
-            if (a_texG > -1)
-            {
-                glVertexAttribPointer(a_texG, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex),
-                    reinterpret_cast<void*>(6*sizeof(float)));//&mesh.pVertexData[0].TanEyeAnglesG);
-                glEnableVertexAttribArray(a_texG);
-            }
-
-            const int a_texB =  glGetAttribLocation(prog, "vTexB");
-            if (a_texB > -1)
-            {
-                glVertexAttribPointer(a_texB, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex),
-                    reinterpret_cast<void*>(8*sizeof(float)));//&mesh.pVertexData[0].TanEyeAnglesB);
-                glEnableVertexAttribArray(a_texB);
-            }
 
             ovrVector2f uvoff =
                 m_uvScaleOffsetOut[2*eyeNum + 1];
