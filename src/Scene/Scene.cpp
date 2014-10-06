@@ -155,33 +155,6 @@ void Scene::DrawColorCube() const
     glBindVertexArray(0);
 }
 
-/// Utility function to draw colored line segments along unit x,y,z axes
-void Scene::DrawOrigin() const
-{
-    const float verts[] = {
-        0,0,0,
-        1,0,0,
-        0,1,0,
-        0,0,1,
-    };
-    const unsigned int lines[] = {
-        0,1,
-        0,2,
-        0,3,
-    };
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, verts);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, verts);
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-
-    glDrawElements(GL_LINES,
-                   3*2,
-                   GL_UNSIGNED_INT,
-                   &lines[0]);
-}
-
 /// Draw a circle of color cubes(why not)
 void Scene::_DrawBouncingCubes(const glm::mat4& modelview) const
 {
