@@ -1,12 +1,15 @@
 // presentmesh.frag
+#version 330
 
 uniform float fboScale;
 uniform sampler2D fboTex;
 
-varying vec2 vfTexR;
-varying vec2 vfTexG;
-varying vec2 vfTexB;
-varying float vfColor;
+in vec2 vfTexR;
+in vec2 vfTexG;
+in vec2 vfTexB;
+in float vfColor;
+
+out vec4 fragColor;
 
 vec2 scaleAndFlip(vec2 tc)
 {
@@ -18,5 +21,5 @@ void main()
     float resR = texture2D(fboTex, scaleAndFlip(vfTexR)).r;
     float resG = texture2D(fboTex, scaleAndFlip(vfTexG)).g;
     float resB = texture2D(fboTex, scaleAndFlip(vfTexB)).b;
-    gl_FragColor = vec4(vfColor * vec3(resR, resG, resB), 1.0);
+    fragColor = vec4(vfColor * vec3(resR, resG, resB), 1.0);
 }
