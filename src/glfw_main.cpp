@@ -607,6 +607,13 @@ int main(void)
     const ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
 
+#ifdef USE_CORE_CONTEXT
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
     glfwWindowHint(GLFW_SAMPLES, 0);
     l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
 
@@ -650,7 +657,11 @@ int main(void)
 #endif
 
 #ifdef USE_ANTTWEAKBAR
+  #ifdef USE_CORE_CONTEXT
+    TwInit(TW_OPENGL_CORE, NULL);
+  #else
     TwInit(TW_OPENGL, NULL);
+  #endif
     InitializeBar();
 #endif
 
