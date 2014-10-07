@@ -239,7 +239,7 @@ void RiftAppSkeleton::_initPresentDistMesh(ShaderWithVariables& shader, int eyeI
     if (a_texR > -1)
     {
         glVertexAttribPointer(a_texR, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex),
-            reinterpret_cast<void*>(4*sizeof(float)));//&mesh.pVertexData[0].TanEyeAnglesR);
+            reinterpret_cast<void*>(offsetof(ovrDistortionVertex, TanEyeAnglesR)));
         glEnableVertexAttribArray(a_texR);
     }
 
@@ -247,7 +247,7 @@ void RiftAppSkeleton::_initPresentDistMesh(ShaderWithVariables& shader, int eyeI
     if (a_texG > -1)
     {
         glVertexAttribPointer(a_texG, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex),
-            reinterpret_cast<void*>(6*sizeof(float)));//&mesh.pVertexData[0].TanEyeAnglesG);
+            reinterpret_cast<void*>(offsetof(ovrDistortionVertex, TanEyeAnglesG)));
         glEnableVertexAttribArray(a_texG);
     }
 
@@ -255,7 +255,7 @@ void RiftAppSkeleton::_initPresentDistMesh(ShaderWithVariables& shader, int eyeI
     if (a_texB > -1)
     {
         glVertexAttribPointer(a_texB, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex),
-            reinterpret_cast<void*>(8*sizeof(float)));//&mesh.pVertexData[0].TanEyeAnglesB);
+            reinterpret_cast<void*>(offsetof(ovrDistortionVertex, TanEyeAnglesB)));
         glEnableVertexAttribArray(a_texB);
     }
 
@@ -265,7 +265,6 @@ void RiftAppSkeleton::_initPresentDistMesh(ShaderWithVariables& shader, int eyeI
     shader.AddVbo("elements", elementVbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementVbo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.IndexCount * sizeof(GLushort), &mesh.pIndexData[0], GL_STATIC_DRAW);
-
 
 
     glBindVertexArray(0);
