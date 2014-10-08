@@ -9,5 +9,5 @@ uniform sampler2D fboTex;
 
 void main()
 {
-    fragColor = texture2D(fboTex, vfTex * fboScale);
+    fragColor = texture(fboTex, vfTex * fboScale);
 }
