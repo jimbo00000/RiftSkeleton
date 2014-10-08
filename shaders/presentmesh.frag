@@ -18,8 +18,8 @@ vec2 scaleAndFlip(vec2 tc)
 
 void main()
 {
-    float resR = texture2D(fboTex, scaleAndFlip(vfTexR)).r;
-    float resG = texture2D(fboTex, scaleAndFlip(vfTexG)).g;
-    float resB = texture2D(fboTex, scaleAndFlip(vfTexB)).b;
+    float resR = texture(fboTex, scaleAndFlip(vfTexR)).r;
+    float resG = texture(fboTex, scaleAndFlip(vfTexG)).g;
+    float resB = texture(fboTex, scaleAndFlip(vfTexB)).b;
     fragColor = vec4(vfColor * vec3(resR, resG, resB), 1.0);
 }
