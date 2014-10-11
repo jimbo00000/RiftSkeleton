@@ -415,9 +415,8 @@ void RiftAppSkeleton::display_buffered(bool setViewport) const
 
     if (setViewport)
     {
-        const int w = m_Cfg.OGL.Header.RTSize.w;
-        const int h = m_Cfg.OGL.Header.RTSize.h;
-        glViewport(0, 0, w, h);
+        const glm::ivec2 vp = getRTSize();
+        glViewport(0, 0, vp.x, vp.y);
     }
 
     // Present FBO to screen
@@ -626,10 +625,8 @@ void RiftAppSkeleton::display_client() //const
     unbindFBO();
 
 
-    // Set full viewport...?
-    const int w = m_Cfg.OGL.Header.RTSize.w;
-    const int h = m_Cfg.OGL.Header.RTSize.h;
-    glViewport(0, 0, w, h);
+    const glm::ivec2 vp = getRTSize();
+    glViewport(0, 0, vp.x, vp.y);
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
