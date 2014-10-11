@@ -31,6 +31,7 @@ public:
     void _DrawScenes(const float* pMview, const float* pPersp) const;
     void display_raw() const;
     void display_buffered(bool setViewport=true) const;
+    void timestep(float dt);
     void resize(int w, int h);
 
 public:

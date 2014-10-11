@@ -57,7 +57,6 @@ public:
     void display_stereo_undistorted();// const;
     void display_sdk();// const;
     void display_client();// const;
-    void timestep(float dt);
 
 protected:
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);

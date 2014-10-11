@@ -313,49 +313,6 @@ void RiftAppSkeleton::CheckForTapToDismissHealthAndSafetyWarning() const
     }
 }
 
-void RiftAppSkeleton::timestep(float dt)
-{
-    for (std::vector<IScene*>::iterator it = m_scenes.begin();
-        it != m_scenes.end();
-        ++it)
-    {
-        IScene* pScene = *it;
-        if (pScene != NULL)
-        {
-            pScene->timestep(dt);
-        }
-    }
-
-    glm::vec3 hydraMove = glm::vec3(0.0f, 0.0f, 0.0f);
-#ifdef USE_SIXENSE
-    const sixenseAllControllerData& state = m_fm.GetCurrentState();
-    for (int i = 0; i<2; ++i)
-    {
-        const sixenseControllerData& cd = state.controllers[i];
-        const float moveScale = pow(10.0f, cd.trigger);
-        hydraMove.x += cd.joystick_x * moveScale;
-
-        const FlyingMouse::Hand h = static_cast<FlyingMouse::Hand>(i);
-        if (m_fm.IsPressed(h, SIXENSE_BUTTON_JOYSTICK)) ///@note left hand does not work
-            hydraMove.y += cd.joystick_y * moveScale;
-        else
-            hydraMove.z -= cd.joystick_y * moveScale;
-    }
-#endif
-
-    glm::vec3 move_dt = (m_keyboardMove + m_joystickMove + m_mouseMove + hydraMove) * dt;
-
-    // Move in the direction the viewer is facing.
-    const glm::mat4 tx = getUserViewMatrix();
-    const glm::vec4 mv4 = tx * glm::vec4(move_dt, 0.0f);
-    m_chassisPos += glm::vec3(mv4);
-
-    m_chassisYaw += (m_keyboardYaw + m_joystickYaw + m_mouseDeltaYaw) * dt;
-
-    m_fm.updateHydraData();
-    m_hyif.updateHydraData(m_fm, 1.0f);
-}
-
 ///@todo Even though this function shares most of its code with client rendering,
 /// which appears to work fine, it is non-convergable. It appears that the projection
 /// matrices for each eye are too far apart? Could be modelview...
