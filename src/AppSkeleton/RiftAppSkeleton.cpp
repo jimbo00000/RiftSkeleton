@@ -185,14 +185,6 @@ int RiftAppSkeleton::ConfigureSDKRendering()
     m_Cfg.OGL.Header.API = ovrRenderAPI_OpenGL;
     m_Cfg.OGL.Header.Multisample = 0;
 
-    const int l_DistortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_TimeWarp;
-    ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, l_DistortionCaps, m_EyeFov, m_EyeRenderDesc);
-
-    // Reset this state before rendering anything else or we get a black screen.
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glUseProgram(0);
-
     m_EyeTexture[0].OGL.Header.API = ovrRenderAPI_OpenGL;
     m_EyeTexture[0].OGL.Header.TextureSize.w = l_TextureSize.w;
     m_EyeTexture[0].OGL.Header.TextureSize.h = l_TextureSize.h;
@@ -205,6 +197,17 @@ int RiftAppSkeleton::ConfigureSDKRendering()
     // Right eye the same, except for the x-position in the texture...
     m_EyeTexture[1] = m_EyeTexture[0];
     m_EyeTexture[1].OGL.Header.RenderViewport.Pos.x = (l_TextureSize.w+1) / 2;
+
+
+    const int distortionCaps =
+        ovrDistortionCap_Chromatic |
+        ovrDistortionCap_TimeWarp;
+    ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, distortionCaps, m_EyeFov, m_EyeRenderDesc);
+
+    // Reset this state before rendering anything else or we get a black screen.
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glUseProgram(0);
 
     return 0;
 }
