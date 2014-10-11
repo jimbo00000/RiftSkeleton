@@ -29,6 +29,8 @@ public:
     void ResetAllTransformations();
     void initGL();
     void _DrawScenes(const float* pMview, const float* pPersp) const;
+    void display_raw() const;
+    void display_buffered(bool setViewport=true) const;
     void resize(int w, int h);
 
 public:
@@ -39,6 +41,8 @@ public:
 
 protected:
     void _initPresentFbo();
+    void _resetGLState() const;
+    void _drawSceneMono() const;
     virtual glm::ivec2 getRTSize() const { return m_rtSize; }
 
     std::vector<IScene*> m_scenes;

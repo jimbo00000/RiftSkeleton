@@ -132,7 +132,16 @@ void AppSkeleton::_initPresentFbo()
     glBindVertexArray(0);
 }
 
+void AppSkeleton::_resetGLState() const
+{
+    glClearDepth(1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glDepthRangef(0.0f, 1.0f);
+    glDepthFunc(GL_LESS);
 
+    glDisable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
+}
 
 void AppSkeleton::_DrawScenes(const float* pMview, const float* pPersp) const
 {
@@ -146,6 +155,70 @@ void AppSkeleton::_DrawScenes(const float* pMview, const float* pPersp) const
             pScene->RenderForOneEye(pMview, pPersp);
         }
     }
+}
+
+void AppSkeleton::_drawSceneMono() const
+{
+    _resetGLState();
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    const glm::vec3 EyePos(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z);
+    const glm::vec3 LookVec(0.0f, 0.0f, -1.0f);
+    const glm::vec3 up(0.0f, 1.0f, 0.0f);
+    glm::mat4 lookat = glm::lookAt(EyePos, EyePos + LookVec, up);
+    lookat = glm::translate(lookat, EyePos);
+    lookat = glm::rotate(lookat, m_chassisYaw, glm::vec3(0.0f, 1.0f, 0.0f));
+    lookat = glm::translate(lookat, -EyePos);
+
+    const glm::ivec2 vp = getRTSize();
+    const glm::mat4 persp = glm::perspective(
+        90.0f,
+        static_cast<float>(vp.x)/static_cast<float>(vp.y),
+        0.004f,
+        500.0f);
+
+    _DrawScenes(glm::value_ptr(lookat), glm::value_ptr(persp));
+}
+
+void AppSkeleton::display_raw() const
+{
+    const glm::ivec2 vp = getRTSize();
+    glViewport(0, 0, vp.x, vp.y);
+    _drawSceneMono();
+}
+
+void AppSkeleton::display_buffered(bool setViewport) const
+{
+    bindFBO(m_renderBuffer, m_fboScale);
+    _drawSceneMono();
+    unbindFBO();
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
+    if (setViewport)
+    {
+        const glm::ivec2 vp = getRTSize();
+        glViewport(0, 0, vp.x, vp.y);
+    }
+
+    // Present FBO to screen
+    const GLuint prog = m_presentFbo.prog();
+    glUseProgram(prog);
+    m_presentFbo.bindVAO();
+    {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_renderBuffer.tex);
+        glUniform1i(m_presentFbo.GetUniLoc("fboTex"), 0);
+
+        // This is the only uniform that changes per-frame
+        glUniform1f(m_presentFbo.GetUniLoc("fboScale"), m_fboScale);
+
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    }
+    glBindVertexArray(0);
+    glUseProgram(0);
 }
 
 void AppSkeleton::resize(int w, int h)

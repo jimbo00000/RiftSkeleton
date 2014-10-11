@@ -54,8 +54,6 @@ public:
     void DismissHealthAndSafetyWarning() const;
     void CheckForTapToDismissHealthAndSafetyWarning() const;
 
-    void display_raw() const;
-    void display_buffered(bool setViewport=true) const;
     void display_stereo_undistorted();// const;
     void display_sdk();// const;
     void display_client();// const;
@@ -70,8 +68,6 @@ public:
 
 protected:
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);
-    void _resetGLState() const;
-    void _drawSceneMono() const;
     virtual glm::ivec2 getRTSize() const;
 
     ovrHmd m_Hmd;
