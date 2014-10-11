@@ -12,20 +12,15 @@
 #  include <windows.h>
 #endif
 
+#include "AppSkeleton.h"
+
 #include <OVR_CAPI.h>
 #include <OVR_CAPI_GL.h>
 
-#include "FBO.h"
-#include "Scene.h"
-#include "HydraScene.h"
-#include "OVRScene.h"
-
-#include "FlyingMouse.h"
-#include "VirtualTrackball.h"
 
 ///@brief Encapsulates as much of the VR viewer state as possible,
 /// pushing all viewer-independent stuff to Scene.
-class RiftAppSkeleton
+class RiftAppSkeleton : public AppSkeleton
 {
 public:
     RiftAppSkeleton();
@@ -96,33 +91,6 @@ protected:
     ovrDistortionMesh m_DistMeshes[2];
     ovrQuatf m_eyeOri;
 
-public:
-    // This public section is for exposing state variables to AntTweakBar
-    Scene m_scene;
-    HydraScene m_hydraScene;
-    OVRScene m_ovrScene;
-
-protected:
-    std::vector<IScene*> m_scenes;
-    FBO m_renderBuffer;
-    float m_fboScale;
-    ShaderWithVariables m_presentFbo;
-    ShaderWithVariables m_presentDistMeshL;
-    ShaderWithVariables m_presentDistMeshR;
-
-    glm::vec3 m_chassisPos;
-    float m_chassisYaw;
-
-    VirtualTrackball m_hyif;
-
-public:
-    FlyingMouse m_fm;
-    glm::vec3 m_keyboardMove;
-    glm::vec3 m_joystickMove;
-    glm::vec3 m_mouseMove;
-    float m_keyboardYaw;
-    float m_joystickYaw;
-    float m_mouseDeltaYaw;
 
 private: // Disallow copy ctor and assignment operator
     RiftAppSkeleton(const RiftAppSkeleton&);

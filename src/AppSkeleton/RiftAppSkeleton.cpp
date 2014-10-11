@@ -7,15 +7,12 @@
 #endif
 #include <GL/glew.h>
 
-#include <OVR.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <algorithm>
 #include <iostream>
+
+#include <OVR.h>
 
 #include "RiftAppSkeleton.h"
 #include "ShaderFunctions.h"
@@ -25,24 +22,6 @@ RiftAppSkeleton::RiftAppSkeleton()
 : m_Hmd(NULL)
 , m_usingDebugHmd(false)
 
-, m_scene()
-, m_hydraScene()
-, m_ovrScene()
-, m_scenes()
-
-, m_fboScale(1.0f)
-, m_presentFbo()
-, m_presentDistMeshL()
-, m_presentDistMeshR()
-, m_chassisYaw(0.0f)
-, m_fm()
-, m_hyif()
-, m_keyboardMove(0.0f)
-, m_joystickMove(0.0f)
-, m_mouseMove(0.0f)
-, m_keyboardYaw(0.0f)
-, m_joystickYaw(0.0f)
-, m_mouseDeltaYaw(0.0f)
 {
     m_eyeOri = OVR::Quatf();
 
