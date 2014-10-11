@@ -72,7 +72,7 @@ protected:
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);
     void _resetGLState() const;
     void _drawSceneMono() const;
-    glm::ivec2 getRTSize() const;
+    virtual glm::ivec2 getRTSize() const;
 
     ovrHmd m_Hmd;
     ovrFovPort m_EyeFov[2];

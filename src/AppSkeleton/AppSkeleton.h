@@ -39,6 +39,7 @@ public:
 
 protected:
     void _initPresentFbo();
+    virtual glm::ivec2 getRTSize() const { return m_rtSize; }
 
     std::vector<IScene*> m_scenes;
     FBO m_renderBuffer;
@@ -51,6 +52,8 @@ protected:
     float m_chassisYaw;
 
     VirtualTrackball m_hyif;
+
+    glm::ivec2 m_rtSize;
 
 public:
     FlyingMouse m_fm;

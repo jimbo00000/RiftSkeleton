@@ -26,6 +26,7 @@ AppSkeleton::AppSkeleton()
 , m_chassisYaw(0.0f)
 , m_fm()
 , m_hyif()
+, m_rtSize(640,480)
 , m_keyboardMove(0.0f)
 , m_joystickMove(0.0f)
 , m_mouseMove(0.0f)
@@ -149,12 +150,6 @@ void AppSkeleton::_DrawScenes(const float* pMview, const float* pPersp) const
 
 void AppSkeleton::resize(int w, int h)
 {
-    (void)w;
-    (void)h;
-    //m_Cfg.OGL.Header.RTSize.w = w;
-    //m_Cfg.OGL.Header.RTSize.h = h;
-
-    //const int l_DistortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_TimeWarp;
-    ///@warning this crashes the app. What are we supposed to do here???
-    //ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, l_DistortionCaps, m_EyeFov, m_EyeRenderDesc);
+    m_rtSize.x = w;
+    m_rtSize.y = h;
 }
