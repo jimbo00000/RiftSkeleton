@@ -29,6 +29,7 @@ public:
     void ResetAllTransformations();
     void initGL();
     void _DrawScenes(const float* pMview, const float* pPersp) const;
+    void resize(int w, int h);
 
 public:
     // This public section is for exposing state variables to AntTweakBar

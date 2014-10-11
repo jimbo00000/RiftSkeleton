@@ -61,7 +61,6 @@ public:
     void display_client();// const;
     void timestep(float dt);
 
-    void resize(int w, int h);
 
     float GetFBOScale() const { return m_fboScale; }
     void SetFBOScale(float s);

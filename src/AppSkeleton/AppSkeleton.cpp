@@ -146,3 +146,15 @@ void AppSkeleton::_DrawScenes(const float* pMview, const float* pPersp) const
         }
     }
 }
+
+void AppSkeleton::resize(int w, int h)
+{
+    (void)w;
+    (void)h;
+    //m_Cfg.OGL.Header.RTSize.w = w;
+    //m_Cfg.OGL.Header.RTSize.h = h;
+
+    //const int l_DistortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_TimeWarp;
+    ///@warning this crashes the app. What are we supposed to do here???
+    //ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, l_DistortionCaps, m_EyeFov, m_EyeRenderDesc);
+}

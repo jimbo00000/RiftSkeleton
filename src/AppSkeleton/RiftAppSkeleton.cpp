@@ -315,18 +315,6 @@ void RiftAppSkeleton::_resetGLState() const
     glFrontFace(GL_CCW);
 }
 
-void RiftAppSkeleton::resize(int w, int h)
-{
-    (void)w;
-    (void)h;
-    //m_Cfg.OGL.Header.RTSize.w = w;
-    //m_Cfg.OGL.Header.RTSize.h = h;
-
-    //const int l_DistortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_TimeWarp;
-    ///@warning this crashes the app. What are we supposed to do here???
-    //ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, l_DistortionCaps, m_EyeFov, m_EyeRenderDesc);
-}
-
 void RiftAppSkeleton::SetFBOScale(float s)
 {
     m_fboScale = s;
