@@ -26,6 +26,8 @@ public:
     AppSkeleton();
     virtual ~AppSkeleton();
 
+    void ResetAllTransformations();
+
 public:
     // This public section is for exposing state variables to AntTweakBar
     Scene m_scene;

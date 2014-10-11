@@ -33,8 +33,28 @@ AppSkeleton::AppSkeleton()
 , m_joystickYaw(0.0f)
 , m_mouseDeltaYaw(0.0f)
 {
+    // Add as many scenes here as you like. They will share color and depth buffers,
+    // so drawing one after the other should just result in pixel-perfect integration -
+    // provided they all do forward rendering. Per-scene deferred render passes will
+    // take a little bit more work.
+    m_scenes.push_back(&m_scene);
+    m_scenes.push_back(&m_hydraScene);
+    m_scenes.push_back(&m_ovrScene);
+
+    // Give this scene a pointer to get live Hydra data for display
+    m_hydraScene.SetFlyingMousePointer(&m_fm);
+
+    ResetAllTransformations();
 }
 
 AppSkeleton::~AppSkeleton()
 {
+}
+
+void AppSkeleton::ResetAllTransformations()
+{
+    m_chassisPos.x = 0.0f;
+    m_chassisPos.y = 1.27f; // my sitting height
+    m_chassisPos.z = 1.0f;
+    m_chassisYaw = 0.0f;
 }

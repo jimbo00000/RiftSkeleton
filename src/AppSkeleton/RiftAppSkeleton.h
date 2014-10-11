@@ -32,7 +32,6 @@ public:
     void exitVR();
 
     void RecenterPose();
-    void ResetAllTransformations();
     void SetChassisPosition(glm::vec3 p) { m_chassisPos = p; }
     ovrSizei getHmdResolution() const;
     ovrVector2i getHmdWindowPos() const;
