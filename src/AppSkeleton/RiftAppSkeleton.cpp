@@ -56,6 +56,11 @@ ovrVector2i RiftAppSkeleton::getHmdWindowPos() const
     return m_Hmd->WindowsPos;
 }
 
+glm::ivec2 RiftAppSkeleton::getRTSize() const
+{
+    const ovrSizei& sz = m_Cfg.OGL.Header.RTSize;
+    return glm::ivec2(sz.w, sz.h);
+}
 
 ///@brief Set this up early so we can get the HMD's display dimensions to create a window.
 void RiftAppSkeleton::initHMD()
@@ -394,11 +399,10 @@ void RiftAppSkeleton::_drawSceneMono() const
     lookat = glm::rotate(lookat, m_chassisYaw, glm::vec3(0.0f, 1.0f, 0.0f));
     lookat = glm::translate(lookat, -EyePos);
 
-    const int w = m_Cfg.OGL.Header.RTSize.w;
-    const int h = m_Cfg.OGL.Header.RTSize.h;
+    const glm::ivec2 vp = getRTSize();
     const glm::mat4 persp = glm::perspective(
         90.0f,
-        static_cast<float>(w)/static_cast<float>(h),
+        static_cast<float>(vp.x)/static_cast<float>(vp.y),
         0.004f,
         500.0f);
 
