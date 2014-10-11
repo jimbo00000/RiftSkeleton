@@ -615,7 +615,7 @@ void RiftAppSkeleton::display_stereo_undistorted() //const
             0.01f, 10000.0f, true);
 
         //m_EyeRenderDesc[eye].DistortedViewport;
-        OVR::Vector3f EyePos = m_chassisPos;
+        OVR::Vector3f EyePos = OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z);
         OVR::Matrix4f view = OVR::Matrix4f(orientation.Inverted())
             * OVR::Matrix4f::RotationY(m_chassisYaw)
             * OVR::Matrix4f::Translation(-EyePos);
@@ -697,7 +697,7 @@ void RiftAppSkeleton::display_sdk() //const
             OVR::Matrix4f::Translation(-OVR::Vector3f(m_EyeRenderDesc[eye].ViewAdjust)) // not sure why negative...
             * eyePoseMatrix.Inverted()
             * OVR::Matrix4f::RotationY(m_chassisYaw)
-            * OVR::Matrix4f::Translation(-OVR::Vector3f(m_chassisPos));
+            * OVR::Matrix4f::Translation(-OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
 
         _resetGLState();
 
@@ -758,7 +758,7 @@ void RiftAppSkeleton::display_client() //const
             OVR::Matrix4f::Translation(m_EyeRenderDesc[eye].ViewAdjust)
             * eyePoseMatrix.Inverted()
             * OVR::Matrix4f::RotationY(m_chassisYaw)
-            * OVR::Matrix4f::Translation(-OVR::Vector3f(m_chassisPos));
+            * OVR::Matrix4f::Translation(-OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
 
         _resetGLState();
 

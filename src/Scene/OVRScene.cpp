@@ -174,7 +174,10 @@ void OVRScene::RenderForOneEye(const float* pMview, const float* pPersp) const
 
         // Construct the matrix as the reverse of the one in RiftAppSkeleton::display_client
         if (m_pPos != NULL)
-            camMtx *= OVR::Matrix4f::Translation(OVR::Vector3f(*m_pPos));
+        {
+            const glm::vec3& pos = *m_pPos;
+            camMtx *= OVR::Matrix4f::Translation(OVR::Vector3f(pos.x, pos.y, pos.z));
+        }
         if (m_pYaw != NULL)
             camMtx *= OVR::Matrix4f::RotationY(-*m_pYaw);
 

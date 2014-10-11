@@ -38,7 +38,7 @@ public:
 
     void RecenterPose();
     void ResetAllTransformations();
-    void SetChassisPosition(ovrVector3f p) { m_chassisPos = p; }
+    void SetChassisPosition(glm::vec3 p) { m_chassisPos = p; }
     ovrSizei getHmdResolution() const;
     ovrVector2i getHmdWindowPos() const;
     GLuint getRenderBufferTex() const { return m_renderBuffer.tex; }
@@ -110,7 +110,7 @@ protected:
     ShaderWithVariables m_presentDistMeshL;
     ShaderWithVariables m_presentDistMeshR;
 
-    ovrVector3f m_chassisPos;
+    glm::vec3 m_chassisPos;
     float m_chassisYaw;
 
     VirtualTrackball m_hyif;
