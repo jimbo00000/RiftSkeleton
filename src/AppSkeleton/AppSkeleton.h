@@ -27,6 +27,7 @@ public:
     virtual ~AppSkeleton();
 
     void ResetAllTransformations();
+    void _DrawScenes(const float* pMview, const float* pPersp) const;
 
 public:
     // This public section is for exposing state variables to AntTweakBar

@@ -450,20 +450,6 @@ void RiftAppSkeleton::timestep(float dt)
     m_hyif.updateHydraData(m_fm, 1.0f);
 }
 
-void RiftAppSkeleton::_DrawScenes(const float* pMview, const float* pPersp) const
-{
-    for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
-        it != m_scenes.end();
-        ++it)
-    {
-        const IScene* pScene = *it;
-        if (pScene != NULL)
-        {
-            pScene->RenderForOneEye(pMview, pPersp);
-        }
-    }
-}
-
 void RiftAppSkeleton::_drawSceneMono() const
 {
     _resetGLState();

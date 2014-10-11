@@ -59,3 +59,17 @@ void AppSkeleton::ResetAllTransformations()
     m_chassisPos.z = 1.0f;
     m_chassisYaw = 0.0f;
 }
+
+void AppSkeleton::_DrawScenes(const float* pMview, const float* pPersp) const
+{
+    for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
+        it != m_scenes.end();
+        ++it)
+    {
+        const IScene* pScene = *it;
+        if (pScene != NULL)
+        {
+            pScene->RenderForOneEye(pMview, pPersp);
+        }
+    }
+}
