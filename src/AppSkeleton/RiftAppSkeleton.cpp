@@ -411,10 +411,8 @@ void RiftAppSkeleton::_drawSceneMono() const
 
 void RiftAppSkeleton::display_raw() const
 {
-    const int w = m_Cfg.OGL.Header.RTSize.w;
-    const int h = m_Cfg.OGL.Header.RTSize.h;
-    glViewport(0, 0, w, h);
-
+    const glm::ivec2 vp = getRTSize();
+    glViewport(0, 0, vp.x, vp.y);
     _drawSceneMono();
 }
 
