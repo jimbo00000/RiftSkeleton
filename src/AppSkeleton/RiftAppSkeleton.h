@@ -26,7 +26,6 @@ public:
     RiftAppSkeleton();
     virtual ~RiftAppSkeleton();
 
-    void initGL();
     void initHMD();
     void initVR();
     void exitVR();
@@ -71,7 +70,6 @@ public:
 #endif
 
 protected:
-    void _initPresentFbo();
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);
     void _resetGLState() const;
     void _drawSceneMono() const;

@@ -27,6 +27,7 @@ public:
     virtual ~AppSkeleton();
 
     void ResetAllTransformations();
+    void initGL();
     void _DrawScenes(const float* pMview, const float* pPersp) const;
 
 public:
@@ -36,6 +37,8 @@ public:
     OVRScene m_ovrScene;
 
 protected:
+    void _initPresentFbo();
+
     std::vector<IScene*> m_scenes;
     FBO m_renderBuffer;
     float m_fboScale;

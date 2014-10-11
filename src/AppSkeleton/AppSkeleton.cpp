@@ -60,6 +60,79 @@ void AppSkeleton::ResetAllTransformations()
     m_chassisYaw = 0.0f;
 }
 
+
+void AppSkeleton::initGL()
+{
+    for (std::vector<IScene*>::iterator it = m_scenes.begin();
+        it != m_scenes.end();
+        ++it)
+    {
+        IScene* pScene = *it;
+        if (pScene != NULL)
+        {
+            pScene->initGL();
+        }
+    }
+
+    m_presentFbo.initProgram("presentfbo");
+    _initPresentFbo();
+    m_presentDistMeshL.initProgram("presentmesh");
+    m_presentDistMeshR.initProgram("presentmesh");
+    // Init the present mesh VAO *after* initVR, which creates the mesh
+
+    // sensible initial value?
+    allocateFBO(m_renderBuffer, 800, 600);
+    m_fm.Init();
+}
+
+
+void AppSkeleton::_initPresentFbo()
+{
+    m_presentFbo.bindVAO();
+
+    const float verts[] = {
+        -1, -1,
+        1, -1,
+        1, 1,
+        -1, 1
+    };
+    const float texs[] = {
+        0, 0,
+        1, 0,
+        1, 1,
+        0, 1,
+    };
+
+    GLuint vertVbo = 0;
+    glGenBuffers(1, &vertVbo);
+    m_presentFbo.AddVbo("vPosition", vertVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vertVbo);
+    glBufferData(GL_ARRAY_BUFFER, 4*2*sizeof(GLfloat), verts, GL_STATIC_DRAW);
+    glVertexAttribPointer(m_presentFbo.GetAttrLoc("vPosition"), 2, GL_FLOAT, GL_FALSE, 0, NULL);
+
+    GLuint texVbo = 0;
+    glGenBuffers(1, &texVbo);
+    m_presentFbo.AddVbo("vTex", texVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, texVbo);
+    glBufferData(GL_ARRAY_BUFFER, 4*2*sizeof(GLfloat), texs, GL_STATIC_DRAW);
+    glVertexAttribPointer(m_presentFbo.GetAttrLoc("vTex"), 2, GL_FLOAT, GL_FALSE, 0, NULL);
+
+    glEnableVertexAttribArray(m_presentFbo.GetAttrLoc("vPosition"));
+    glEnableVertexAttribArray(m_presentFbo.GetAttrLoc("vTex"));
+
+    glUseProgram(m_presentFbo.prog());
+    {
+        glm::mat4 id(1.0f);
+        glUniformMatrix4fv(m_presentFbo.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(id));
+        glUniformMatrix4fv(m_presentFbo.GetUniLoc("prmtx"), 1, false, glm::value_ptr(id));
+    }
+    glUseProgram(0);
+
+    glBindVertexArray(0);
+}
+
+
+
 void AppSkeleton::_DrawScenes(const float* pMview, const float* pPersp) const
 {
     for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
