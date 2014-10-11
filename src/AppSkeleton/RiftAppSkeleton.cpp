@@ -99,11 +99,7 @@ void RiftAppSkeleton::initVR()
         }
     }
 
-    // The RTSize fields are used by all rendering paths
-    ovrSizei l_ClientSize;
-    l_ClientSize = getHmdResolution();
-    m_Cfg.OGL.Header.RTSize.w = l_ClientSize.w;
-    m_Cfg.OGL.Header.RTSize.h = l_ClientSize.h;
+    m_Cfg.OGL.Header.RTSize = getHmdResolution();
 
     ///@todo Do we need to choose here?
     ConfigureSDKRendering();
