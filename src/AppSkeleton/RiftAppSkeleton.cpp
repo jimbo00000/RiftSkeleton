@@ -386,20 +386,17 @@ void RiftAppSkeleton::_drawSceneMono() const
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const int w = m_Cfg.OGL.Header.RTSize.w;
-    const int h = m_Cfg.OGL.Header.RTSize.h;
-
     const glm::vec3 EyePos(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z);
     const glm::vec3 LookVec(0.0f, 0.0f, -1.0f);
     const glm::vec3 up(0.0f, 1.0f, 0.0f);
-
     glm::mat4 lookat = glm::lookAt(EyePos, EyePos + LookVec, up);
-
     lookat = glm::translate(lookat, EyePos);
     lookat = glm::rotate(lookat, m_chassisYaw, glm::vec3(0.0f, 1.0f, 0.0f));
     lookat = glm::translate(lookat, -EyePos);
 
-    glm::mat4 persp = glm::perspective(
+    const int w = m_Cfg.OGL.Header.RTSize.w;
+    const int h = m_Cfg.OGL.Header.RTSize.h;
+    const glm::mat4 persp = glm::perspective(
         90.0f,
         static_cast<float>(w)/static_cast<float>(h),
         0.004f,
