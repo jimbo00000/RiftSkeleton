@@ -68,6 +68,11 @@ void AppSkeleton::ResetAllTransformations()
     m_chassisYaw = 0.0f;
 }
 
+glm::mat4 AppSkeleton::getUserViewMatrix() const
+{
+    return glm::rotate(glm::mat4(1.0f), -m_chassisYaw, glm::vec3(0,1,0));
+}
+
 void AppSkeleton::initGL()
 {
     for (std::vector<IScene*>::iterator it = m_scenes.begin();

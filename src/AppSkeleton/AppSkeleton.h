@@ -50,6 +50,7 @@ protected:
     void _resetGLState() const;
     void _drawSceneMono() const;
     virtual glm::ivec2 getRTSize() const { return m_rtSize; }
+    virtual glm::mat4 getUserViewMatrix() const;
 
     std::vector<IScene*> m_scenes;
     FBO m_renderBuffer;

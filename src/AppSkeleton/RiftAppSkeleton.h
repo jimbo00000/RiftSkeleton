@@ -62,7 +62,7 @@ public:
 protected:
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);
     virtual glm::ivec2 getRTSize() const;
-    glm::mat4 getUserViewMatrix() const;
+    virtual glm::mat4 getUserViewMatrix() const;
 
     ovrHmd m_Hmd;
     ovrFovPort m_EyeFov[2];
