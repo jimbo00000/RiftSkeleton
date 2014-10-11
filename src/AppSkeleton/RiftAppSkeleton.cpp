@@ -27,7 +27,6 @@ RiftAppSkeleton::RiftAppSkeleton()
 
 RiftAppSkeleton::~RiftAppSkeleton()
 {
-    m_fm.Destroy();
 }
 
 void RiftAppSkeleton::RecenterPose()

@@ -49,6 +49,7 @@ AppSkeleton::AppSkeleton()
 
 AppSkeleton::~AppSkeleton()
 {
+    m_fm.Destroy();
 }
 
 void AppSkeleton::ResetAllTransformations()
