@@ -62,6 +62,15 @@ glm::ivec2 RiftAppSkeleton::getRTSize() const
     return glm::ivec2(sz.w, sz.h);
 }
 
+glm::mat4 RiftAppSkeleton::getUserViewMatrix() const
+{
+    const OVR::Matrix4f rotmtx = 
+          OVR::Matrix4f::RotationY(-m_chassisYaw)
+        * OVR::Matrix4f(m_eyeOri);
+
+    return glm::make_mat4(&rotmtx.Transposed().M[0][0]);
+}
+
 ///@brief Set this up early so we can get the HMD's display dimensions to create a window.
 void RiftAppSkeleton::initHMD()
 {
@@ -335,19 +344,11 @@ void RiftAppSkeleton::timestep(float dt)
 #endif
 
     glm::vec3 move_dt = (m_keyboardMove + m_joystickMove + m_mouseMove + hydraMove) * dt;
-    ovrVector3f kbm;
-    kbm.x = move_dt.x;
-    kbm.y = move_dt.y;
-    kbm.z = move_dt.z;
 
     // Move in the direction the viewer is facing.
-    const OVR::Matrix4f rotmtx = 
-          OVR::Matrix4f::RotationY(-m_chassisYaw)
-        * OVR::Matrix4f(m_eyeOri);
-    const OVR::Vector3f kbmVec = rotmtx.Transform(OVR::Vector3f(kbm));
-    m_chassisPos.x += kbmVec.x;
-    m_chassisPos.y += kbmVec.y;
-    m_chassisPos.z += kbmVec.z;
+    const glm::mat4 tx = getUserViewMatrix();
+    const glm::vec4 mv4 = tx * glm::vec4(move_dt, 0.0f);
+    m_chassisPos += glm::vec3(mv4);
 
     m_chassisYaw += (m_keyboardYaw + m_joystickYaw + m_mouseDeltaYaw) * dt;
 
