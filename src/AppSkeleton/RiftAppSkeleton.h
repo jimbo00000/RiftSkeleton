@@ -59,13 +59,6 @@ public:
     void display_client();// const;
     void timestep(float dt);
 
-
-    float GetFBOScale() const { return m_fboScale; }
-    void SetFBOScale(float s);
-#ifdef USE_ANTTWEAKBAR
-    float* GetFBOScalePointer() { return &m_fboScale; }
-#endif
-
 protected:
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);
     virtual glm::ivec2 getRTSize() const;

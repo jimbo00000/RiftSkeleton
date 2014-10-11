@@ -304,13 +304,6 @@ void RiftAppSkeleton::CheckForTapToDismissHealthAndSafetyWarning() const
     }
 }
 
-void RiftAppSkeleton::SetFBOScale(float s)
-{
-    m_fboScale = s;
-    m_fboScale = std::max(0.05f, m_fboScale);
-    m_fboScale = std::min(1.0f, m_fboScale);
-}
-
 void RiftAppSkeleton::timestep(float dt)
 {
     for (std::vector<IScene*>::iterator it = m_scenes.begin();

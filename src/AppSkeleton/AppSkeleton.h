@@ -39,6 +39,12 @@ public:
     HydraScene m_hydraScene;
     OVRScene m_ovrScene;
 
+    float GetFBOScale() const { return m_fboScale; }
+    void SetFBOScale(float s);
+#ifdef USE_ANTTWEAKBAR
+    float* GetFBOScalePointer() { return &m_fboScale; }
+#endif
+
 protected:
     void _initPresentFbo();
     void _resetGLState() const;

@@ -53,6 +53,13 @@ AppSkeleton::~AppSkeleton()
     m_fm.Destroy();
 }
 
+void AppSkeleton::SetFBOScale(float s)
+{
+    m_fboScale = s;
+    m_fboScale = std::max(0.05f, m_fboScale);
+    m_fboScale = std::min(1.0f, m_fboScale);
+}
+
 void AppSkeleton::ResetAllTransformations()
 {
     m_chassisPos.x = 0.0f;
@@ -60,7 +67,6 @@ void AppSkeleton::ResetAllTransformations()
     m_chassisPos.z = 1.0f;
     m_chassisYaw = 0.0f;
 }
-
 
 void AppSkeleton::initGL()
 {
