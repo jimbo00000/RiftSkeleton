@@ -36,7 +36,12 @@
 #include "FPSTimer.h"
 #include "Logger.h"
 
+#ifdef USE_OCULUSSDK
 RiftAppSkeleton g_app;
+#else
+AppSkeleton g_app;
+#endif
+
 RenderingMode g_renderMode;
 Timer g_timer;
 FPSTimer g_fps;
@@ -522,6 +527,7 @@ void displayToHMD()
         glfwSwapBuffers(g_pHMDWindow);
         break;
 
+#ifdef USE_OCULUSSDK
     case RenderingMode::SideBySide_Undistorted:
         g_app.display_stereo_undistorted();
         glfwSwapBuffers(g_pHMDWindow);
@@ -536,6 +542,7 @@ void displayToHMD()
         g_app.display_client();
         glfwSwapBuffers(g_pHMDWindow);
         break;
+#endif //USE_OCULUSSDK
 
     default:
         LOG_ERROR("Unknown display type: %d", g_renderMode.outputType);
@@ -602,11 +609,6 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    // This call assumes the Rift display is in extended mode.
-    g_app.initHMD();
-    const ovrSizei sz = g_app.getHmdResolution();
-    const ovrVector2i pos = g_app.getHmdWindowPos();
-
 #ifdef USE_CORE_CONTEXT
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 #if defined(_MACOS)
@@ -619,6 +621,12 @@ int main(void)
 #endif
 
     glfwWindowHint(GLFW_SAMPLES, 0);
+
+#ifdef USE_OCULUSSDK
+    // This call assumes the Rift display is in extended mode.
+    g_app.initHMD();
+    const ovrSizei sz = g_app.getHmdResolution();
+    const ovrVector2i pos = g_app.getHmdWindowPos();
     l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
 
     if (g_app.UsingDebugHmd() == false)
@@ -626,6 +634,9 @@ int main(void)
         glfwSetWindowPos(l_Window, pos.x, pos.y);
         g_renderMode.outputType = RenderingMode::OVR_SDK;
     }
+#else
+    l_Window = glfwCreateWindow(800, 600, "GLFW Oculus Rift Test", NULL, NULL);
+#endif //USE_OCULUSSDK
 
     if (!l_Window)
     {
@@ -654,11 +665,13 @@ int main(void)
     printGLContextInfo(l_Window);
 
     // Required for SDK rendering (to do the buffer swap on its own)
-#if defined(_WIN32)
+#ifdef USE_OCULUSSDK
+  #if defined(_WIN32)
     g_app.setWindow(glfwGetWin32Window(l_Window));
-#elif defined(__linux__)
+  #elif defined(__linux__)
     g_app.setWindow(glfwGetX11Window(l_Window), glfwGetX11Display());
-#endif
+  #endif
+#endif //USE_OCULUSSDK
 
 #ifdef USE_ANTTWEAKBAR
   #ifdef USE_CORE_CONTEXT

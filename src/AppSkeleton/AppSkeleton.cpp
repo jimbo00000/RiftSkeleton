@@ -26,7 +26,7 @@ AppSkeleton::AppSkeleton()
 , m_chassisYaw(0.0f)
 , m_fm()
 , m_hyif()
-, m_rtSize(640,480)
+, m_rtSize(800, 600)
 , m_keyboardMove(0.0f)
 , m_joystickMove(0.0f)
 , m_mouseMove(0.0f)
@@ -40,7 +40,9 @@ AppSkeleton::AppSkeleton()
     // take a little bit more work.
     m_scenes.push_back(&m_scene);
     m_scenes.push_back(&m_hydraScene);
+#ifdef USE_OCULUSSDK
     m_scenes.push_back(&m_ovrScene);
+#endif
 
     // Give this scene a pointer to get live Hydra data for display
     m_hydraScene.SetFlyingMousePointer(&m_fm);

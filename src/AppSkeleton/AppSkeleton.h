@@ -38,6 +38,15 @@ public:
     GLuint getRenderBufferTex() const { return m_renderBuffer.tex; }
     float GetFboScale() const { return m_fboScale; }
 
+    // These vestigial functions match the entry points in RiftAppSkeleton.
+    // Having them here is ugly, but doesn't seem as bad as a ton of #ifdefs in main.
+    void initVR() {}
+    void exitVR() {}
+    void RecenterPose() {}
+    bool UsingDebugHmd() const { return true; }
+    void DismissHealthAndSafetyWarning() const {}
+    void CheckForTapToDismissHealthAndSafetyWarning() const {}
+
 public:
     // This public section is for exposing state variables to AntTweakBar
     Scene m_scene;
