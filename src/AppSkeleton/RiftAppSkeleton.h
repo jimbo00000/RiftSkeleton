@@ -31,11 +31,8 @@ public:
     void exitVR();
 
     void RecenterPose();
-    void SetChassisPosition(glm::vec3 p) { m_chassisPos = p; }
     ovrSizei getHmdResolution() const;
     ovrVector2i getHmdWindowPos() const;
-    GLuint getRenderBufferTex() const { return m_renderBuffer.tex; }
-    float GetFboScale() const { return m_fboScale; }
     bool UsingDebugHmd() const { return m_usingDebugHmd; }
 
     int ConfigureSDKRendering();

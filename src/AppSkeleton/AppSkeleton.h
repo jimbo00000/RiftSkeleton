@@ -34,6 +34,10 @@ public:
     void timestep(float dt);
     void resize(int w, int h);
 
+    void SetChassisPosition(glm::vec3 p) { m_chassisPos = p; }
+    GLuint getRenderBufferTex() const { return m_renderBuffer.tex; }
+    float GetFboScale() const { return m_fboScale; }
+
 public:
     // This public section is for exposing state variables to AntTweakBar
     Scene m_scene;
