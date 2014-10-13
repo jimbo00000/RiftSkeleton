@@ -30,7 +30,12 @@
 #include <string.h>
 #include <sstream>
 
+#ifdef USE_OCULUSSDK
 #include "RiftAppSkeleton.h"
+#else
+#include "AppSkeleton.h"
+#endif
+
 #include "RenderingMode.h"
 #include "Timer.h"
 #include "FPSTimer.h"

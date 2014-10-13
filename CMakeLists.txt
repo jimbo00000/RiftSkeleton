@@ -269,9 +269,20 @@ FILE( GLOB_RECURSE SCENE_SOURCE_FILES
     )
 
 FILE( GLOB_RECURSE FLYINGMOUSE_SOURCE_FILES
-        src/FlyingMouse/*.cpp
-        src/FlyingMouse/*.h
+    src/FlyingMouse/*.cpp
+    src/FlyingMouse/*.h
     )
+
+# Manually exclude the OVR-dependent files from file lists.
+IF( NOT USE_OCULUSSDK )
+    MESSAGE( "Removing OVR-dependent files..." )
+
+    LIST(REMOVE_ITEM APPSKELETON_SOURCE_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/RiftAppSkeleton.cpp )
+
+    LIST(REMOVE_ITEM SCENE_SOURCE_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Scene/OVRScene.cpp )
+ENDIF()
 
 INCLUDE_DIRECTORIES("src/Util")
 INCLUDE_DIRECTORIES("src/Util/GL")

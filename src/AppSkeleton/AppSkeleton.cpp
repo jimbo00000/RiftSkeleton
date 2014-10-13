@@ -16,7 +16,9 @@
 AppSkeleton::AppSkeleton()
 : m_scene()
 , m_hydraScene()
+#ifdef USE_OCULUSSDK
 , m_ovrScene()
+#endif
 , m_scenes()
 
 , m_fboScale(1.0f)
@@ -98,8 +100,10 @@ void AppSkeleton::initGL()
     allocateFBO(m_renderBuffer, 800, 600);
     m_fm.Init();
 
+#ifdef USE_OCULUSSDK
     m_ovrScene.SetChassisPosPointer(&m_chassisPos);
     m_ovrScene.SetChassisYawPointer(&m_chassisYaw);
+#endif
 
     // Both ovrVector3f and glm::vec3 are at heart a float[3], so this works fine.
     m_fm.SetChassisPosPointer(reinterpret_cast<glm::vec3*>(&m_chassisPos));

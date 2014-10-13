@@ -15,7 +15,10 @@
 #include "FBO.h"
 #include "Scene.h"
 #include "HydraScene.h"
+
+#ifdef USE_OCULUSSDK
 #include "OVRScene.h"
+#endif
 
 #include "FlyingMouse.h"
 #include "VirtualTrackball.h"
@@ -51,7 +54,10 @@ public:
     // This public section is for exposing state variables to AntTweakBar
     Scene m_scene;
     HydraScene m_hydraScene;
+
+#ifdef USE_OCULUSSDK
     OVRScene m_ovrScene;
+#endif
 
     float GetFBOScale() const { return m_fboScale; }
     void SetFBOScale(float s);
