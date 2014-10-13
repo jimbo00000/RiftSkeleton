@@ -209,6 +209,7 @@ ELSEIF( UNIX )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Src" )
         LINK_DIRECTORIES   ( "${OCULUSSDK_ROOT}/LibOVR/Lib/Linux/Debug/x86_64" )
         ADD_DEFINITIONS( -DOVR_OS_LINUX )
+        SET( OVR_LIBS -lovr -ludev -lXinerama )
     ENDIF( USE_OCULUSSDK )
 
     IF( USE_SIXENSE )
@@ -230,19 +231,16 @@ ELSEIF( UNIX )
     ENDIF( USE_ANTTWEAKBAR )
 
     find_package(OpenGL REQUIRED)
-    find_package(GLUT REQUIRED)
-    include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
+    include_directories( ${OPENGL_INCLUDE_DIRS} )
 
     SET( PLATFORM_LIBS
-        -lovr
+        ${OVR_LIBS}
         -lGLEW
         -lGL
         -lGLU
         ${FRAMEWORK_LIBS}
         -pthread
-        -ludev
         -lrt
-        -lXinerama
         -lXrandr
         -lXxf86vm
         -lXi
