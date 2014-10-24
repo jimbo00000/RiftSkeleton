@@ -51,9 +51,9 @@ public:
     void DismissHealthAndSafetyWarning() const;
     void CheckForTapToDismissHealthAndSafetyWarning() const;
 
-    void display_stereo_undistorted();// const;
-    void display_sdk();// const;
-    void display_client();// const;
+    void display_stereo_undistorted() const;
+    void display_sdk() const;
+    void display_client() const;
 
 protected:
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);
@@ -71,7 +71,7 @@ protected:
     ovrRecti m_RenderViewports[2];
     ovrVector2f m_uvScaleOffsetOut[4];
     ovrDistortionMesh m_DistMeshes[2];
-    ovrQuatf m_eyeOri;
+    mutable ovrQuatf m_eyeOri;
 
 
 private: // Disallow copy ctor and assignment operator

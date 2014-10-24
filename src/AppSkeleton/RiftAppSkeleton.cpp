@@ -311,7 +311,7 @@ void RiftAppSkeleton::CheckForTapToDismissHealthAndSafetyWarning() const
 ///@todo Even though this function shares most of its code with client rendering,
 /// which appears to work fine, it is non-convergable. It appears that the projection
 /// matrices for each eye are too far apart? Could be modelview...
-void RiftAppSkeleton::display_stereo_undistorted() //const
+void RiftAppSkeleton::display_stereo_undistorted() const
 {
     ovrHmd hmd = m_Hmd;
     if (hmd == NULL)
@@ -381,7 +381,7 @@ void RiftAppSkeleton::display_stereo_undistorted() //const
     ovrHmd_EndFrameTiming(hmd);
 }
 
-void RiftAppSkeleton::display_sdk() //const
+void RiftAppSkeleton::display_sdk() const
 {
     ovrHmd hmd = m_Hmd;
     if (hmd == NULL)
@@ -444,7 +444,7 @@ void RiftAppSkeleton::display_sdk() //const
     glUseProgram(0);
 }
 
-void RiftAppSkeleton::display_client() //const
+void RiftAppSkeleton::display_client() const
 {
     ovrHmd hmd = m_Hmd;
     if (hmd == NULL)
