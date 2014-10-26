@@ -328,7 +328,7 @@ void RiftAppSkeleton::display_stereo_undistorted() const
     for (int eyeIndex = 0; eyeIndex < ovrEye_Count; eyeIndex++)
     {
         ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
-        ovrPosef eyePose = ovrHmd_GetEyePose(hmd, eye);
+        ovrPosef eyePose = ovrHmd_GetHmdPosePerEye(hmd, eye);
 
         const ovrGLTexture& otex = m_EyeTexture[eye];
         const ovrRecti& rvp = otex.OGL.Header.RenderViewport;
@@ -348,7 +348,7 @@ void RiftAppSkeleton::display_stereo_undistorted() const
         OVR::Matrix4f view = OVR::Matrix4f(orientation.Inverted())
             * OVR::Matrix4f::RotationY(m_chassisYaw)
             * OVR::Matrix4f::Translation(-EyePos);
-        OVR::Matrix4f eyeview = OVR::Matrix4f::Translation(m_EyeRenderDesc[eye].ViewAdjust) * view;
+        OVR::Matrix4f eyeview = OVR::Matrix4f::Translation(m_EyeRenderDesc[eye].HmdToEyeViewOffset) * view;
 
         _resetGLState();
 
@@ -402,7 +402,7 @@ void RiftAppSkeleton::display_sdk() const
     for (int eyeIndex=0; eyeIndex<ovrEye_Count; eyeIndex++)
     {
         const ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
-        const ovrPosef eyePose = ovrHmd_GetEyePose(m_Hmd, eye);
+        const ovrPosef eyePose = ovrHmd_GetHmdPosePerEye(m_Hmd, eye);
         m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
         const ovrGLTexture& otex = m_EyeTexture[eye];
@@ -423,7 +423,7 @@ void RiftAppSkeleton::display_sdk() const
             * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
 
         const OVR::Matrix4f l_ModelViewMatrix =
-            OVR::Matrix4f::Translation(-OVR::Vector3f(m_EyeRenderDesc[eye].ViewAdjust)) // not sure why negative...
+            OVR::Matrix4f::Translation(-OVR::Vector3f(m_EyeRenderDesc[eye].HmdToEyeViewOffset)) // not sure why negative...
             * eyePoseMatrix.Inverted()
             * OVR::Matrix4f::RotationY(m_chassisYaw)
             * OVR::Matrix4f::Translation(-OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
@@ -461,7 +461,7 @@ void RiftAppSkeleton::display_client() const
     for (int eyeIndex = 0; eyeIndex < ovrEye_Count; eyeIndex++)
     {
         ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
-        ovrPosef eyePose = ovrHmd_GetEyePose(hmd, eye);
+        ovrPosef eyePose = ovrHmd_GetHmdPosePerEye(hmd, eye);
         m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
         const ovrGLTexture& otex = m_EyeTexture[eye];
@@ -484,7 +484,7 @@ void RiftAppSkeleton::display_client() const
             * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
 
         OVR::Matrix4f view =
-            OVR::Matrix4f::Translation(m_EyeRenderDesc[eye].ViewAdjust)
+            OVR::Matrix4f::Translation(m_EyeRenderDesc[eye].HmdToEyeViewOffset)
             * eyePoseMatrix.Inverted()
             * OVR::Matrix4f::RotationY(m_chassisYaw)
             * OVR::Matrix4f::Translation(-OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
