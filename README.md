@@ -4,7 +4,12 @@ RiftSkeleton
 A basic OpenGL app for the Oculus VR SDK.
 
 ## Description 
-The skeleton app targets the OVR SDK v0.4.1 and provides a simple framework for developing OpenGL VR programs. Take a look at the Scene class under src/ for a basic "hello world" implementation(some simple color cubes in space).
+The skeleton app targets the OVR SDK v0.4.3 and provides a simple framework for developing OpenGL VR programs. Take a look at the Scene class under src/ for a basic "hello world" implementation(some simple color cubes in space).
+
+## Portability 
+
+ - Linux, MacOS, Windows  
+ - NVIDIA, AMD
 
 ## Features 
  - OVR SDK and Client rendering paths  
@@ -15,7 +20,3 @@ The skeleton app targets the OVR SDK v0.4.1 and provides a simple framework for 
  - Sixense SDK Hydra support  
  - Keyboard and gamepad world motion support
  - Interchangeable GLFW and SDL2 backends  
-
-## Portability 
-The app is designed to be portable across all systems targeted by the OVR SDK(Windows, Mac, Linux). Unfortunately, Linux is not yet supported by the recent versions(0.4.x) of the OVR SDK.
-
