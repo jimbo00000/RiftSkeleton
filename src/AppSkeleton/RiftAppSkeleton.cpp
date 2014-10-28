@@ -392,10 +392,22 @@ void RiftAppSkeleton::display_sdk() const
     ovrPosef renderPose[2];
     ovrTexture eyeTexture[2];
 
+    ovrVector3f e2v[2];
+    e2v[0] = m_EyeRenderDesc[0].HmdToEyeViewOffset;
+    e2v[1] = m_EyeRenderDesc[1].HmdToEyeViewOffset;
+    ovrTrackingState outHmdTrackingState;
+    ovrPosef outEyePoses[2];
+    ovrHmd_GetEyePoses(
+        hmd,
+        0,
+        e2v,
+        outEyePoses,
+        &outHmdTrackingState);
+
     for (int eyeIndex=0; eyeIndex<ovrEye_Count; eyeIndex++)
     {
         const ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
-        const ovrPosef eyePose = ovrHmd_GetHmdPosePerEye(m_Hmd, eye);
+        const ovrPosef eyePose = outEyePoses[eyeIndex];
         m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
         const ovrGLTexture& otex = m_EyeTexture[eye];
@@ -416,8 +428,7 @@ void RiftAppSkeleton::display_sdk() const
             * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
 
         const OVR::Matrix4f l_ModelViewMatrix =
-            OVR::Matrix4f::Translation(-OVR::Vector3f(m_EyeRenderDesc[eye].HmdToEyeViewOffset)) // not sure why negative...
-            * eyePoseMatrix.Inverted()
+            eyePoseMatrix.Inverted()
             * OVR::Matrix4f::RotationY(m_chassisYaw)
             * OVR::Matrix4f::Translation(-OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
 
