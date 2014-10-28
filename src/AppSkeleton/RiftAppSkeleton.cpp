@@ -439,7 +439,7 @@ void RiftAppSkeleton::display_sdk() const
 
 void RiftAppSkeleton::display_client() const
 {
-    ovrHmd hmd = m_Hmd;
+    const ovrHmd hmd = m_Hmd;
     if (hmd == NULL)
         return;
 
@@ -453,8 +453,8 @@ void RiftAppSkeleton::display_client() const
 
     for (int eyeIndex = 0; eyeIndex < ovrEye_Count; eyeIndex++)
     {
-        ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
-        ovrPosef eyePose = ovrHmd_GetHmdPosePerEye(hmd, eye);
+        const ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
+        const ovrPosef eyePose = ovrHmd_GetHmdPosePerEye(hmd, eye);
         m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
         const ovrGLTexture& otex = m_EyeTexture[eye];
@@ -465,18 +465,18 @@ void RiftAppSkeleton::display_client() const
             static_cast<int>(m_fboScale * rvp.Size.w),
             static_cast<int>(m_fboScale * rvp.Size.h));
 
-        OVR::Matrix4f proj = ovrMatrix4f_Projection(
+        const OVR::Matrix4f proj = ovrMatrix4f_Projection(
             m_EyeRenderDesc[eye].Fov,
             0.01f, 10000.0f, true);
 
         ///@todo Should we be using this variable?
         //m_EyeRenderDesc[eye].DistortedViewport;
 
-        OVR::Matrix4f eyePoseMatrix =
+        const OVR::Matrix4f eyePoseMatrix =
             OVR::Matrix4f::Translation(eyePose.Position)
             * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
 
-        OVR::Matrix4f view =
+        const OVR::Matrix4f view =
             OVR::Matrix4f::Translation(m_EyeRenderDesc[eye].HmdToEyeViewOffset)
             * eyePoseMatrix.Inverted()
             * OVR::Matrix4f::RotationY(m_chassisYaw)
