@@ -206,11 +206,6 @@ int RiftAppSkeleton::ConfigureSDKRendering()
         ovrDistortionCap_TimeWarp;
     ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, distortionCaps, m_EyeFov, m_EyeRenderDesc);
 
-    // Reset this state before rendering anything else or we get a black screen.
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glUseProgram(0);
-
     return 0;
 }
 
