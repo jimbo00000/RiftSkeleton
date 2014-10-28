@@ -451,10 +451,22 @@ void RiftAppSkeleton::display_client() const
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    ovrVector3f e2v[2];
+    e2v[0] = m_EyeRenderDesc[0].HmdToEyeViewOffset;
+    e2v[1] = m_EyeRenderDesc[1].HmdToEyeViewOffset;
+    ovrTrackingState outHmdTrackingState;
+    ovrPosef outEyePoses[2];
+    ovrHmd_GetEyePoses(
+        hmd,
+        0,
+        e2v,
+        outEyePoses,
+        &outHmdTrackingState);
+
     for (int eyeIndex = 0; eyeIndex < ovrEye_Count; eyeIndex++)
     {
         const ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
-        const ovrPosef eyePose = ovrHmd_GetHmdPosePerEye(hmd, eye);
+        const ovrPosef eyePose = outEyePoses[eyeIndex];
         m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
         const ovrGLTexture& otex = m_EyeTexture[eye];
