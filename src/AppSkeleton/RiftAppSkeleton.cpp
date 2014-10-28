@@ -260,12 +260,6 @@ int RiftAppSkeleton::ConfigureClientRendering()
             m_EyeRenderDesc[eyeNum].Fov,
             distortionCaps,
             &m_DistMeshes[eyeNum]);
-
-        ovrHmd_GetRenderScaleAndOffset(
-            m_EyeRenderDesc[eyeNum].Fov,
-            l_TextureSize,
-            m_RenderViewports[eyeNum],
-            &m_uvScaleOffsetOut[2*eyeNum]);
     }
     return 0;
 }
@@ -515,12 +509,15 @@ void RiftAppSkeleton::display_client() const
         {
             const ovrDistortionMesh& mesh = m_DistMeshes[eyeNum];
 
-            ovrVector2f uvoff =
-                m_uvScaleOffsetOut[2*eyeNum + 1];
-                //DistortionData.UVScaleOffset[eyeNum][0];
-            ovrVector2f uvscale =
-                m_uvScaleOffsetOut[2*eyeNum + 0];
-                //DistortionData.UVScaleOffset[eyeNum][1];
+            ovrVector2f uvScaleOffsetOut[2];
+            ovrHmd_GetRenderScaleAndOffset(
+                m_EyeFov[eyeNum],
+                m_EyeTexture[eyeNum].Texture.Header.TextureSize,
+                m_EyeTexture[eyeNum].OGL.Header.RenderViewport,
+                uvScaleOffsetOut );
+
+            const ovrVector2f uvscale = uvScaleOffsetOut[0];
+            const ovrVector2f uvoff = uvScaleOffsetOut[1];
 
             glUniform2f(eyeShader.GetUniLoc("EyeToSourceUVOffset"), uvoff.x, uvoff.y);
             glUniform2f(eyeShader.GetUniLoc("EyeToSourceUVScale"), uvscale.x, uvscale.y);

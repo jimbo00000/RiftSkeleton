@@ -69,7 +69,6 @@ protected:
 
     // For client rendering
     ovrRecti m_RenderViewports[2];
-    ovrVector2f m_uvScaleOffsetOut[4];
     ovrDistortionMesh m_DistMeshes[2];
     mutable ovrQuatf m_eyeOri;
 
