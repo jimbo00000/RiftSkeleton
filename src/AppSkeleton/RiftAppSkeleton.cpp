@@ -114,7 +114,7 @@ void RiftAppSkeleton::_initPresentDistMesh(ShaderWithVariables& shader, int eyeI
     // Init left and right VAOs separately
     shader.bindVAO();
 
-    const ovrDistortionMesh& mesh = m_DistMeshes[eyeIdx];
+    ovrDistortionMesh& mesh = m_DistMeshes[eyeIdx];
     GLuint vertVbo = 0;
     glGenBuffers(1, &vertVbo);
     shader.AddVbo("vPosition", vertVbo);
@@ -156,6 +156,10 @@ void RiftAppSkeleton::_initPresentDistMesh(ShaderWithVariables& shader, int eyeI
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementVbo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.IndexCount * sizeof(GLushort), &mesh.pIndexData[0], GL_STATIC_DRAW);
 
+    // We have copies of the mesh in GL, but keep a count of indices around for the GL draw call.
+    const unsigned int tmp = mesh.IndexCount;
+    ovrHmd_DestroyDistortionMesh(&mesh);
+    mesh.IndexCount = tmp;
 
     glBindVertexArray(0);
 }
