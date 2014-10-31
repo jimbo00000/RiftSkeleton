@@ -30,8 +30,8 @@ Scene::Scene()
 : m_basic()
 , m_plane()
 , m_phaseVal(0.0f)
-, m_cubeScale(1.0f)
-, m_amplitude(1.0f)
+, m_cubeScale(0.05f)
+, m_amplitude(0.01f)
 {
 }
 
@@ -158,20 +158,22 @@ void Scene::DrawColorCube() const
 /// Draw a circle of color cubes(why not)
 void Scene::_DrawBouncingCubes(const glm::mat4& modelview) const
 {
+    const glm::mat4 ringCenter = glm::translate(
+            modelview,
+            glm::vec3(0.0f, 1.0f, 0.5f));
+
     const int numCubes = 12;
     for (int i=0; i<numCubes; ++i)
     {
-        const float radius = 15.0f;
-        const float posPhase = 2.0f * (float)M_PI * (float)i / (float)numCubes;
-        const glm::vec3 cubePosition(radius * sin(posPhase), 0.0f, radius * cos(posPhase));
-
+        const float radius = 0.25f;
         const float frequency = 3.0f;
-        const float amplitude = m_amplitude;
-        float oscVal = amplitude * sin(frequency * (m_phaseVal + posPhase));
+        const float posPhase = 2.0f * (float)M_PI * (float)i / (float)numCubes;
+        const float oscVal = m_amplitude * sin(frequency * (m_phaseVal + posPhase));
 
-        glm::mat4 sinmtx = glm::translate(
-            modelview,
-            glm::vec3(cubePosition.x, oscVal, cubePosition.z));
+        glm::mat4 sinmtx = glm::rotate(ringCenter, posPhase, glm::vec3(0.0f, 1.0f, 0.0f));
+        sinmtx = glm::translate(
+            sinmtx,
+            glm::vec3(0.0f, oscVal, radius));
         sinmtx = glm::scale(sinmtx, glm::vec3(m_cubeScale));
 
         glUniformMatrix4fv(m_basic.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(sinmtx));
