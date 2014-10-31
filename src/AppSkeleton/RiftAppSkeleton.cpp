@@ -421,7 +421,7 @@ void RiftAppSkeleton::display_sdk() const
 
         // Get Projection and ModelView matrici from the device...
         const OVR::Matrix4f l_ProjectionMatrix = ovrMatrix4f_Projection(
-            m_EyeRenderDesc[eye].Fov, 0.3f, 100.0f, true);
+            m_EyeRenderDesc[eye].Fov, 0.01f, 100.0f, true);
 
         const OVR::Matrix4f eyePoseMatrix =
             OVR::Matrix4f::Translation(eyePose.Position)
