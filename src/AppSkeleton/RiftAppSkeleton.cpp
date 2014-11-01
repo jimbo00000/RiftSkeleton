@@ -417,10 +417,10 @@ void RiftAppSkeleton::display_sdk() const
         const ovrGLTexture& otex = m_EyeTexture[e];
         const ovrRecti& rvp = otex.OGL.Header.RenderViewport;
         glViewport(
-            rvp.Pos.x,
-            rvp.Pos.y,
-            rvp.Size.w,
-            rvp.Size.h
+            static_cast<int>(m_fboScale * rvp.Pos.x),
+            static_cast<int>(m_fboScale * rvp.Pos.y),
+            static_cast<int>(m_fboScale * rvp.Size.w),
+            static_cast<int>(m_fboScale * rvp.Size.h)
             );
 
         const OVR::Matrix4f l_ProjectionMatrix = ovrMatrix4f_Projection(
@@ -441,6 +441,15 @@ void RiftAppSkeleton::display_sdk() const
     }
     unbindFBO();
 
+    // Inform SDK of downscaled texture target size(performance scaling)
+    for (int i=0; i<ovrEye_Count; ++i)
+    {
+        const ovrSizei& ts = m_EyeTexture[i].Texture.Header.TextureSize;
+        ovrRecti& rr = eyeTexture[i].Header.RenderViewport;
+        rr.Size.w = static_cast<int>(static_cast<float>(ts.w/2) * m_fboScale);
+        rr.Size.h = static_cast<int>(static_cast<float>(ts.h) * m_fboScale);
+        rr.Pos.x = i * rr.Size.w;
+    }
     ovrHmd_EndFrame(m_Hmd, renderPose, eyeTexture);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
