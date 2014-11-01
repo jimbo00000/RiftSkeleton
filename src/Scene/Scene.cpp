@@ -156,11 +156,12 @@ void Scene::DrawColorCube() const
 }
 
 /// Draw a circle of color cubes(why not)
-void Scene::_DrawBouncingCubes(const glm::mat4& modelview) const
+void Scene::_DrawBouncingCubes(
+    const glm::mat4& modelview,
+    glm::vec3 center,
+    float scale) const
 {
-    const glm::mat4 ringCenter = glm::translate(
-            modelview,
-            glm::vec3(0.0f, 1.0f, 0.5f));
+    const glm::mat4 ringCenter = glm::translate(modelview, center);
 
     const int numCubes = 12;
     for (int i=0; i<numCubes; ++i)
@@ -174,7 +175,7 @@ void Scene::_DrawBouncingCubes(const glm::mat4& modelview) const
         sinmtx = glm::translate(
             sinmtx,
             glm::vec3(0.0f, oscVal, radius));
-        sinmtx = glm::scale(sinmtx, glm::vec3(m_cubeScale));
+        sinmtx = glm::scale(sinmtx, glm::vec3(scale));
 
         glUniformMatrix4fv(m_basic.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(sinmtx));
         DrawColorCube();
@@ -229,7 +230,7 @@ void Scene::DrawScene(
         glUniformMatrix4fv(m_basic.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(modelview));
         glUniformMatrix4fv(m_basic.GetUniLoc("prmtx"), 1, false, glm::value_ptr(projection));
 
-        _DrawBouncingCubes(modelview);
+        _DrawBouncingCubes(modelview, glm::vec3(0.0f, 1.0f, 0.5f), 0.05f);
 
         (void)object;
 #if 0

@@ -40,7 +40,10 @@ protected:
     void _InitCubeAttributes();
     void _InitPlaneAttributes();
 
-    void _DrawBouncingCubes(const glm::mat4& modelview) const;
+    void _DrawBouncingCubes(
+        const glm::mat4& modelview,
+        glm::vec3 center,
+        float scale) const;
     void _DrawScenePlanes(const glm::mat4& modelview) const;
 
     ShaderWithVariables m_basic;
