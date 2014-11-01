@@ -159,6 +159,7 @@ void Scene::DrawColorCube() const
 void Scene::_DrawBouncingCubes(
     const glm::mat4& modelview,
     glm::vec3 center,
+    float radius,
     float scale) const
 {
     const glm::mat4 ringCenter = glm::translate(modelview, center);
@@ -166,7 +167,6 @@ void Scene::_DrawBouncingCubes(
     const int numCubes = 12;
     for (int i=0; i<numCubes; ++i)
     {
-        const float radius = 0.25f;
         const float frequency = 3.0f;
         const float posPhase = 2.0f * (float)M_PI * (float)i / (float)numCubes;
         const float oscVal = m_amplitude * sin(frequency * (m_phaseVal + posPhase));
@@ -230,7 +230,8 @@ void Scene::DrawScene(
         glUniformMatrix4fv(m_basic.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(modelview));
         glUniformMatrix4fv(m_basic.GetUniLoc("prmtx"), 1, false, glm::value_ptr(projection));
 
-        _DrawBouncingCubes(modelview, glm::vec3(0.0f, 1.0f, 0.5f), 0.05f);
+        _DrawBouncingCubes(modelview, glm::vec3(0.0f, 1.0f, 0.5f), 0.25f, 0.05f);
+        _DrawBouncingCubes(modelview, glm::vec3(0.0f, 0.0f, 0.5f), 1.5f, 0.5f);
 
         (void)object;
 #if 0

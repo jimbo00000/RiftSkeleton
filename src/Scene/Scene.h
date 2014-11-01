@@ -43,6 +43,7 @@ protected:
     void _DrawBouncingCubes(
         const glm::mat4& modelview,
         glm::vec3 center,
+        float radius,
         float scale) const;
     void _DrawScenePlanes(const glm::mat4& modelview) const;
 
