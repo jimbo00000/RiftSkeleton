@@ -207,7 +207,8 @@ int RiftAppSkeleton::ConfigureSDKRendering()
 
     const int distortionCaps =
         ovrDistortionCap_Chromatic |
-        ovrDistortionCap_TimeWarp;
+        ovrDistortionCap_TimeWarp |
+        ovrDistortionCap_Vignette;
     ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, distortionCaps, m_EyeFov, m_EyeRenderDesc);
 
     return 0;
@@ -477,7 +478,7 @@ void RiftAppSkeleton::display_client() const
     for (int eyeIndex = 0; eyeIndex < ovrEye_Count; eyeIndex++)
     {
         const ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
-        const ovrPosef eyePose = outEyePoses[eyeIndex];
+        const ovrPosef eyePose = outEyePoses[eye];
         m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
         const ovrGLTexture& otex = m_EyeTexture[eye];
@@ -500,8 +501,7 @@ void RiftAppSkeleton::display_client() const
             * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
 
         const OVR::Matrix4f view =
-            OVR::Matrix4f::Translation(m_EyeRenderDesc[eye].HmdToEyeViewOffset)
-            * eyePoseMatrix.Inverted()
+            eyePoseMatrix.Inverted()
             * OVR::Matrix4f::RotationY(m_chassisYaw)
             * OVR::Matrix4f::Translation(-OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
 
