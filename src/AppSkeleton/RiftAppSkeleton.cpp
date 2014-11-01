@@ -407,11 +407,11 @@ void RiftAppSkeleton::display_sdk() const
 
     for (int eyeIndex=0; eyeIndex<ovrEye_Count; eyeIndex++)
     {
-        const ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
-        const ovrPosef eyePose = outEyePoses[eyeIndex];
+        const ovrEyeType e = hmd->EyeRenderOrder[eyeIndex];
+        const ovrPosef eyePose = outEyePoses[e];
         m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
-        const ovrGLTexture& otex = m_EyeTexture[eye];
+        const ovrGLTexture& otex = m_EyeTexture[e];
         const ovrRecti& rvp = otex.OGL.Header.RenderViewport;
         glViewport(
             rvp.Pos.x,
@@ -422,7 +422,7 @@ void RiftAppSkeleton::display_sdk() const
 
         // Get Projection and ModelView matrici from the device...
         const OVR::Matrix4f l_ProjectionMatrix = ovrMatrix4f_Projection(
-            m_EyeRenderDesc[eye].Fov, 0.01f, 100.0f, true);
+            m_EyeRenderDesc[e].Fov, 0.01f, 100.0f, true);
 
         const OVR::Matrix4f eyePoseMatrix =
             OVR::Matrix4f::Translation(eyePose.Position)
@@ -437,8 +437,8 @@ void RiftAppSkeleton::display_sdk() const
 
         _DrawScenes(&l_ModelViewMatrix.Transposed().M[0][0], &l_ProjectionMatrix.Transposed().M[0][0]);
 
-        renderPose[eyeIndex] = eyePose;
-        eyeTexture[eyeIndex] = m_EyeTexture[eye].Texture;
+        renderPose[e] = eyePose;
+        eyeTexture[e] = m_EyeTexture[e].Texture;
     }
     unbindFBO();
 
