@@ -389,27 +389,30 @@ void RiftAppSkeleton::display_sdk() const
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // For passing to EndFrame once rendering is done
-    ovrPosef renderPose[2];
-    ovrTexture eyeTexture[2];
-
-    ovrVector3f e2v[2];
-    e2v[0] = m_EyeRenderDesc[0].HmdToEyeViewOffset;
-    e2v[1] = m_EyeRenderDesc[1].HmdToEyeViewOffset;
+    ovrVector3f e2v[2] = {
+        m_EyeRenderDesc[0].HmdToEyeViewOffset,
+        m_EyeRenderDesc[1].HmdToEyeViewOffset,
+    };
     ovrTrackingState outHmdTrackingState;
     ovrPosef outEyePoses[2];
     ovrHmd_GetEyePoses(
         hmd,
         0,
-        e2v,
+        e2v, // could this parameter be const?
         outEyePoses,
         &outHmdTrackingState);
 
+    // For passing to EndFrame once rendering is done
+    ovrPosef renderPose[2];
+    ovrTexture eyeTexture[2];
     for (int eyeIndex=0; eyeIndex<ovrEye_Count; eyeIndex++)
     {
         const ovrEyeType e = hmd->EyeRenderOrder[eyeIndex];
+
         const ovrPosef eyePose = outEyePoses[e];
-        m_eyeOri = eyePose.Orientation; // cache this for movement direction
+        renderPose[e] = eyePose;
+        eyeTexture[e] = m_EyeTexture[e].Texture;
+        m_eyeOri = eyePose.Orientation; // cache this for chassis movement direction
 
         const ovrGLTexture& otex = m_EyeTexture[e];
         const ovrRecti& rvp = otex.OGL.Header.RenderViewport;
@@ -420,7 +423,6 @@ void RiftAppSkeleton::display_sdk() const
             rvp.Size.h
             );
 
-        // Get Projection and ModelView matrici from the device...
         const OVR::Matrix4f l_ProjectionMatrix = ovrMatrix4f_Projection(
             m_EyeRenderDesc[e].Fov, 0.01f, 100.0f, true);
 
@@ -436,9 +438,6 @@ void RiftAppSkeleton::display_sdk() const
         _resetGLState();
 
         _DrawScenes(&l_ModelViewMatrix.Transposed().M[0][0], &l_ProjectionMatrix.Transposed().M[0][0]);
-
-        renderPose[e] = eyePose;
-        eyeTexture[e] = m_EyeTexture[e].Texture;
     }
     unbindFBO();
 
