@@ -21,6 +21,7 @@
 RiftAppSkeleton::RiftAppSkeleton()
 : m_Hmd(NULL)
 , m_usingDebugHmd(false)
+, m_directHmdMode(true)
 {
     m_eyeOri = OVR::Quatf();
 }
@@ -81,6 +82,15 @@ void RiftAppSkeleton::initHMD()
     {
         m_Hmd = ovrHmd_CreateDebug(ovrHmd_DK1);
         m_usingDebugHmd = true;
+    }
+
+    ///@todo Why does ovrHmd_GetEnabledCaps always return 0 when querying the caps
+    /// through the field in ovrHmd appears to work correctly?
+    //const unsigned int caps = ovrHmd_GetEnabledCaps(m_Hmd);
+    const unsigned int caps = m_Hmd->HmdCaps;
+    if ((caps & ovrHmdCap_ExtendDesktop) != 0)
+    {
+        m_directHmdMode = false;
     }
 
     m_ovrScene.SetHmdPointer(m_Hmd);

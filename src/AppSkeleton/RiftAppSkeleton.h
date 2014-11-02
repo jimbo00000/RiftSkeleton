@@ -34,6 +34,8 @@ public:
     ovrSizei getHmdResolution() const;
     ovrVector2i getHmdWindowPos() const;
     bool UsingDebugHmd() const { return m_usingDebugHmd; }
+    bool UsingDirectMode() const { return m_directHmdMode; }
+    void AttachToWindow(void* pWindow) { ovrHmd_AttachToWindow(m_Hmd, pWindow, nullptr, nullptr); }
 
     int ConfigureSDKRendering();
     int ConfigureClientRendering();
@@ -66,6 +68,7 @@ protected:
     ovrEyeRenderDesc m_EyeRenderDesc[2];
     ovrGLTexture m_EyeTexture[2];
     bool m_usingDebugHmd;
+    bool m_directHmdMode;
 
     // For client rendering
     ovrRecti m_RenderViewports[2];

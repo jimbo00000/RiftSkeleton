@@ -68,7 +68,7 @@ int g_joystickIdx = -1;
 
 float g_fpsSmoothingFactor = 0.02f;
 float g_fpsDeltaThreshold = 5.0f;
-bool g_dynamicallyScaleFBO = true;
+bool g_dynamicallyScaleFBO = false;
 int g_targetFPS = 100;
 
 #ifdef USE_ANTTWEAKBAR
@@ -174,12 +174,16 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
             {
                 // Clear the frame before calling all the destructors - even a few
                 // frames worth of frozen video is enough to cause discomfort!
+                ///@note This does not seem to work in Direct mode.
                 glClearColor(58.f/255.f, 110.f/255.f, 165.f/255.f, 1.f); // Win7 default desktop color
                 glClear(GL_COLOR_BUFFER_BIT);
                 glfwSwapBuffers(g_pHMDWindow);
                 glClear(GL_COLOR_BUFFER_BIT);
                 glfwSwapBuffers(g_pHMDWindow);
 
+                g_app.exitVR();
+                glfwDestroyWindow(g_pHMDWindow);
+                glfwTerminate();
                 exit(0);
             }
             else
@@ -636,13 +640,36 @@ int main(void)
     glfwWindowHint(GLFW_SAMPLES, 0);
 
 #ifdef USE_OCULUSSDK
-    // This call assumes the Rift display is in extended mode.
     g_app.initHMD();
     const ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
 
-    glfwWindowHint(GLFW_DECORATED, 0);
-    l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
+    if (g_app.UsingDirectMode())
+    {
+        printf("Using Direct to Rift mode...\n");
+        LOG_INFO("Using Direct to Rift mode...\n");
+        const GLFWmonitor* pPrimary = glfwGetPrimaryMonitor();
+        int monitorCount = 0;
+        GLFWmonitor** ppMonitors = glfwGetMonitors(&monitorCount);
+        for (int i=0; i<monitorCount; ++i)
+        {
+            GLFWmonitor* pCur = ppMonitors[i];
+            if (pCur == pPrimary)
+                continue;
+            const GLFWvidmode* mode = glfwGetVideoMode(pCur);
+        }
+
+        l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
+        glfwSetWindowPos(l_Window, pos.x, pos.y);
+
+        g_app.AttachToWindow((void*)glfwGetWin32Window(l_Window));
+    }
+    else
+    {
+        glfwWindowHint(GLFW_DECORATED, 0);
+        l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
+        glfwWindowHint(GLFW_DECORATED, 1);
+    }
 
     if (g_app.UsingDebugHmd() == false)
     {
