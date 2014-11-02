@@ -30,7 +30,6 @@ Scene::Scene()
 : m_basic()
 , m_plane()
 , m_phaseVal(0.0f)
-, m_cubeScale(0.05f)
 , m_amplitude(0.01f)
 {
 }
@@ -230,7 +229,7 @@ void Scene::DrawScene(
         glUniformMatrix4fv(m_basic.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(modelview));
         glUniformMatrix4fv(m_basic.GetUniLoc("prmtx"), 1, false, glm::value_ptr(projection));
 
-        _DrawBouncingCubes(modelview, glm::vec3(0.0f, 1.0f, 0.5f), 0.25f, 0.05f);
+        _DrawBouncingCubes(modelview, glm::vec3(0.0f, 1.0f, 0.5f), 0.25f, 0.064f);
         _DrawBouncingCubes(modelview, glm::vec3(0.0f, 0.0f, 0.5f), 1.5f, 0.5f);
 
         (void)object;

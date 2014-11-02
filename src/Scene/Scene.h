@@ -53,7 +53,6 @@ protected:
     float m_phaseVal;
 
 public:
-    float m_cubeScale;
     float m_amplitude;
 
 private: // Disallow copy ctor and assignment operator

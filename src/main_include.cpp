@@ -55,8 +55,6 @@ void InitializeBar()
 
     TwAddVarRW(g_pTweakbar, "Draw Scene", TW_TYPE_BOOLCPP, &g_app.m_scene.m_bDraw,
                "  group='Scene' ");
-    TwAddVarRW(g_pTweakbar, "cube scale", TW_TYPE_FLOAT, &g_app.m_scene.m_cubeScale,
-               " min=0.1 max=20 step=0.05 group='Scene' ");
     TwAddVarRW(g_pTweakbar, "amplitude", TW_TYPE_FLOAT, &g_app.m_scene.m_amplitude,
                " min=0 max=2 step=0.01 group='Scene' ");
 
