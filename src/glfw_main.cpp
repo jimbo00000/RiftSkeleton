@@ -640,6 +640,8 @@ int main(void)
     g_app.initHMD();
     const ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
+
+    glfwWindowHint(GLFW_DECORATED, 0);
     l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
 
     if (g_app.UsingDebugHmd() == false)
