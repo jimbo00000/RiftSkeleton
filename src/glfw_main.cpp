@@ -150,14 +150,19 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
             break;
 
         case '`':
-            if (g_AuxWindow == NULL)
+            ///@todo Is there a way to create an auxiliary window in Direct to rift mode?
+            /// The call to glfwCreateWindow crashes the app in Win7.
+            if (g_app.UsingDirectMode() == false)
             {
-                g_AuxWindow = initializeAuxiliaryWindow(g_pHMDWindow);
-            }
-            else
-            {
-                destroyAuxiliaryWindow(g_AuxWindow);
-                glfwMakeContextCurrent(g_pHMDWindow);
+                if (g_AuxWindow == NULL)
+                {
+                    g_AuxWindow = initializeAuxiliaryWindow(g_pHMDWindow);
+                }
+                else
+                {
+                    destroyAuxiliaryWindow(g_AuxWindow);
+                    glfwMakeContextCurrent(g_pHMDWindow);
+                }
             }
             break;
 
