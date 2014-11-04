@@ -667,7 +667,9 @@ int main(void)
         l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
         glfwSetWindowPos(l_Window, pos.x, pos.y);
 
+#if defined(_WIN32)
         g_app.AttachToWindow((void*)glfwGetWin32Window(l_Window));
+#endif
     }
     else
     {

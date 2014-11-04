@@ -3,6 +3,8 @@ PROJECT( RiftSkeleton )
 
 INCLUDE(cmake_modules/InvokePython.cmake)
 INVOKEPYTHON( "tools/hardcode_shaders.py" )
+# Python script will dump generated headers to autogen/
+INCLUDE_DIRECTORIES("autogen/")
 
 # GLFW, SDL
 SET( GL_FRAMEWORK "GLFW" CACHE STRING "Which OpenGL windowing framework to use" )
@@ -14,7 +16,7 @@ SET( USE_ANTTWEAKBAR TRUE CACHE BOOL "Use AntTweakBar" )
 SET( USE_SIXENSE TRUE CACHE BOOL "Use Sixense" )
 SET( USE_OCULUSSDK TRUE CACHE BOOL "Use Oculus SDK" )
 
-SET( USE_CORE_CONTEXT FALSE CACHE BOOL "Use Core Context" )
+SET( USE_CORE_CONTEXT TRUE CACHE BOOL "Use Core Context" )
 IF( USE_CORE_CONTEXT )
     ADD_DEFINITIONS(-DUSE_CORE_CONTEXT)
 ENDIF()
@@ -140,6 +142,7 @@ ELSEIF( APPLE )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Src" )
         LINK_DIRECTORIES   ( "${OCULUSSDK_ROOT}/LibOVR/Lib/Mac/Debug/" )
         ADD_DEFINITIONS( -DOVR_OS_MAC )
+        ADD_DEFINITIONS( -DUSE_OCULUSSDK )
     ENDIF( USE_OCULUSSDK )
 
     FIND_LIBRARY(COCOA_LIBRARY Cocoa)
