@@ -84,6 +84,10 @@ void RiftAppSkeleton::initHMD()
         m_usingDebugHmd = true;
     }
 
+#ifdef _DEBUG
+    ovrHmd_StartPerfLog(m_Hmd, "RiftSkeleton-PerfLog.csv", NULL);
+#endif
+
     ///@todo Why does ovrHmd_GetEnabledCaps always return 0 when querying the caps
     /// through the field in ovrHmd appears to work correctly?
     //const unsigned int caps = ovrHmd_GetEnabledCaps(m_Hmd);
@@ -176,6 +180,10 @@ void RiftAppSkeleton::_initPresentDistMesh(ShaderWithVariables& shader, int eyeI
 
 void RiftAppSkeleton::exitVR()
 {
+#ifdef _DEBUG
+    ovrHmd_StopPerfLog(m_Hmd);
+#endif
+
     deallocateFBO(m_renderBuffer);
     ovrHmd_Destroy(m_Hmd);
     ovr_Shutdown();
