@@ -59,7 +59,7 @@ ovrVector2i RiftAppSkeleton::getHmdWindowPos() const
 
 glm::ivec2 RiftAppSkeleton::getRTSize() const
 {
-    const ovrSizei& sz = m_Cfg.OGL.Header.RTSize;
+    const ovrSizei& sz = m_Cfg.OGL.Header.BackBufferSize;
     return glm::ivec2(sz.w, sz.h);
 }
 
@@ -113,7 +113,7 @@ void RiftAppSkeleton::initVR()
         }
     }
 
-    m_Cfg.OGL.Header.RTSize = getHmdResolution();
+    m_Cfg.OGL.Header.BackBufferSize = getHmdResolution();
 
     ///@todo Do we need to choose here?
     ConfigureSDKRendering();
