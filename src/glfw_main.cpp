@@ -760,7 +760,7 @@ int main(void)
     glfwMakeContextCurrent(l_Window);
     g_pHMDWindow = l_Window;
 
-    SetVsync(1);
+    //SetVsync(1);
 
     while (!glfwWindowShouldClose(l_Window))
     {
