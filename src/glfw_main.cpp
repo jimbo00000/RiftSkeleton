@@ -49,6 +49,7 @@ AppSkeleton g_app;
 
 RenderingMode g_renderMode;
 Timer g_timer;
+double g_lastFrameTime = 0.0;
 FPSTimer g_fps;
 
 int m_keyStates[GLFW_KEY_LAST];
@@ -427,9 +428,10 @@ void resize_Aux(GLFWwindow* pWindow, int w, int h)
 
 void timestep()
 {
-    float dt = static_cast<float>(g_timer.seconds());
-    g_timer.reset();
-    g_app.timestep(dt);
+    const double absT = g_timer.seconds();
+    const double dt = absT - g_lastFrameTime;
+    g_lastFrameTime = absT;
+    g_app.timestep(absT, dt);
 }
 
 void printGLContextInfo(GLFWwindow* pW)
@@ -757,6 +759,8 @@ int main(void)
 
     glfwMakeContextCurrent(l_Window);
     g_pHMDWindow = l_Window;
+
+    SetVsync(1);
 
     while (!glfwWindowShouldClose(l_Window))
     {

@@ -245,7 +245,7 @@ void AppSkeleton::display_buffered(bool setViewport) const
     glUseProgram(0);
 }
 
-void AppSkeleton::timestep(float dt)
+void AppSkeleton::timestep(double absTime, double dt)
 {
     for (std::vector<IScene*>::iterator it = m_scenes.begin();
         it != m_scenes.end();
@@ -254,7 +254,7 @@ void AppSkeleton::timestep(float dt)
         IScene* pScene = *it;
         if (pScene != NULL)
         {
-            pScene->timestep(dt);
+            pScene->timestep(absTime, dt);
         }
     }
 
@@ -275,7 +275,7 @@ void AppSkeleton::timestep(float dt)
     }
 #endif
 
-    glm::vec3 move_dt = (m_keyboardMove + m_joystickMove + m_mouseMove + hydraMove) * dt;
+    glm::vec3 move_dt = (m_keyboardMove + m_joystickMove + m_mouseMove + hydraMove) * static_cast<float>(dt);
 
     // Move in the direction the viewer is facing.
     const glm::mat4 tx = getUserViewMatrix();
