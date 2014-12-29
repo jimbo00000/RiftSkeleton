@@ -1,7 +1,7 @@
 RiftSkeleton
 ============
 
-A basic OpenGL app for the Oculus VR SDK.
+A basic framework for getting started with OpenGL programming for the Oculus Rift.
 
 ## Description 
 The skeleton app targets the OVR SDK v0.4.4 and provides a simple framework for developing OpenGL VR programs. Take a look at the Scene class under src/ for a basic "hello world" implementation(some simple color cubes in space).
@@ -31,3 +31,9 @@ I set up my local build environment with libraries installed under a single dire
  - Sixense SDK Hydra support  
  - Keyboard and gamepad world motion support
  - Interchangeable GLFW and SDL2 backends  
+
+## Similar Projects 
+ - [OculusRiftInAction](https://github.com/jherico/OculusRiftInAction)  
+ - [Oculus Rift SDL2 OpenGL Demo (Updated for Oculus SDK 0.4.0)](https://forums.oculus.com/viewtopic.php?f=30&t=8948)  
+ - [jovr](https://github.com/jherico/jovr) - Java bindings for OVR SDK  
+ - [python-ovrsdk](https://github.com/jherico/python-ovrsdk) - Python bindings for OVR SDK  
