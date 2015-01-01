@@ -27,6 +27,14 @@ public:
     virtual void timestep(double absTime, double dt);
     virtual void RenderForOneEye(const float* pMview, const float* pPersp) const;
 
+    virtual bool RayIntersects(
+        const float* pRayOrigin,
+        const float* pRayDirection,
+        float* pTParameter, // [inout]
+        float* pHitLocation, // [inout]
+        float* pHitNormal // [inout]
+        ) const;
+
 protected:
     void DrawColorCube() const;
     void DrawGrid() const;

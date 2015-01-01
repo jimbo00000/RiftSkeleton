@@ -22,6 +22,7 @@
 
 #include "FlyingMouse.h"
 #include "VirtualTrackball.h"
+#include "SpaceCursor.h"
 
 class AppSkeleton
 {
@@ -36,6 +37,7 @@ public:
     void display_buffered(bool setViewport=true) const;
     void timestep(double absTime, double dt);
     void resize(int w, int h);
+    ///@todo OnMouseMove(int,int)
 
     void SetChassisPosition(glm::vec3 p) { m_chassisPos = p; }
     GLuint getRenderBufferTex() const { return m_renderBuffer.tex; }
@@ -85,6 +87,10 @@ protected:
     VirtualTrackball m_hyif;
 
     glm::ivec2 m_rtSize;
+
+    bool m_rayHitsScene;
+    SpaceCursor m_spaceCursor;
+    glm::vec3 m_spaceCursorPos;
 
 public:
     FlyingMouse m_fm;

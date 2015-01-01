@@ -29,6 +29,9 @@ AppSkeleton::AppSkeleton()
 , m_fm()
 , m_hyif()
 , m_rtSize(800, 600)
+, m_rayHitsScene(false)
+, m_spaceCursor()
+, m_spaceCursorPos()
 , m_keyboardMove(0.0f)
 , m_joystickMove(0.0f)
 , m_mouseMove(0.0f)
@@ -105,6 +108,8 @@ void AppSkeleton::initGL()
     m_ovrScene.SetChassisYawPointer(&m_chassisYaw);
 #endif
 
+    m_spaceCursor.initGL();
+
     // Both ovrVector3f and glm::vec3 are at heart a float[3], so this works fine.
     m_fm.SetChassisPosPointer(reinterpret_cast<glm::vec3*>(&m_chassisPos));
     m_fm.SetChassisYawPointer(&m_chassisYaw);
@@ -178,6 +183,14 @@ void AppSkeleton::_DrawScenes(const float* pMview, const float* pPersp) const
         {
             pScene->RenderForOneEye(pMview, pPersp);
         }
+    }
+
+    // Draw scene hit cursor
+    if (m_rayHitsScene)
+    {
+        const glm::mat4 modelview = glm::make_mat4(pMview);
+        glm::mat4 cursMtx = glm::translate(modelview, m_spaceCursorPos);
+        m_spaceCursor.RenderForOneEye(glm::value_ptr(cursMtx), pPersp);
     }
 }
 
@@ -286,6 +299,30 @@ void AppSkeleton::timestep(double absTime, double dt)
 
     m_fm.updateHydraData();
     m_hyif.updateHydraData(m_fm, 1.0f);
+
+    // Check intersections with scene
+    m_rayHitsScene = false;
+    for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
+        it != m_scenes.end();
+        ++it)
+    {
+        const IScene* pScene = *it;
+        if (pScene != NULL)
+        {
+            glm::vec3 origin3;
+            glm::vec3 dir3;
+            m_fm.GetControllerOriginAndDirection(FlyingMouse::Right, origin3, dir3);
+
+            float t = 0.f;
+            glm::vec3 hit;
+            glm::vec3 norm;
+            if (pScene->RayIntersects(glm::value_ptr(origin3), glm::value_ptr(dir3), &t, glm::value_ptr(hit), glm::value_ptr(norm)))
+            {
+                m_rayHitsScene = true;
+                m_spaceCursorPos = hit;
+            }
+        }
+    }
 }
 
 void AppSkeleton::resize(int w, int h)

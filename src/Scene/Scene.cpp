@@ -17,10 +17,12 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/intersect.hpp>
 
 #include <GL/glew.h>
 
@@ -263,4 +265,80 @@ void Scene::RenderForOneEye(const float* pMview, const float* pPersp) const
 void Scene::timestep(double absTime, double dt)
 {
     m_phaseVal += static_cast<float>(dt);
+}
+
+// Check for hits against floor plane
+bool Scene::RayIntersects(
+    const float* pRayOrigin,
+    const float* pRayDirection,
+    float* pTParameter, // [inout]
+    float* pHitLocation, // [inout]
+    float* pHitNormal // [inout]
+    ) const
+{
+    const glm::vec3 origin3 = glm::make_vec3(pRayOrigin);
+    const glm::vec3 dir3 = glm::make_vec3(pRayDirection);
+
+    const glm::vec3 minPt(-10.0f, 0.0f, -10.0f);
+    const glm::vec3 maxPt(10.0f, 0.0f, 10.0f);
+
+    std::vector<glm::vec3> pts;
+    pts.push_back(glm::vec3(minPt.x, minPt.y, minPt.z));
+    pts.push_back(glm::vec3(minPt.x, minPt.y, maxPt.z));
+    pts.push_back(glm::vec3(maxPt.x, minPt.y, maxPt.z));
+    pts.push_back(glm::vec3(maxPt.x, minPt.y, minPt.z));
+
+    glm::vec3 retval1(0.0f);
+    glm::vec3 retval2(0.0f);
+    const bool hit1 = glm::intersectLineTriangle(origin3, dir3, pts[0], pts[1], pts[2], retval1);
+    const bool hit2 = glm::intersectLineTriangle(origin3, dir3, pts[0], pts[2], pts[3], retval2);
+    if ( !(hit1||hit2) )
+        return false;
+
+    glm::vec3 hitval(0.0f);
+    glm::vec3 cartesianpos(0.0f);
+    if (hit1)
+    {
+        hitval = retval1;
+        // At this point, retval1 or retval2 contains hit data returned from glm::intersectLineTriangle.
+        // This does not appear to be raw - y and z appear to be barycentric coordinates.
+        // Fill out the x coord with the barycentric identity then convert using simple weighted sum.
+        hitval.x = 1.0f - hitval.y - hitval.z;
+        cartesianpos = 
+            hitval.x * pts[0] +
+            hitval.y * pts[1] +
+            hitval.z * pts[2];
+    }
+    else if (hit2)
+    {
+        hitval = retval2;
+        hitval.x = 1.0f - hitval.y - hitval.z;
+        cartesianpos = 
+            hitval.x * pts[0] +
+            hitval.y * pts[2] +
+            hitval.z * pts[3];
+    }
+
+    const glm::vec3 originToHitPt = cartesianpos - origin3;
+    const float tParam = glm::length(originToHitPt);
+    *pTParameter = tParam;
+    if (tParam < 0.f)
+        return false;
+
+    //const glm::vec3 v1 = pts[1] - pts[0]; // x axis
+    //const glm::vec3 v2 = pts[3] - pts[0]; // y axis
+    //const float len = glm::length(v1); // v2 length should be equal
+    //const glm::vec3 vh = (cartesianpos - pts[0]) / len;
+
+    const glm::vec3 hitPos = origin3 + *pTParameter * dir3;
+
+    pHitLocation[0] = hitPos.x;
+    pHitLocation[1] = hitPos.y;
+    pHitLocation[2] = hitPos.z;
+
+    pHitNormal[0] = 0.f;
+    pHitNormal[1] = 1.f;
+    pHitNormal[2] = 0.f;
+
+    return true;
 }

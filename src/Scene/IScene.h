@@ -16,5 +16,13 @@ public:
         const float* pMview,
         const float* pPersp) const = 0;
 
+    virtual bool RayIntersects(
+        const float* pRayOrigin,
+        const float* pRayDirection,
+        float* pTParameter, // [inout]
+        float* pHitLocation, // [inout]
+        float* pHitNormal // [inout]
+        ) const { return false; }
+
     bool m_bDraw;
 };
