@@ -245,3 +245,12 @@ void FlyingMouse::GetControllerOriginAndDirection(Hand h, glm::vec3& origin, glm
     origin = glm::vec3(ori4) + m_baseOffset + GetChassisPos();
     direction = glm::normalize(glm::vec3(dir4));
 }
+
+bool FlyingMouse::ControllerIsOnBase(Hand h) const
+{
+    const glm::mat4 mR = glm::make_mat4(h == Right ? mtxR : mtxL);
+    const glm::vec4 ori4 = mR * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    ///@todo Check along the x axis from the orb center.
+    const float dist = glm::length(glm::vec3(ori4));
+    return dist < 0.10f; // Distance determined experimentally
+}

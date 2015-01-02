@@ -65,6 +65,7 @@ public:
     float GetTriggerValue(Hand h) const;
 
     void GetControllerOriginAndDirection(Hand h, glm::vec3& origin, glm::vec3& direction) const;
+    bool ControllerIsOnBase(Hand h) const;
     void SetChassisPosPointer(glm::vec3* pPos) { m_pChassisPos = pPos; }
     void SetChassisYawPointer(float* pYaw) { m_pChassisYaw = pYaw; }
     glm::vec3 GetChassisPos() const { return *m_pChassisPos; }
