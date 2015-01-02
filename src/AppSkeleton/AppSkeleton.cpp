@@ -323,31 +323,14 @@ void AppSkeleton::timestep(double absTime, double dt)
     m_fm.updateHydraData();
     m_hyif.updateHydraData(m_fm, 1.0f);
 
-#if 0
-    // Check intersections with scene
-    m_rayHitsScene = false;
-    for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
-        it != m_scenes.end();
-        ++it)
+    const FlyingMouse::Hand h = FlyingMouse::Right;
+    if (m_fm.ControllerIsOnBase(h) == false)
     {
-        const IScene* pScene = *it;
-        if (pScene != NULL)
-        {
-            glm::vec3 origin3;
-            glm::vec3 dir3;
-            m_fm.GetControllerOriginAndDirection(FlyingMouse::Right, origin3, dir3);
-
-            float t = 0.f;
-            glm::vec3 hit;
-            glm::vec3 norm;
-            if (pScene->RayIntersects(glm::value_ptr(origin3), glm::value_ptr(dir3), &t, glm::value_ptr(hit), glm::value_ptr(norm)))
-            {
-                m_rayHitsScene = true;
-                m_spaceCursorPos = hit;
-            }
-        }
+        glm::vec3 origin3;
+        glm::vec3 dir3;
+        m_fm.GetControllerOriginAndDirection(h, origin3, dir3);
+        _checkSceneIntersections(origin3, dir3);
     }
-#endif
 }
 
 void AppSkeleton::resize(int w, int h)
