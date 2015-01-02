@@ -300,6 +300,7 @@ void AppSkeleton::timestep(double absTime, double dt)
     m_fm.updateHydraData();
     m_hyif.updateHydraData(m_fm, 1.0f);
 
+#if 0
     // Check intersections with scene
     m_rayHitsScene = false;
     for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
@@ -323,10 +324,64 @@ void AppSkeleton::timestep(double absTime, double dt)
             }
         }
     }
+#endif
 }
 
 void AppSkeleton::resize(int w, int h)
 {
     m_rtSize.x = w;
     m_rtSize.y = h;
+}
+
+void AppSkeleton::OnMouseMove(int x, int y)
+{
+    // Find modelview matrix
+    const glm::vec3 EyePos(m_chassisPos);
+    glm::mat4 mv = glm::mat4(1.f);
+    mv = glm::translate(mv, EyePos);
+    mv *= getUserViewMatrix();
+
+    // Calculate world space ray through mouse pointer
+    const glm::vec2 uv01 = glm::vec2(
+        static_cast<float>(x) / static_cast<float>(m_rtSize.x),
+        1.f - static_cast<float>(y) / static_cast<float>(m_rtSize.y)
+        );
+    const glm::vec2 uv_11 = 2.f*uv01 - glm::vec2(1.f);
+
+    const float aspect = static_cast<float>(m_rtSize.x) / static_cast<float>(m_rtSize.y);
+    const float tanHalfFov = 4.f;
+
+    const glm::vec3 fwd = glm::vec3(0.f, 0.f, -1.f);
+    const glm::vec3 rt = glm::vec3(1.f, 0.f, 0.f);
+    const glm::vec3 up(0.0f, 1.0f, 0.0f);
+
+    const glm::vec3 localOrigin = glm::vec3(0.f);
+    const glm::vec3 localRay = glm::normalize(
+        aspect*fwd +
+        tanHalfFov * uv_11.x * rt +
+        tanHalfFov * uv_11.y * up);
+
+    // Check intersections with scenes
+    const glm::vec3 origin3 = glm::vec3(mv * glm::vec4(localOrigin,1.f));
+    const glm::vec3 dir3 = glm::vec3(mv * glm::vec4(localRay,0.f));
+
+    m_rayHitsScene = false;
+    for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
+        it != m_scenes.end();
+        ++it)
+    {
+        const IScene* pScene = *it;
+        if (pScene != NULL)
+        {
+            float t = 0.f;
+            glm::vec3 hit;
+            glm::vec3 norm;
+            if (pScene->RayIntersects(glm::value_ptr(origin3), glm::value_ptr(dir3),
+                &t, glm::value_ptr(hit), glm::value_ptr(norm)))
+            {
+                m_rayHitsScene = true;
+                m_spaceCursorPos = hit;
+            }
+        }
+    }
 }

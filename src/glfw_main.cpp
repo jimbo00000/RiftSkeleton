@@ -363,6 +363,11 @@ void mouseWheel(GLFWwindow* pWindow, double x, double y)
     g_app.SetFBOScale(curscale * pow(incr, static_cast<float>(delta)));
 }
 
+void mousePassive(GLFWwindow* pWindow, double x, double y)
+{
+    g_app.OnMouseMove(static_cast<int>(x), static_cast<int>(y));
+}
+
 void resize(GLFWwindow* pWindow, int w, int h)
 {
     (void)pWindow;
@@ -679,6 +684,7 @@ int main(void)
         l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
         glfwWindowHint(GLFW_DECORATED, 1);
     }
+    resize(l_Window, sz.w, sz.h);
 
     if (g_app.UsingDebugHmd() == false)
     {
@@ -700,6 +706,7 @@ int main(void)
     glfwSetMouseButtonCallback(l_Window, mouseDown);
     glfwSetCursorPosCallback(l_Window, mouseMove);
     glfwSetScrollCallback(l_Window, mouseWheel);
+    glfwSetCursorPosCallback(l_Window, mousePassive);
     glfwSetKeyCallback(l_Window, keyboard);
 
     // Don't forget to initialize Glew, turn glewExperimental on to

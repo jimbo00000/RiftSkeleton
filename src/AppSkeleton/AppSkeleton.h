@@ -37,7 +37,8 @@ public:
     void display_buffered(bool setViewport=true) const;
     void timestep(double absTime, double dt);
     void resize(int w, int h);
-    ///@todo OnMouseMove(int,int)
+
+    void OnMouseMove(int,int);
 
     void SetChassisPosition(glm::vec3 p) { m_chassisPos = p; }
     GLuint getRenderBufferTex() const { return m_renderBuffer.tex; }
