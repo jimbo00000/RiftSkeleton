@@ -72,6 +72,7 @@ protected:
     void _initPresentFbo();
     void _resetGLState() const;
     void _drawSceneMono() const;
+    void _checkSceneIntersections(glm::vec3 origin, glm::vec3 dir);
     virtual glm::ivec2 getRTSize() const { return m_rtSize; }
     virtual glm::mat4 getUserViewMatrix() const;
 

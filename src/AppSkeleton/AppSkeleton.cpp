@@ -194,6 +194,29 @@ void AppSkeleton::_DrawScenes(const float* pMview, const float* pPersp) const
     }
 }
 
+void AppSkeleton::_checkSceneIntersections(glm::vec3 origin, glm::vec3 dir)
+{
+    m_rayHitsScene = false;
+    for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
+        it != m_scenes.end();
+        ++it)
+    {
+        const IScene* pScene = *it;
+        if (pScene != NULL)
+        {
+            float t = 0.f;
+            glm::vec3 hit;
+            glm::vec3 norm;
+            if (pScene->RayIntersects(glm::value_ptr(origin), glm::value_ptr(dir),
+                &t, glm::value_ptr(hit), glm::value_ptr(norm)))
+            {
+                m_rayHitsScene = true;
+                m_spaceCursorPos = hit;
+            }
+        }
+    }
+}
+
 void AppSkeleton::_drawSceneMono() const
 {
     _resetGLState();
@@ -361,27 +384,7 @@ void AppSkeleton::OnMouseMove(int x, int y)
         tanHalfFov * uv_11.x * rt +
         tanHalfFov * uv_11.y * up);
 
-    // Check intersections with scenes
     const glm::vec3 origin3 = glm::vec3(mv * glm::vec4(localOrigin,1.f));
     const glm::vec3 dir3 = glm::vec3(mv * glm::vec4(localRay,0.f));
-
-    m_rayHitsScene = false;
-    for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
-        it != m_scenes.end();
-        ++it)
-    {
-        const IScene* pScene = *it;
-        if (pScene != NULL)
-        {
-            float t = 0.f;
-            glm::vec3 hit;
-            glm::vec3 norm;
-            if (pScene->RayIntersects(glm::value_ptr(origin3), glm::value_ptr(dir3),
-                &t, glm::value_ptr(hit), glm::value_ptr(norm)))
-            {
-                m_rayHitsScene = true;
-                m_spaceCursorPos = hit;
-            }
-        }
-    }
+    _checkSceneIntersections(origin3, dir3);
 }
