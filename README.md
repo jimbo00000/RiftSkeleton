@@ -24,12 +24,13 @@ I set up my local build environment with libraries installed under a single dire
 
 ## Features 
  - OVR SDK and Client rendering paths  
- - Adaptive render buffer resolution scaling to ensure fastest possible frame rate(Client path only)  
+ - Adaptive render buffer resolution scaling to ensure fastest possible frame rate  
  - Camera frustum highlighting when headset approaches limits of tracking area  
  - Auxiliary window with AntTweakbar controls(toggle with backtick(`) press)  
  - Tap HMD to hide Health and Safety warning  
+ - Mouse click to teleport in Scene, wheel tilt for "comfort mode" rotation  
  - Sixense SDK Hydra support  
- - Keyboard and gamepad world motion support
+ - Keyboard and gamepad world motion support  
  - Interchangeable GLFW and SDL2 backends  
 
 ## Similar Projects 
