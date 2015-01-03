@@ -153,7 +153,8 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
         case '`':
             ///@todo Is there a way to create an auxiliary window in Direct to rift mode?
             /// The call to glfwCreateWindow crashes the app in Win7.
-            if (g_app.UsingDirectMode() == false)
+            if ((g_app.UsingDirectMode() == false) ||
+                (g_app.UsingDebugHmd() == true))
             {
                 if (g_AuxWindow == NULL)
                 {
@@ -656,31 +657,38 @@ int main(void)
     const ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
 
-    if (g_app.UsingDirectMode())
+    if (g_app.UsingDebugHmd() == true)
     {
-        printf("Using Direct to Rift mode...\n");
-        LOG_INFO("Using Direct to Rift mode...\n");
-
+        // Debug HMD - create a normal, decorated application window
         l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
-        glfwSetWindowPos(l_Window, pos.x, pos.y);
-
-#if defined(_WIN32)
-        g_app.AttachToWindow((void*)glfwGetWin32Window(l_Window));
-#endif
     }
     else
     {
-        glfwWindowHint(GLFW_DECORATED, 0);
-        l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
-        glfwWindowHint(GLFW_DECORATED, 1);
-    }
-    resize(l_Window, sz.w, sz.h);
+        // HMD active - position undecorated window to fill HMD viewport
+        if (g_app.UsingDirectMode())
+        {
+            printf("Using Direct to Rift mode...\n");
+            LOG_INFO("Using Direct to Rift mode...\n");
 
-    if (g_app.UsingDebugHmd() == false)
-    {
+            l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
+            glfwSetWindowPos(l_Window, pos.x, pos.y);
+
+#if defined(_WIN32)
+            g_app.AttachToWindow((void*)glfwGetWin32Window(l_Window));
+#endif
+        }
+        else
+        {
+            // Extended desktop mode
+            glfwWindowHint(GLFW_DECORATED, 0);
+            l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
+            glfwWindowHint(GLFW_DECORATED, 1);
+        }
+
         glfwSetWindowPos(l_Window, pos.x, pos.y);
         g_renderMode.outputType = RenderingMode::OVR_SDK;
     }
+    resize(l_Window, sz.w, sz.h); // inform AppSkeleton of window size
 #else
     l_Window = glfwCreateWindow(800, 600, "GLFW Oculus Rift Test", NULL, NULL);
 #endif //USE_OCULUSSDK
