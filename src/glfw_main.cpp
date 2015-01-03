@@ -362,6 +362,10 @@ void mouseWheel(GLFWwindow* pWindow, double x, double y)
     const float curscale = g_app.GetFBOScale();
     const float incr = 1.05f;
     g_app.SetFBOScale(curscale * pow(incr, static_cast<float>(delta)));
+    if (fabs(x) > 0.)
+    {
+        g_app.OnMouseWheel(x,y);
+    }
 }
 
 void mousePassive(GLFWwindow* pWindow, double x, double y)

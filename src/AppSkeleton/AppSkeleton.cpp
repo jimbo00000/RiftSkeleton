@@ -7,6 +7,9 @@
 #endif
 #include <GL/glew.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -370,4 +373,10 @@ void AppSkeleton::OnMouseMove(int x, int y)
     const glm::vec3 origin3 = glm::vec3(mv * glm::vec4(localOrigin,1.f));
     const glm::vec3 dir3 = glm::vec3(mv * glm::vec4(localRay,0.f));
     _checkSceneIntersections(origin3, dir3);
+}
+
+void AppSkeleton::OnMouseWheel(double x, double y)
+{
+    const float rotationIncrement = 30.f * M_PI / 180.f;
+    m_chassisYaw += x * rotationIncrement;
 }

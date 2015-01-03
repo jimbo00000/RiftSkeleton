@@ -38,7 +38,8 @@ public:
     void timestep(double absTime, double dt);
     void resize(int w, int h);
 
-    void OnMouseMove(int,int);
+    virtual void OnMouseMove(int,int);
+    virtual void OnMouseWheel(double,double);
 
     void SetChassisPosition(glm::vec3 p) { m_chassisPos = p; }
     GLuint getRenderBufferTex() const { return m_renderBuffer.tex; }
