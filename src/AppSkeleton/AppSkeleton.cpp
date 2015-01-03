@@ -342,6 +342,18 @@ void AppSkeleton::resize(int w, int h)
     m_rtSize.y = h;
 }
 
+void AppSkeleton::OnMouseButton(int button, int action)
+{
+    if (action == 1) // glfw button press
+    {
+        if (button == 1) // glfw right click
+        {
+            const glm::vec3 sittingHeight = glm::vec3(0.f, 1.27f, 0.f);
+            m_chassisPos = m_spaceCursorPos + sittingHeight;
+        }
+    }
+}
+
 void AppSkeleton::OnMouseMove(int x, int y)
 {
     // Find modelview matrix

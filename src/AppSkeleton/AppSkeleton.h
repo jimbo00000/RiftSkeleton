@@ -38,6 +38,7 @@ public:
     void timestep(double absTime, double dt);
     void resize(int w, int h);
 
+    virtual void OnMouseButton(int,int);
     virtual void OnMouseMove(int,int);
     virtual void OnMouseWheel(double,double);
 

@@ -322,6 +322,7 @@ void mouseDown(GLFWwindow* pWindow, int button, int action, int mods)
     {
         which_button = -1;
     }
+    g_app.OnMouseButton(button, action);
 }
 
 void mouseMove(GLFWwindow* pWindow, double xd, double yd)
