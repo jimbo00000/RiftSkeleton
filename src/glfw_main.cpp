@@ -691,6 +691,15 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
+    // Required for SDK rendering (to do the buffer swap on its own)
+#ifdef USE_OCULUSSDK
+  #if defined(_WIN32)
+    g_app.setWindow(glfwGetWin32Window(l_Window));
+  #elif defined(__linux__)
+    g_app.setWindow(glfwGetX11Window(l_Window), glfwGetX11Display());
+  #endif
+#endif //USE_OCULUSSDK
+
     glfwMakeContextCurrent(l_Window);
     glfwSetWindowSizeCallback(l_Window, resize);
     glfwSetMouseButtonCallback(l_Window, mouseDown);
@@ -711,15 +720,6 @@ int main(void)
     }
 
     printGLContextInfo(l_Window);
-
-    // Required for SDK rendering (to do the buffer swap on its own)
-#ifdef USE_OCULUSSDK
-  #if defined(_WIN32)
-    g_app.setWindow(glfwGetWin32Window(l_Window));
-  #elif defined(__linux__)
-    g_app.setWindow(glfwGetX11Window(l_Window), glfwGetX11Display());
-  #endif
-#endif //USE_OCULUSSDK
 
 #ifdef USE_ANTTWEAKBAR
   #ifdef USE_CORE_CONTEXT
