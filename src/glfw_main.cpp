@@ -660,16 +660,6 @@ int main(void)
     {
         printf("Using Direct to Rift mode...\n");
         LOG_INFO("Using Direct to Rift mode...\n");
-        const GLFWmonitor* pPrimary = glfwGetPrimaryMonitor();
-        int monitorCount = 0;
-        GLFWmonitor** ppMonitors = glfwGetMonitors(&monitorCount);
-        for (int i=0; i<monitorCount; ++i)
-        {
-            GLFWmonitor* pCur = ppMonitors[i];
-            if (pCur == pPrimary)
-                continue;
-            const GLFWvidmode* mode = glfwGetVideoMode(pCur);
-        }
 
         l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
         glfwSetWindowPos(l_Window, pos.x, pos.y);
