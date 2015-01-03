@@ -708,34 +708,6 @@ int main(void)
     glfwSetCursorPosCallback(l_Window, mousePassive);
     glfwSetKeyCallback(l_Window, keyboard);
 
-    // Don't forget to initialize Glew, turn glewExperimental on to
-    // avoid problems fetching function pointers...
-    glewExperimental = GL_TRUE;
-    const GLenum l_Result = glewInit();
-    if (l_Result != GLEW_OK)
-    {
-        printf("glewInit() error.\n");
-        LOG_INFO("glewInit() error.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    printGLContextInfo(l_Window);
-
-#ifdef USE_ANTTWEAKBAR
-  #ifdef USE_CORE_CONTEXT
-    TwInit(TW_OPENGL_CORE, NULL);
-  #else
-    TwInit(TW_OPENGL, NULL);
-  #endif
-    InitializeBar();
-#endif
-
-    LOG_INFO("Calling initGL...");
-    g_app.initGL();
-    LOG_INFO("Calling initVR...");
-    g_app.initVR();
-    LOG_INFO("initVR complete.");
-
     memset(m_keyStates, 0, GLFW_KEY_LAST*sizeof(int));
 
     // joysticks
@@ -754,8 +726,37 @@ int main(void)
         break;
     }
 
+    printGLContextInfo(l_Window);
     glfwMakeContextCurrent(l_Window);
     g_pHMDWindow = l_Window;
+
+
+    // Don't forget to initialize Glew, turn glewExperimental on to
+    // avoid problems fetching function pointers...
+    glewExperimental = GL_TRUE;
+    const GLenum l_Result = glewInit();
+    if (l_Result != GLEW_OK)
+    {
+        printf("glewInit() error.\n");
+        LOG_INFO("glewInit() error.\n");
+        exit(EXIT_FAILURE);
+    }
+
+
+#ifdef USE_ANTTWEAKBAR
+  #ifdef USE_CORE_CONTEXT
+    TwInit(TW_OPENGL_CORE, NULL);
+  #else
+    TwInit(TW_OPENGL, NULL);
+  #endif
+    InitializeBar();
+#endif
+
+    LOG_INFO("Calling initGL...");
+    g_app.initGL();
+    LOG_INFO("Calling initVR...");
+    g_app.initVR();
+    LOG_INFO("initVR complete.");
 
     //SetVsync(1);
 
