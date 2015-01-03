@@ -356,13 +356,7 @@ void AppSkeleton::OnMouseButton(int button, int action)
 
 void AppSkeleton::OnMouseMove(int x, int y)
 {
-    // Find modelview matrix
-    const glm::vec3 EyePos(m_chassisPos);
-    glm::mat4 mv = glm::mat4(1.f);
-    mv = glm::translate(mv, EyePos);
-    mv *= getUserViewMatrix();
-
-    // Calculate world space ray through mouse pointer
+    // Calculate eye space ray through mouse pointer
     const glm::vec2 uv01 = glm::vec2(
         static_cast<float>(x) / static_cast<float>(m_rtSize.x),
         1.f - static_cast<float>(y) / static_cast<float>(m_rtSize.y)
@@ -372,8 +366,8 @@ void AppSkeleton::OnMouseMove(int x, int y)
     const float aspect = static_cast<float>(m_rtSize.x) / static_cast<float>(m_rtSize.y);
     const float tanHalfFov = 4.f;
 
-    const glm::vec3 fwd = glm::vec3(0.f, 0.f, -1.f);
-    const glm::vec3 rt = glm::vec3(1.f, 0.f, 0.f);
+    const glm::vec3 fwd(0.f, 0.f, -1.f);
+    const glm::vec3 rt(1.f, 0.f, 0.f);
     const glm::vec3 up(0.0f, 1.0f, 0.0f);
 
     const glm::vec3 localOrigin = glm::vec3(0.f);
@@ -382,8 +376,13 @@ void AppSkeleton::OnMouseMove(int x, int y)
         tanHalfFov * uv_11.x * rt +
         tanHalfFov * uv_11.y * up);
 
+    // Transform ray into world space
+    const glm::mat4 mv =
+        glm::translate(glm::mat4(1.f), m_chassisPos)
+        * getUserViewMatrix();
     const glm::vec3 origin3 = glm::vec3(mv * glm::vec4(localOrigin,1.f));
     const glm::vec3 dir3 = glm::vec3(mv * glm::vec4(localRay,0.f));
+
     _checkSceneIntersections(origin3, dir3);
 }
 
