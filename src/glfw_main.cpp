@@ -352,6 +352,17 @@ void mouseMove(GLFWwindow* pWindow, double xd, double yd)
         g_app.m_mouseMove.x += static_cast<float>(mmx) * moveMagnitude;
         g_app.m_mouseMove.z += static_cast<float>(mmy) * moveMagnitude;
     }
+    else if (which_button == GLFW_MOUSE_BUTTON_3) // Middle click
+    {
+        const float moveMagnitude = 0.5f;
+        g_app.m_mouseMove.x += static_cast<float>(mmx) * moveMagnitude;
+        g_app.m_mouseMove.y -= static_cast<float>(mmy) * moveMagnitude;
+    }
+    else
+    {
+        // Passive motion, no mouse button pressed
+        g_app.OnMouseMove(static_cast<int>(x), static_cast<int>(y));
+    }
 }
 
 void mouseWheel(GLFWwindow* pWindow, double x, double y)
@@ -367,11 +378,6 @@ void mouseWheel(GLFWwindow* pWindow, double x, double y)
     {
         g_app.OnMouseWheel(x,y);
     }
-}
-
-void mousePassive(GLFWwindow* pWindow, double x, double y)
-{
-    g_app.OnMouseMove(static_cast<int>(x), static_cast<int>(y));
 }
 
 void resize(GLFWwindow* pWindow, int w, int h)
@@ -718,7 +724,6 @@ int main(void)
     glfwSetMouseButtonCallback(l_Window, mouseDown);
     glfwSetCursorPosCallback(l_Window, mouseMove);
     glfwSetScrollCallback(l_Window, mouseWheel);
-    glfwSetCursorPosCallback(l_Window, mousePassive);
     glfwSetKeyCallback(l_Window, keyboard);
 
     memset(m_keyStates, 0, GLFW_KEY_LAST*sizeof(int));
