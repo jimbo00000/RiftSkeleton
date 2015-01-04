@@ -38,22 +38,11 @@ void VirtualTrackball::updateHydraData(const FlyingMouse& fm, float headSize)
     txVec *= sqrt(headSize);
 
 #ifdef USE_SIXENSE
-    const int moveButton1 = SIXENSE_BUTTON_1;
-    const int moveButton2 = SIXENSE_BUTTON_3;
-    const int rotateButton = SIXENSE_BUTTON_BUMPER;
+    const int moveButton = SIXENSE_BUTTON_BUMPER;
+    const int rotateButton = SIXENSE_BUTTON_1 | SIXENSE_BUTTON_3;
     const int scaleButtonUp = SIXENSE_BUTTON_4;
     const int scaleButtonDown = SIXENSE_BUTTON_2;
     const FlyingMouse::Hand hand = FlyingMouse::Right;
-
-    const bool moveButtonJustPressed = 
-        fm.WasJustPressed(hand, moveButton1)
-     || fm.WasJustPressed(hand, moveButton2);
-    const bool moveButtonIsPressed = 
-        fm.IsPressed(hand, moveButton1)
-     || fm.IsPressed(hand, moveButton2);
-    const bool moveButtonJustReleased = 
-        fm.WasJustReleased(hand, moveButton1)
-     || fm.WasJustReleased(hand, moveButton2);
 
     // Apply operations given by Sixense input to all Transformations in the list
     for (std::vector<Transformation*>::iterator it = m_txs.begin();
@@ -68,12 +57,13 @@ void VirtualTrackball::updateHydraData(const FlyingMouse& fm, float headSize)
         if (fm.WasJustPressed(hand, rotateButton))
         {
             tx.m_atClickOrientation = hydraMtx;
-            tx.m_lockedAtClick = tx.m_lock;
+            tx.m_lockedAtClickOri = tx.m_lock;
         }
-        else if (moveButtonJustPressed)
+        
+        if (fm.WasJustPressed(hand, moveButton))
         {
             tx.m_atClickPosition = glm::mat4(1.0f);
-            tx.m_lockedAtClick = tx.m_lock;
+            tx.m_lockedAtClickPos = tx.m_lock;
 
             // Find initial position of hit against controller ray with t param stored by Scene.
             if (tx.m_controllerTParamAtClick > 0.0f)
@@ -90,7 +80,7 @@ void VirtualTrackball::updateHydraData(const FlyingMouse& fm, float headSize)
         {
             tx.m_momentaryHydraOrientation = hydraMtx;
         }
-        if (moveButtonIsPressed)
+        if (fm.IsPressed(hand, moveButton))
         {
             // Take t param along controller ray and calculate new positional delta for tx.
             if (tx.m_controllerTParamAtClick > 0.0f)
@@ -106,12 +96,13 @@ void VirtualTrackball::updateHydraData(const FlyingMouse& fm, float headSize)
         if (fm.WasJustReleased(hand, rotateButton))
         {
             tx.AccumulateOrientation();
-            tx.m_lockedAtClick = false;
+            tx.m_lockedAtClickOri = false;
         }
-        else if (moveButtonJustReleased)
+
+        if (fm.WasJustReleased(hand, moveButton))
         {
             tx.AccumulatePosition();
-            tx.m_lockedAtClick = false;
+            tx.m_lockedAtClickPos = false;
             tx.m_controllerTParamAtClick = 0.0f;
             tx.m_controllerRayHitPtAClick = glm::vec3(0.0f);
         }
@@ -131,7 +122,7 @@ void VirtualTrackball::updateHydraData(const FlyingMouse& fm, float headSize)
         }
 
         // Press stick in to reset matrices
-        if (fm.IsPressed(hand, rotateButton) && fm.WasJustPressed(hand, SIXENSE_BUTTON_JOYSTICK))
+        if (fm.IsPressed(hand, moveButton) && fm.WasJustPressed(hand, SIXENSE_BUTTON_JOYSTICK))
         {
             tx.ResetPosition();
             tx.ResetOrientation();

@@ -29,7 +29,8 @@ struct Transformation
     float m_secondaryScale;
 
     bool m_lock;
-    bool m_lockedAtClick;
+    bool m_lockedAtClickPos;
+    bool m_lockedAtClickOri;
 
     float m_controllerTParamAtClick;
     glm::vec3 m_controllerRayHitPtAClick;
@@ -48,7 +49,8 @@ struct Transformation
         , m_accumulatedScale(1.0f)
         , m_secondaryScale(1.0f)
         , m_lock(false)
-        , m_lockedAtClick(false)
+        , m_lockedAtClickPos(false)
+        , m_lockedAtClickOri(false)
         , m_controllerTParamAtClick(0.0f)
         , m_controllerRayHitPtAClick(0.0f)
     {}
@@ -70,7 +72,7 @@ struct Transformation
     /// will be identical before and after this function is called.
     virtual void AccumulatePosition()
     {
-        if (!m_lockedAtClick)
+        if (!m_lockedAtClickPos)
         {
             m_accumulatedPosition = 
                 glm::translate(glm::mat4(1.0f), -GetReverseClickTxVec()) *
@@ -85,7 +87,7 @@ struct Transformation
     ///@brief This is effectively a *= for orientation.
     virtual void AccumulateOrientation()
     {
-        if (!m_lockedAtClick)
+        if (!m_lockedAtClickOri)
             m_accumulatedOrientation = GetCurrentOrientation();
 
         m_atClickOrientation = glm::mat4(1.0f);
@@ -119,9 +121,17 @@ struct Transformation
     /// Reverse transform by the initial rotation to start from identity each gesture
     virtual glm::mat4 GetMatrix() const
     {
-        if (m_lockedAtClick)
+        if (m_lockedAtClickPos)
         {
             return m_accumulatedPosition
+                * m_accumulatedOrientation
+                * glm::scale(glm::mat4(1.0f), glm::vec3(m_accumulatedScale));
+        }
+        else if (m_lockedAtClickOri)
+        {
+            return glm::translate(glm::mat4(1.0f), -GetReverseClickTxVec())
+                * m_momentaryHydraPosition
+                * m_accumulatedPosition
                 * m_accumulatedOrientation
                 * glm::scale(glm::mat4(1.0f), glm::vec3(m_accumulatedScale));
         }
