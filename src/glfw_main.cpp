@@ -114,6 +114,9 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
         //printf("key ac  %d %d\n", key, action);
     }
 
+    const float f = 0.9f;
+    const float ff = 0.99f;
+
     if (action == GLFW_PRESS)
     {
     switch (key)
@@ -149,6 +152,17 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
             g_renderMode.toggleRenderingTypeDistortion();
             LOG_INFO("Called toggleRenderingTypeDistortion");
             break;
+
+        case GLFW_KEY_F5: g_dynamicallyScaleFBO = false; g_app.SetFBOScale(f * g_app.GetFBOScale()); break;
+        case GLFW_KEY_F6: g_dynamicallyScaleFBO = false; g_app.SetFBOScale(ff * g_app.GetFBOScale()); break;
+        case GLFW_KEY_F7: g_dynamicallyScaleFBO = false; g_app.SetFBOScale((1.f/ff) * g_app.GetFBOScale()); break;
+        case GLFW_KEY_F8: g_dynamicallyScaleFBO = false; g_app.SetFBOScale((1.f/f) * g_app.GetFBOScale()); break;
+
+        case GLFW_KEY_F9: SetVsync(0); break;
+        case GLFW_KEY_F10: SetVsync(1); break;
+        case GLFW_KEY_F11: SetVsync(-1); break;
+
+        case GLFW_KEY_DELETE: g_dynamicallyScaleFBO = !g_dynamicallyScaleFBO; break;
 
         case '`':
             ///@todo Is there a way to create an auxiliary window in Direct to rift mode?
