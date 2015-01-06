@@ -25,6 +25,11 @@ ENDIF()
 # Platform-dependent section
 #
 IF( WIN32 )
+    MESSAGE(STATUS "MSVC_VERSION=${MSVC_VERSION}")
+    # 1600 = VS 10.0
+    # 1700 = VS 11.0
+    # 1800 = VS 12.0
+
     #
     # Custom Windows include and link dirs for my machine:
     #
@@ -36,9 +41,17 @@ IF( WIN32 )
 
     IF( GL_FRAMEWORK STREQUAL "GLFW" )
         MESSAGE("Using GLFW Framework.")
-        SET( GLFW3_ROOT "${LIBS_HOME}/glfw-3.0.1.bin.WIN32" CACHE STRING "glfw root" )
+        IF( MSVC_VERSION STREQUAL "1600" )
+            SET( GLFW3_ROOT "${LIBS_HOME}/glfw-3.0.1.bin.WIN32" CACHE STRING "glfw root" )
+            LINK_DIRECTORIES( "${GLFW3_ROOT}/lib-msvc100" )
+        ELSEIF( MSVC_VERSION STREQUAL "1700" )
+            SET( GLFW3_ROOT "${LIBS_HOME}/glfw-3.0.4.bin.WIN32" CACHE STRING "glfw root" )
+            LINK_DIRECTORIES( "${GLFW3_ROOT}/lib-msvc110" )
+        ELSEIF( MSVC_VERSION STREQUAL "1800" )
+            SET( GLFW3_ROOT "${LIBS_HOME}/glfw-3.0.4.bin.WIN32" CACHE STRING "glfw root" )
+            LINK_DIRECTORIES( "${GLFW3_ROOT}/lib-msvc120" )
+        ENDIF()
         INCLUDE_DIRECTORIES( "${GLFW3_ROOT}/include" )
-        LINK_DIRECTORIES   ( "${GLFW3_ROOT}/lib-msvc100" )
         SET( FRAMEWORK_LIBS glfw3.lib )
     ELSEIF( GL_FRAMEWORK STREQUAL "SDL" )
         MESSAGE("Using SDL2 Framework.")
@@ -59,7 +72,13 @@ IF( WIN32 )
         SET( OCULUSSDK_ROOT "${LIBS_HOME}/OculusSDK" CACHE STRING "OculusSDK root" )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Include" )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Src" )
-        LINK_DIRECTORIES   ( "${OCULUSSDK_ROOT}/LibOVR/Lib/Win32/VS2010" )
+        IF( MSVC_VERSION STREQUAL "1600" )
+            LINK_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Lib/Win32/VS2010" )
+        ELSEIF( MSVC_VERSION STREQUAL "1700" )
+            LINK_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Lib/Win32/VS2012" )
+        ELSEIF( MSVC_VERSION STREQUAL "1800" )
+            LINK_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Lib/Win32/VS2013" )
+        ENDIF()
         SET( OVR_LIBS optimized libovr.lib debug libovrd.lib )
         ADD_DEFINITIONS( -DOVR_OS_WIN32 )
         ADD_DEFINITIONS( -DUSE_OCULUSSDK )
