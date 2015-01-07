@@ -288,9 +288,8 @@ void joystick()
     if (numButtons < 8)
         return;
 
-    glm::vec3 joystickMove(0.0f, 0.0f, 0.0f);
     // Map joystick buttons to move directions
-    glm::vec3 moveDirs[8] = {
+    const glm::vec3 moveDirsPCJoystick[8] = {
         glm::vec3(-1.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 1.0f),
         glm::vec3(1.0f, 0.0f, 0.0f),
@@ -301,6 +300,10 @@ void joystick()
         glm::vec3(0.0f, -1.0f, 0.0f),
     };
 
+    ///@todo Different mappings for different controllers.
+    const glm::vec3* moveDirs = moveDirsPCJoystick;
+
+    glm::vec3 joystickMove(0.0f, 0.0f, 0.0f);
     for (int i=0; i<std::min(8,numButtons); ++i)
     {
         if (pButtonStates[i] == GLFW_PRESS)
@@ -309,7 +312,7 @@ void joystick()
         }
     }
 
-    float mag = 1.0f;
+    const float mag = 1.0f;
     g_app.m_joystickMove = mag * joystickMove;
 
 
