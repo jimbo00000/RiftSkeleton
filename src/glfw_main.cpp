@@ -289,19 +289,46 @@ void joystick()
         return;
 
     // Map joystick buttons to move directions
-    const glm::vec3 moveDirsPCJoystick[8] = {
-        glm::vec3(-1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, -1.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f),
+    const glm::vec3 moveDirsGravisGamepadPro[8] = {
+        glm::vec3(-1.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  1.f),
+        glm::vec3( 1.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f, -1.f),
+        glm::vec3( 0.f,  1.f,  0.f),
+        glm::vec3( 0.f,  1.f,  0.f),
+        glm::vec3( 0.f, -1.f,  0.f),
+        glm::vec3( 0.f, -1.f,  0.f),
+    };
+
+    // Xbox controller layout in glfw:
+    // numAxes 5, numButtons 14
+    // 0 A (down position)
+    // 1 B (right position)
+    // 2 X (left position)
+    // 3 Y (up position)
+    // 4 L bumper
+    // 5 R bumper
+    // 6 Back (left center)
+    // 7 Start (right center)
+    const glm::vec3 moveDirsXboxController[8] = {
+        glm::vec3( 0.f,  0.f,  1.f),
+        glm::vec3( 1.f,  0.f,  0.f),
+        glm::vec3(-1.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f, -1.f),
+        glm::vec3( 0.f, -1.f,  0.f),
+        glm::vec3( 0.f,  1.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
     };
 
     ///@todo Different mappings for different controllers.
-    const glm::vec3* moveDirs = moveDirsPCJoystick;
+    const glm::vec3* moveDirs = moveDirsGravisGamepadPro;
+    // Take an educated guess that this is an Xbox controller - glfw's
+    // id string says "Microsoft PC Joystick" for most gamepad types.
+    if (numAxes == 5 && numButtons == 14)
+    {
+        moveDirs = moveDirsXboxController;
+    }
 
     glm::vec3 joystickMove(0.0f, 0.0f, 0.0f);
     for (int i=0; i<std::min(8,numButtons); ++i)
