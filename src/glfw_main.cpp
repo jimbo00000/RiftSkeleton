@@ -310,6 +310,9 @@ void joystick()
     // 5 R bumper
     // 6 Back (left center)
     // 7 Start (right center)
+    // Axis 0 1 Left stick x y
+    // Axis 2 triggers, left positive right negative
+    // Axis 3 4 right stick x y
     const glm::vec3 moveDirsXboxController[8] = {
         glm::vec3( 0.f,  0.f,  1.f),
         glm::vec3( 1.f,  0.f,  0.f),
@@ -339,9 +342,12 @@ void joystick()
         }
     }
 
-    const float mag = 1.0f;
+    float mag = 1.f;
+    if (numAxes > 2)
+    {
+        mag = pow(10.f, pAxisStates[2]);
+    }
     g_app.m_joystickMove = mag * joystickMove;
-
 
     float x_move = pAxisStates[0];
     const float deadzone = 0.2f;
