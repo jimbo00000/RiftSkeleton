@@ -9,7 +9,8 @@
 /// Open the output file.
 Logger::Logger()
 {
-    m_stream.open("log.txt");
+    m_stream.open("RiftSkeleton-log.txt");
+    Write("RiftSkeleton log");
 }
 
 /// Flush and close the output file.

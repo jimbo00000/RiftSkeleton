@@ -536,7 +536,7 @@ void printGLContextInfo(GLFWwindow* pW)
             LOG_INFO("GLFW_OPENGL_CORE_PROFILE");
         }
     }
-    LOG_INFO("OpenGL: %d.%d ", l_Major, l_Minor);
+    LOG_INFO("OpenGL: %d.%d", l_Major, l_Minor);
     LOG_INFO("Vendor: %s", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
     LOG_INFO("Renderer: %s", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
 }
