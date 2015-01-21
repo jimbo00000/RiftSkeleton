@@ -98,7 +98,6 @@ static void SetVsync(int state)
 
 static void ErrorCallback(int p_Error, const char* p_Description)
 {
-    printf("ERROR: %d, %s\n", p_Error, p_Description);
     LOG_INFO("ERROR: %d, %s\n", p_Error, p_Description);
 }
 
@@ -528,21 +527,16 @@ void printGLContextInfo(GLFWwindow* pW)
     {
         if (l_Profile == GLFW_OPENGL_COMPAT_PROFILE)
         {
-            printf("GLFW_OPENGL_COMPAT_PROFILE\n");
-            LOG_INFO("GLFW_OPENGL_COMPAT_PROFILE\n");
+            LOG_INFO("GLFW_OPENGL_COMPAT_PROFILE");
         }
         else
         {
-            printf("GLFW_OPENGL_CORE_PROFILE\n");
-            LOG_INFO("GLFW_OPENGL_CORE_PROFILE\n");
+            LOG_INFO("GLFW_OPENGL_CORE_PROFILE");
         }
     }
-    printf("OpenGL: %d.%d ", l_Major, l_Minor);
-    printf("Vendor: %s\n", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
-    printf("Renderer: %s\n", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
     LOG_INFO("OpenGL: %d.%d ", l_Major, l_Minor);
-    LOG_INFO("Vendor: %s\n", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
-    LOG_INFO("Renderer: %s\n", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
+    LOG_INFO("Vendor: %s", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
+    LOG_INFO("Renderer: %s", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
 }
 
 void initAuxPresentFboShader()
@@ -737,7 +731,8 @@ int main(void)
 
     if (g_app.UsingDebugHmd() == true)
     {
-        // Debug HMD - create a normal, decorated application window
+        // Create a normal, decorated application window
+        LOG_INFO("Using Debug HMD mode.");
         l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
     }
     else
@@ -745,8 +740,7 @@ int main(void)
         // HMD active - position undecorated window to fill HMD viewport
         if (g_app.UsingDirectMode())
         {
-            printf("Using Direct to Rift mode...\n");
-            LOG_INFO("Using Direct to Rift mode...\n");
+            LOG_INFO("Using Direct to Rift mode.");
 
             l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
             glfwSetWindowPos(l_Window, pos.x, pos.y);
@@ -757,7 +751,8 @@ int main(void)
         }
         else
         {
-            // Extended desktop mode
+            LOG_INFO("Using Extended desktop mode.");
+
             glfwWindowHint(GLFW_DECORATED, 0);
             l_Window = glfwCreateWindow(sz.w, sz.h, "GLFW Oculus Rift Test", NULL, NULL);
             glfwWindowHint(GLFW_DECORATED, 1);
@@ -796,7 +791,6 @@ int main(void)
     memset(m_keyStates, 0, GLFW_KEY_LAST*sizeof(int));
 
     // joysticks
-    printf("\n\n");
     for (int i = GLFW_JOYSTICK_1; i <= GLFW_JOYSTICK_LAST; ++i)
     {
         if (GL_FALSE == glfwJoystickPresent(i))
@@ -806,7 +800,7 @@ int main(void)
         if (pJoyName == NULL)
             continue;
 
-        printf("Opened Joystick %d: %s\n", i, pJoyName);
+        LOG_INFO("Glfw opened Joystick %d: %s", i, pJoyName);
         g_joystickIdx = i;
         break;
     }
@@ -822,8 +816,7 @@ int main(void)
     const GLenum l_Result = glewInit();
     if (l_Result != GLEW_OK)
     {
-        printf("glewInit() error.\n");
-        LOG_INFO("glewInit() error.\n");
+        LOG_INFO("glewInit() error.");
         exit(EXIT_FAILURE);
     }
 
