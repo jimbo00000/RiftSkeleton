@@ -93,6 +93,7 @@ static void SetVsync(int state)
     }
     glfwMakeContextCurrent(g_pHMDWindow);
     glfwSwapInterval(state);
+    LOG_INFO("SetVsync(%d)", state);
 }
 
 #include "main_include.cpp"
