@@ -811,6 +811,25 @@ int main(void)
             g_joystickIdx = i;
     }
 
+    // Log system monitor information
+    const GLFWmonitor* pPrimary = glfwGetPrimaryMonitor();
+    int monitorCount = 0;
+    GLFWmonitor** ppMonitors = glfwGetMonitors(&monitorCount);
+    for (int i=0; i<monitorCount; ++i)
+    {
+        GLFWmonitor* pCur = ppMonitors[i];
+        const GLFWvidmode* mode = glfwGetVideoMode(pCur);
+        if (mode != NULL)
+        {
+            LOG_INFO("Monitor #%d: %dx%d @ %dHz %s",
+                i,
+                mode->width,
+                mode->height,
+                mode->refreshRate,
+                pCur==pPrimary ? "Primary":"");
+        }
+    }
+
     printGLContextInfo(l_Window);
     glfwMakeContextCurrent(l_Window);
     g_pHMDWindow = l_Window;
