@@ -801,9 +801,14 @@ int main(void)
         if (pJoyName == NULL)
             continue;
 
-        LOG_INFO("Glfw opened Joystick %d: %s", i, pJoyName);
-        g_joystickIdx = i;
-        break;
+        int numAxes = 0;
+        int numButtons = 0;
+        glfwGetJoystickAxes(i, &numAxes);
+        glfwGetJoystickButtons(i, &numButtons);
+
+        LOG_INFO("Glfw opened Joystick #%d: %s w/ %d axes, %d buttons", i, pJoyName, numAxes, numButtons);
+        if (g_joystickIdx == -1)
+            g_joystickIdx = i;
     }
 
     printGLContextInfo(l_Window);
