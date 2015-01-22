@@ -7,7 +7,7 @@
 struct RenderingMode
 {
     enum outputType {
-        Mono_Raw,
+        Mono_Raw=0,
         Mono_Buffered,
         SideBySide_Undistorted,
         OVR_SDK,
