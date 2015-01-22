@@ -18,12 +18,20 @@
 #include "ShaderFunctions.h"
 #include "GLUtils.h"
 
+#define USE_OVR_PERF_LOGGING
+
 RiftAppSkeleton::RiftAppSkeleton()
 : m_Hmd(NULL)
 , m_usingDebugHmd(false)
 , m_directHmdMode(true)
 {
     m_eyeOri = OVR::Quatf();
+    memset(m_logUserData, 0, 256);
+#ifdef USE_OVR_PERF_LOGGING
+    sprintf(m_logUserData, "RiftSkeleton");
+    // Unfortunately, the OVR perf log does not appear to re-read data
+    // at the given user pointer each log entry(~1Hz). Is this a bug?
+#endif
 }
 
 RiftAppSkeleton::~RiftAppSkeleton()
@@ -84,8 +92,8 @@ void RiftAppSkeleton::initHMD()
         m_usingDebugHmd = true;
     }
 
-#ifdef _DEBUG
-    ovrHmd_StartPerfLog(m_Hmd, "RiftSkeleton-PerfLog.csv", NULL);
+#ifdef USE_OVR_PERF_LOGGING
+    ovrHmd_StartPerfLog(m_Hmd, "RiftSkeletonxxx-PerfLog.csv", m_logUserData);
 #endif
 
     ///@todo Why does ovrHmd_GetEnabledCaps always return 0 when querying the caps
@@ -180,7 +188,7 @@ void RiftAppSkeleton::_initPresentDistMesh(ShaderWithVariables& shader, int eyeI
 
 void RiftAppSkeleton::exitVR()
 {
-#ifdef _DEBUG
+#ifdef USE_OVR_PERF_LOGGING
     ovrHmd_StopPerfLog(m_Hmd);
 #endif
 
@@ -318,6 +326,17 @@ void RiftAppSkeleton::CheckForTapToDismissHealthAndSafetyWarning() const
             }
         }
     }
+}
+
+void RiftAppSkeleton::timestep(double absTime, double dt)
+{
+    AppSkeleton::timestep(absTime, dt);
+
+#ifdef USE_OVR_PERF_LOGGING
+    ///@todo Should the logger re-read data at this user pointer for each entry?
+    const glm::ivec2 rtsz = getRTSize();
+    sprintf(m_logUserData, "RT%dx%d", rtsz.x, rtsz.y);
+#endif
 }
 
 ///@todo Even though this function shares most of its code with client rendering,

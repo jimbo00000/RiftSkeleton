@@ -35,7 +35,7 @@ public:
     void _DrawScenes(const float* pMview, const float* pPersp) const;
     void display_raw() const;
     void display_buffered(bool setViewport=true) const;
-    void timestep(double absTime, double dt);
+    virtual void timestep(double absTime, double dt);
     void resize(int w, int h);
 
     virtual void OnMouseButton(int,int);

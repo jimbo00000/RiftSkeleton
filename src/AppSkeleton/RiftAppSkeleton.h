@@ -56,6 +56,7 @@ public:
     void display_stereo_undistorted() const;
     void display_sdk() const;
     void display_client() const;
+    virtual void timestep(double absTime, double dt);
 
 protected:
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);
@@ -75,6 +76,7 @@ protected:
     ovrDistortionMesh m_DistMeshes[2];
     mutable ovrQuatf m_eyeOri;
 
+    char m_logUserData[256];
 
 private: // Disallow copy ctor and assignment operator
     RiftAppSkeleton(const RiftAppSkeleton&);
