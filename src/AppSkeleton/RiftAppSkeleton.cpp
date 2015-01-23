@@ -201,15 +201,15 @@ void RiftAppSkeleton::exitVR()
 /// Add together the render target size fields of the HMD laid out side-by-side.
 ovrSizei calculateCombinedTextureSize(ovrHmd pHmd)
 {
-    ovrSizei l_TextureSize = {0};
+    ovrSizei texSz = {0};
     if (pHmd == NULL)
-        return l_TextureSize;
+        return texSz;
 
-    ovrSizei l_TextureSizeLeft = ovrHmd_GetFovTextureSize(pHmd, ovrEye_Left, pHmd->DefaultEyeFov[0], 1.0f);
-    ovrSizei l_TextureSizeRight = ovrHmd_GetFovTextureSize(pHmd, ovrEye_Right, pHmd->DefaultEyeFov[1], 1.0f);
-    l_TextureSize.w = l_TextureSizeLeft.w + l_TextureSizeRight.w;
-    l_TextureSize.h = (l_TextureSizeLeft.h>l_TextureSizeRight.h ? l_TextureSizeLeft.h : l_TextureSizeRight.h);
-    return l_TextureSize;
+    const ovrSizei szL = ovrHmd_GetFovTextureSize(pHmd, ovrEye_Left, pHmd->DefaultEyeFov[ovrEye_Left], 1.f);
+    const ovrSizei szR = ovrHmd_GetFovTextureSize(pHmd, ovrEye_Right, pHmd->DefaultEyeFov[ovrEye_Right], 1.f);
+    texSz.w = szL.w + szR.w;
+    texSz.h = std::max(szL.h, szR.h);
+    return texSz;
 }
 
 int RiftAppSkeleton::ConfigureRendering()
