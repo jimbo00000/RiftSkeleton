@@ -198,15 +198,26 @@ void RiftAppSkeleton::exitVR()
     ovr_Shutdown();
 }
 
+/// Add together the render target size fields of the HMD laid out side-by-side.
+ovrSizei calculateCombinedTextureSize(ovrHmd pHmd)
+{
+    ovrSizei l_TextureSize = {0};
+    if (pHmd == NULL)
+        return l_TextureSize;
+
+    ovrSizei l_TextureSizeLeft = ovrHmd_GetFovTextureSize(pHmd, ovrEye_Left, pHmd->DefaultEyeFov[0], 1.0f);
+    ovrSizei l_TextureSizeRight = ovrHmd_GetFovTextureSize(pHmd, ovrEye_Right, pHmd->DefaultEyeFov[1], 1.0f);
+    l_TextureSize.w = l_TextureSizeLeft.w + l_TextureSizeRight.w;
+    l_TextureSize.h = (l_TextureSizeLeft.h>l_TextureSizeRight.h ? l_TextureSizeLeft.h : l_TextureSizeRight.h);
+    return l_TextureSize;
+}
+
 int RiftAppSkeleton::ConfigureRendering()
 {
     if (m_Hmd == NULL)
         return 1;
-    ovrSizei l_TextureSizeLeft = ovrHmd_GetFovTextureSize(m_Hmd, ovrEye_Left, m_Hmd->DefaultEyeFov[0], 1.0f);
-    ovrSizei l_TextureSizeRight = ovrHmd_GetFovTextureSize(m_Hmd, ovrEye_Right, m_Hmd->DefaultEyeFov[1], 1.0f);
-    ovrSizei l_TextureSize;
-    l_TextureSize.w = l_TextureSizeLeft.w + l_TextureSizeRight.w;
-    l_TextureSize.h = (l_TextureSizeLeft.h>l_TextureSizeRight.h ? l_TextureSizeLeft.h : l_TextureSizeRight.h);
+
+    ovrSizei l_TextureSize = calculateCombinedTextureSize(m_Hmd);
 
     m_EyeTexture[0].OGL.Header.API = ovrRenderAPI_OpenGL;
     m_EyeTexture[0].OGL.Header.TextureSize.w = l_TextureSize.w;
@@ -254,11 +265,7 @@ int RiftAppSkeleton::ConfigureClientRendering()
     m_EyeRenderDesc[0] = ovrHmd_GetRenderDesc(m_Hmd, ovrEye_Left, m_EyeFov[0]);
     m_EyeRenderDesc[1] = ovrHmd_GetRenderDesc(m_Hmd, ovrEye_Right, m_EyeFov[1]);
 
-    ovrSizei l_TextureSizeLeft = ovrHmd_GetFovTextureSize(m_Hmd, ovrEye_Left, m_Hmd->DefaultEyeFov[0], 1.0f);
-    ovrSizei l_TextureSizeRight = ovrHmd_GetFovTextureSize(m_Hmd, ovrEye_Right, m_Hmd->DefaultEyeFov[1], 1.0f);
-    ovrSizei l_TextureSize;
-    l_TextureSize.w = l_TextureSizeLeft.w + l_TextureSizeRight.w;
-    l_TextureSize.h = (l_TextureSizeLeft.h>l_TextureSizeRight.h ? l_TextureSizeLeft.h : l_TextureSizeRight.h);
+    ovrSizei l_TextureSize = calculateCombinedTextureSize(m_Hmd);
 
     // Renderbuffer init - we can use smaller subsets of it easily
     deallocateFBO(m_renderBuffer);
