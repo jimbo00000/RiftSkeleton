@@ -123,6 +123,7 @@ void RiftAppSkeleton::initVR()
 
     m_Cfg.OGL.Header.BackBufferSize = getHmdResolution();
 
+    ConfigureRendering();
     ///@todo Do we need to choose here?
     ConfigureSDKRendering();
     ConfigureClientRendering();
@@ -197,8 +198,7 @@ void RiftAppSkeleton::exitVR()
     ovr_Shutdown();
 }
 
-// Active GL context is required for the following
-int RiftAppSkeleton::ConfigureSDKRendering()
+int RiftAppSkeleton::ConfigureRendering()
 {
     if (m_Hmd == NULL)
         return 1;
@@ -221,15 +221,21 @@ int RiftAppSkeleton::ConfigureSDKRendering()
     m_EyeTexture[1] = m_EyeTexture[0];
     m_EyeTexture[1].OGL.Header.RenderViewport.Pos.x = (l_TextureSize.w+1) / 2;
 
-
     // Oculus Rift eye configurations...
     m_EyeFov[0] = m_Hmd->DefaultEyeFov[0];
     m_EyeFov[1] = m_Hmd->DefaultEyeFov[1];
 
+    return 0;
+}
+
+// Active GL context is required for the following
+int RiftAppSkeleton::ConfigureSDKRendering()
+{
+    if (m_Hmd == NULL)
+        return 1;
+
     m_Cfg.OGL.Header.API = ovrRenderAPI_OpenGL;
     m_Cfg.OGL.Header.Multisample = 0;
-
-
 
     const int distortionCaps =
         ovrDistortionCap_Chromatic |
@@ -244,31 +250,15 @@ int RiftAppSkeleton::ConfigureClientRendering()
 {
     if (m_Hmd == NULL)
         return 1;
+
+    m_EyeRenderDesc[0] = ovrHmd_GetRenderDesc(m_Hmd, ovrEye_Left, m_EyeFov[0]);
+    m_EyeRenderDesc[1] = ovrHmd_GetRenderDesc(m_Hmd, ovrEye_Right, m_EyeFov[1]);
+
     ovrSizei l_TextureSizeLeft = ovrHmd_GetFovTextureSize(m_Hmd, ovrEye_Left, m_Hmd->DefaultEyeFov[0], 1.0f);
     ovrSizei l_TextureSizeRight = ovrHmd_GetFovTextureSize(m_Hmd, ovrEye_Right, m_Hmd->DefaultEyeFov[1], 1.0f);
     ovrSizei l_TextureSize;
     l_TextureSize.w = l_TextureSizeLeft.w + l_TextureSizeRight.w;
-    l_TextureSize.h = std::max(l_TextureSizeLeft.h, l_TextureSizeRight.h);
-
-    m_EyeTexture[0].OGL.Header.API = ovrRenderAPI_OpenGL;
-    m_EyeTexture[0].OGL.Header.TextureSize.w = l_TextureSize.w;
-    m_EyeTexture[0].OGL.Header.TextureSize.h = l_TextureSize.h;
-    m_EyeTexture[0].OGL.Header.RenderViewport.Pos.x = 0;
-    m_EyeTexture[0].OGL.Header.RenderViewport.Pos.y = 0;
-    m_EyeTexture[0].OGL.Header.RenderViewport.Size.w = l_TextureSize.w/2;
-    m_EyeTexture[0].OGL.Header.RenderViewport.Size.h = l_TextureSize.h;
-    m_EyeTexture[0].OGL.TexId = m_renderBuffer.tex;
-
-    // Right eye the same, except for the x-position in the texture.
-    m_EyeTexture[1] = m_EyeTexture[0];
-    m_EyeTexture[1].OGL.Header.RenderViewport.Pos.x = (l_TextureSize.w+1) / 2;
-
-    // Oculus Rift eye configurations...
-    m_EyeFov[0] = m_Hmd->DefaultEyeFov[0];
-    m_EyeFov[1] = m_Hmd->DefaultEyeFov[1];
-
-    m_EyeRenderDesc[0] = ovrHmd_GetRenderDesc(m_Hmd, ovrEye_Left, m_EyeFov[0]);
-    m_EyeRenderDesc[1] = ovrHmd_GetRenderDesc(m_Hmd, ovrEye_Right, m_EyeFov[1]);
+    l_TextureSize.h = (l_TextureSizeLeft.h>l_TextureSizeRight.h ? l_TextureSizeLeft.h : l_TextureSizeRight.h);
 
     // Renderbuffer init - we can use smaller subsets of it easily
     deallocateFBO(m_renderBuffer);

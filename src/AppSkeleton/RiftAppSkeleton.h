@@ -37,6 +37,7 @@ public:
     bool UsingDirectMode() const { return m_directHmdMode; }
     void AttachToWindow(void* pWindow) { ovrHmd_AttachToWindow(m_Hmd, pWindow, nullptr, nullptr); }
 
+    int ConfigureRendering();
     int ConfigureSDKRendering();
     int ConfigureClientRendering();
 
