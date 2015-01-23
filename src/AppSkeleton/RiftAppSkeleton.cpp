@@ -315,20 +315,18 @@ void RiftAppSkeleton::CheckForTapToDismissHealthAndSafetyWarning() const
     // Health and Safety Warning display state.
     ovrHSWDisplayState hswDisplayState;
     ovrHmd_GetHSWDisplayState(m_Hmd, &hswDisplayState);
-    if (hswDisplayState.Displayed)
+    if (hswDisplayState.Displayed == false)
+        return;
+
+    // Detect a moderate tap on the side of the HMD.
+    const ovrTrackingState ts = ovrHmd_GetTrackingState(m_Hmd, ovr_GetTimeInSeconds());
+    if (ts.StatusFlags & ovrStatus_OrientationTracked)
     {
-        // Detect a moderate tap on the side of the HMD.
-        const ovrTrackingState ts = ovrHmd_GetTrackingState(m_Hmd, ovr_GetTimeInSeconds());
-        if (ts.StatusFlags & ovrStatus_OrientationTracked)
+        const OVR::Vector3f v(ts.RawSensorData.Accelerometer);
+        // Arbitrary value and representing moderate tap on the side of the DK2 Rift.
+        if (v.LengthSq() > 250.f)
         {
-            const OVR::Vector3f v(ts.RawSensorData.Accelerometer.x,
-                ts.RawSensorData.Accelerometer.y,
-                ts.RawSensorData.Accelerometer.z);
-            // Arbitrary value and representing moderate tap on the side of the DK2 Rift.
-            if (v.LengthSq() > 250.f)
-            {
-                ovrHmd_DismissHSWDisplay(m_Hmd);
-            }
+            ovrHmd_DismissHSWDisplay(m_Hmd);
         }
     }
 }
