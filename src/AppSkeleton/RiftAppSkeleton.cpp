@@ -217,24 +217,30 @@ int RiftAppSkeleton::ConfigureRendering()
     if (m_Hmd == NULL)
         return 1;
 
-    ovrSizei l_TextureSize = calculateCombinedTextureSize(m_Hmd);
+    const ovrSizei texSz = calculateCombinedTextureSize(m_Hmd);
 
-    m_EyeTexture[0].OGL.Header.API = ovrRenderAPI_OpenGL;
-    m_EyeTexture[0].OGL.Header.TextureSize.w = l_TextureSize.w;
-    m_EyeTexture[0].OGL.Header.TextureSize.h = l_TextureSize.h;
-    m_EyeTexture[0].OGL.Header.RenderViewport.Pos.x = 0;
-    m_EyeTexture[0].OGL.Header.RenderViewport.Pos.y = 0;
-    m_EyeTexture[0].OGL.Header.RenderViewport.Size.w = l_TextureSize.w/2;
-    m_EyeTexture[0].OGL.Header.RenderViewport.Size.h = l_TextureSize.h;
-    m_EyeTexture[0].OGL.TexId = m_renderBuffer.tex;
+    ovrGLTexture& texL = m_EyeTexture[ovrEye_Left];
+    ovrGLTextureData& texDataL = texL.OGL;
+    ovrTextureHeader& hdrL = texDataL.Header;
+
+    hdrL.API = ovrRenderAPI_OpenGL;
+    hdrL.TextureSize.w = texSz.w;
+    hdrL.TextureSize.h = texSz.h;
+    hdrL.RenderViewport.Pos.x = 0;
+    hdrL.RenderViewport.Pos.y = 0;
+    hdrL.RenderViewport.Size.w = texSz.w / 2;
+    hdrL.RenderViewport.Size.h = texSz.h;
+    texDataL.TexId = m_renderBuffer.tex;
 
     // Right eye the same, except for the x-position in the texture.
-    m_EyeTexture[1] = m_EyeTexture[0];
-    m_EyeTexture[1].OGL.Header.RenderViewport.Pos.x = (l_TextureSize.w+1) / 2;
+    ovrGLTexture& texR = m_EyeTexture[ovrEye_Right];
+    texR = texL;
+    texR.OGL.Header.RenderViewport.Pos.x = (texSz.w + 1) / 2;
 
-    // Oculus Rift eye configurations...
-    m_EyeFov[0] = m_Hmd->DefaultEyeFov[0];
-    m_EyeFov[1] = m_Hmd->DefaultEyeFov[1];
+    for (int ei=0; ei<ovrEye_Count; ++ei)
+    {
+        m_EyeFov[ei] = m_Hmd->DefaultEyeFov[ei];
+    }
 
     return 0;
 }
