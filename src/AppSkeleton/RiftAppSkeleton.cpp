@@ -212,7 +212,7 @@ ovrSizei calculateCombinedTextureSize(ovrHmd pHmd)
     return texSz;
 }
 
-/// Writes to m_EyeTexture and m_EyeFov
+///@brief Writes to m_EyeTexture and m_EyeFov
 int RiftAppSkeleton::ConfigureRendering()
 {
     if (m_Hmd == NULL)
@@ -246,7 +246,8 @@ int RiftAppSkeleton::ConfigureRendering()
     return 0;
 }
 
-// Active GL context is required for the following
+///@brief Active GL context is required for the following
+/// Writes to m_Cfg
 int RiftAppSkeleton::ConfigureSDKRendering()
 {
     if (m_Hmd == NULL)
@@ -264,38 +265,33 @@ int RiftAppSkeleton::ConfigureSDKRendering()
     return 0;
 }
 
+///@brief Writes to m_EyeRenderDesc, m_EyeRenderDesc and m_DistMeshes
 int RiftAppSkeleton::ConfigureClientRendering()
 {
     if (m_Hmd == NULL)
         return 1;
 
-    m_EyeRenderDesc[0] = ovrHmd_GetRenderDesc(m_Hmd, ovrEye_Left, m_EyeFov[0]);
-    m_EyeRenderDesc[1] = ovrHmd_GetRenderDesc(m_Hmd, ovrEye_Right, m_EyeFov[1]);
-
-    ovrSizei l_TextureSize = calculateCombinedTextureSize(m_Hmd);
-
-    // Renderbuffer init - we can use smaller subsets of it easily
+    const ovrSizei texSz = calculateCombinedTextureSize(m_Hmd);
     deallocateFBO(m_renderBuffer);
-    allocateFBO(m_renderBuffer, l_TextureSize.w, l_TextureSize.h);
-
-    m_RenderViewports[0] = m_EyeTexture[0].OGL.Header.RenderViewport;
-    m_RenderViewports[1] = m_EyeTexture[1].OGL.Header.RenderViewport;
+    allocateFBO(m_renderBuffer, texSz.w, texSz.h);
 
     const int distortionCaps =
         ovrDistortionCap_Chromatic |
         ovrDistortionCap_TimeWarp |
         ovrDistortionCap_Vignette;
-
-    // Generate distortion mesh for each eye
-    for (int eyeNum = 0; eyeNum < 2; eyeNum++)
+    for (int eyeIndex = 0; eyeIndex < ovrEye_Count; eyeIndex++)
     {
-        // Allocate & generate distortion mesh vertices.
+        // Using an idiomatic loop though initializing in eye render order is not necessary.
+        const ovrEyeType eye = m_Hmd->EyeRenderOrder[eyeIndex];
+
+        m_EyeRenderDesc[eye] = ovrHmd_GetRenderDesc(m_Hmd, eye, m_EyeFov[eye]);
+        m_RenderViewports[eye] = m_EyeTexture[eye].OGL.Header.RenderViewport;
         ovrHmd_CreateDistortionMesh(
             m_Hmd,
-            m_EyeRenderDesc[eyeNum].Eye,
-            m_EyeRenderDesc[eyeNum].Fov,
+            m_EyeRenderDesc[eye].Eye,
+            m_EyeRenderDesc[eye].Fov,
             distortionCaps,
-            &m_DistMeshes[eyeNum]);
+            &m_DistMeshes[eye]);
     }
     return 0;
 }
