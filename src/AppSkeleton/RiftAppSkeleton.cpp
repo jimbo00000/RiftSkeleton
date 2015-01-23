@@ -212,6 +212,7 @@ ovrSizei calculateCombinedTextureSize(ovrHmd pHmd)
     return texSz;
 }
 
+/// Writes to m_EyeTexture and m_EyeFov
 int RiftAppSkeleton::ConfigureRendering()
 {
     if (m_Hmd == NULL)
