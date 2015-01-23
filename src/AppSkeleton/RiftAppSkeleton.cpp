@@ -219,6 +219,8 @@ int RiftAppSkeleton::ConfigureRendering()
         return 1;
 
     const ovrSizei texSz = calculateCombinedTextureSize(m_Hmd);
+    deallocateFBO(m_renderBuffer);
+    allocateFBO(m_renderBuffer, texSz.w, texSz.h);
 
     ovrGLTexture& texL = m_EyeTexture[ovrEye_Left];
     ovrGLTextureData& texDataL = texL.OGL;
@@ -270,10 +272,6 @@ int RiftAppSkeleton::ConfigureClientRendering()
 {
     if (m_Hmd == NULL)
         return 1;
-
-    const ovrSizei texSz = calculateCombinedTextureSize(m_Hmd);
-    deallocateFBO(m_renderBuffer);
-    allocateFBO(m_renderBuffer, texSz.w, texSz.h);
 
     const int distortionCaps =
         ovrDistortionCap_Chromatic |
