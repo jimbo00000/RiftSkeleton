@@ -263,7 +263,12 @@ int RiftAppSkeleton::ConfigureClientRendering()
     m_EyeTexture[1] = m_EyeTexture[0];
     m_EyeTexture[1].OGL.Header.RenderViewport.Pos.x = (l_TextureSize.w+1) / 2;
 
+    // Oculus Rift eye configurations...
+    m_EyeFov[0] = m_Hmd->DefaultEyeFov[0];
+    m_EyeFov[1] = m_Hmd->DefaultEyeFov[1];
 
+    m_EyeRenderDesc[0] = ovrHmd_GetRenderDesc(m_Hmd, ovrEye_Left, m_EyeFov[0]);
+    m_EyeRenderDesc[1] = ovrHmd_GetRenderDesc(m_Hmd, ovrEye_Right, m_EyeFov[1]);
 
     // Renderbuffer init - we can use smaller subsets of it easily
     deallocateFBO(m_renderBuffer);
