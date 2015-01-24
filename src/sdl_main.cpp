@@ -45,6 +45,7 @@ int modifier_mode = 0;
 //ShaderWithVariables g_auxPresent;
 SDL_Window* g_pHMDWindow = NULL;
 SDL_Window* g_pAuxWindow = NULL;
+SDL_GLContext g_HMDglContext = NULL;
 Uint32 g_HMDWindowID = 0;
 Uint32 g_AuxWindowID = 0;
 int g_auxWindow_w = 600;
@@ -147,7 +148,7 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
             {
                 if (event.key.windowID == g_HMDWindowID)
                 {
-                    //SDL_GL_DeleteContext(glContext);
+                    SDL_GL_DeleteContext(g_HMDglContext);
                     SDL_DestroyWindow(g_pHMDWindow);
 
                     g_app.exitVR();
@@ -553,8 +554,8 @@ int main(void)
 #endif //USE_OCULUSSDK
 
     // thank you http://www.brandonfoltz.com/2013/12/example-using-opengl-3-0-with-sdl2-and-glew/
-    SDL_GLContext glContext = SDL_GL_CreateContext(g_pHMDWindow);
-    if (glContext == NULL)
+    g_HMDglContext = SDL_GL_CreateContext(g_pHMDWindow);
+    if (g_HMDglContext == NULL)
     {
         LOG_ERROR("There was an error creating the OpenGL context!");
         return 0;
@@ -614,7 +615,7 @@ int main(void)
     LOG_INFO("Vendor: %s", (char*)glGetString(GL_VENDOR));
     LOG_INFO("Renderer: %s", (char*)glGetString(GL_RENDERER));
 
-    SDL_GL_MakeCurrent(g_pHMDWindow, glContext);
+    SDL_GL_MakeCurrent(g_pHMDWindow, g_HMDglContext);
 
     // Don't forget to initialize Glew, turn glewExperimental on to
     // avoid problems fetching function pointers...
@@ -677,7 +678,7 @@ int main(void)
         {
             // SDL allows us to share contexts, so we can just call display on g_app
             // and use all of the VAOs resident in the HMD window's context.
-            SDL_GL_MakeCurrent(g_pAuxWindow, glContext);
+            SDL_GL_MakeCurrent(g_pAuxWindow, g_HMDglContext);
 
             // Get window size from SDL - is this worth caching?
             int w, h;
@@ -696,11 +697,11 @@ int main(void)
             SDL_GL_SwapWindow(g_pAuxWindow);
 
             // Set context to Rift window when done
-            SDL_GL_MakeCurrent(g_pHMDWindow, glContext);
+            SDL_GL_MakeCurrent(g_pHMDWindow, g_HMDglContext);
         }
     }
 
-    SDL_GL_DeleteContext(glContext);
+    SDL_GL_DeleteContext(g_HMDglContext);
     SDL_DestroyWindow(g_pHMDWindow);
 
     g_app.exitVR();
