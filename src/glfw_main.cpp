@@ -172,10 +172,12 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
             {
                 if (g_AuxWindow == NULL)
                 {
+                    LOG_INFO("Creating auxiliary window.");
                     g_AuxWindow = initializeAuxiliaryWindow(g_pHMDWindow);
                 }
                 else
                 {
+                    LOG_INFO("Destroying auxiliary window.");
                     destroyAuxiliaryWindow(g_AuxWindow);
                     glfwMakeContextCurrent(g_pHMDWindow);
                 }
@@ -820,6 +822,7 @@ int main(void)
 
 
 #ifdef USE_ANTTWEAKBAR
+    LOG_INFO("Using AntTweakbar.");
   #ifdef USE_CORE_CONTEXT
     TwInit(TW_OPENGL_CORE, NULL);
   #else
