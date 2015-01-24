@@ -462,9 +462,15 @@ int main(void)
     const ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
 
+#ifdef USE_CORE_CONTEXT
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+#else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+#endif
 
     // According to the OVR SDK 0.3.2 Overview, WindowsPos will be set to (0,0)
     // if not supported. This will also be the case if the Rift DK1 display is
@@ -490,7 +496,7 @@ int main(void)
 
     if (g_pHMDWindow == NULL)
     {
-        fprintf(stderr, "%s\n", SDL_GetError());
+        LOG_ERROR("%s", SDL_GetError());
         SDL_Quit();
     }
 
@@ -500,35 +506,15 @@ int main(void)
     SDL_GLContext glContext = SDL_GL_CreateContext(g_pHMDWindow);
     if (glContext == NULL)
     {
-        printf("There was an error creating the OpenGL context!\n");
+        LOG_ERROR("There was an error creating the OpenGL context!");
         return 0;
     }
 
     const unsigned char *version = glGetString(GL_VERSION);
     if (version == NULL) 
     {
-        printf("There was an error creating the OpenGL context!\n");
+        LOG_ERROR("There was an error creating the OpenGL context!");
         return 1;
-    }
-
-    printf("OpenGL: %s ", version);
-    printf("Vendor: %s\n", (char*)glGetString(GL_VENDOR));
-    printf("Renderer: %s\n", (char*)glGetString(GL_RENDERER));
-    LOG_INFO("OpenGL: %s ", version);
-    LOG_INFO("Vendor: %s\n", (char*)glGetString(GL_VENDOR));
-    LOG_INFO("Renderer: %s\n", (char*)glGetString(GL_RENDERER));
-
-    SDL_GL_MakeCurrent(g_pHMDWindow, glContext);
-
-    // Don't forget to initialize Glew, turn glewExperimental on to
-    // avoid problems fetching function pointers...
-    glewExperimental = GL_TRUE;
-    const GLenum l_Result = glewInit();
-    if (l_Result != GLEW_OK)
-    {
-        printf("glewInit() error.\n");
-        LOG_INFO("glewInit() error.\n");
-        exit(EXIT_FAILURE);
     }
 
     SDL_SysWMinfo info;
@@ -540,20 +526,39 @@ int main(void)
     g_app.setWindow(info.info.x11.window, info.info.x11.display);
 #endif
 
+    LOG_INFO("OpenGL: %s", version);
+    LOG_INFO("Vendor: %s", (char*)glGetString(GL_VENDOR));
+    LOG_INFO("Renderer: %s", (char*)glGetString(GL_RENDERER));
+
+    SDL_GL_MakeCurrent(g_pHMDWindow, glContext);
+
+    // Don't forget to initialize Glew, turn glewExperimental on to
+    // avoid problems fetching function pointers...
+    glewExperimental = GL_TRUE;
+    const GLenum l_Result = glewInit();
+    if (l_Result != GLEW_OK)
+    {
+        LOG_INFO("glewInit() error.");
+        exit(EXIT_FAILURE);
+    }
+
+#ifdef USE_ANTTWEAKBAR
+  #ifdef USE_CORE_CONTEXT
+    TwInit(TW_OPENGL_CORE, NULL);
+  #else
+    TwInit(TW_OPENGL, NULL);
+  #endif
+    InitializeBar();
+#endif
+
     LOG_INFO("Calling initGL...");
     g_app.initGL();
     LOG_INFO("Calling initVR...");
     g_app.initVR();
     LOG_INFO("initVR complete.");
 
-#ifdef USE_ANTTWEAKBAR
-    TwInit(TW_OPENGL, NULL);
-    InitializeBar();
-#endif
-
     memset(m_keyStates, 0, 4096*sizeof(int));
 
-    printf("\n");
     // Joysticks/gamepads
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
     // Check for joystick
