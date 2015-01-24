@@ -66,7 +66,16 @@ SDL_Window* initializeAuxiliaryWindow();
 void destroyAuxiliaryWindow(SDL_Window* pAuxWindow);
 
 // Set VSync is framework-dependent and has to come before the include
-static void SetVsync(int state) {}
+static void SetVsync(int state)
+{
+    LOG_INFO("SetVsync(%d)", state);
+    ///@todo Handle aux window
+    int ret = SDL_GL_SetSwapInterval(state);
+    if (ret != 0)
+    {
+        LOG_INFO("Error occurred in SDL_GL_SetSwapInterval: %s", SDL_GetError());
+    }
+}
 
 #include "main_include.cpp"
 
@@ -96,6 +105,9 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
         //printf("key ac  %d %d\n", key, action);
     }
 
+    const float f = 0.9f;
+    const float ff = 0.99f;
+
     if (action == SDL_KEYDOWN)
     {
         switch (key)
@@ -122,6 +134,17 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
         case SDLK_F4:
             g_renderMode.toggleRenderingTypeDistortion();
             break;
+
+        case SDLK_F5: g_dynamicallyScaleFBO = false; g_app.SetFBOScale(f * g_app.GetFBOScale()); break;
+        case SDLK_F6: g_dynamicallyScaleFBO = false; g_app.SetFBOScale(ff * g_app.GetFBOScale()); break;
+        case SDLK_F7: g_dynamicallyScaleFBO = false; g_app.SetFBOScale((1.f/ff) * g_app.GetFBOScale()); break;
+        case SDLK_F8: g_dynamicallyScaleFBO = false; g_app.SetFBOScale((1.f/f) * g_app.GetFBOScale()); break;
+
+        case SDLK_F9: SetVsync(0); break;
+        case SDLK_F10: SetVsync(1); break;
+        case SDLK_F11: SetVsync(-1); break;
+
+        case SDLK_DELETE: g_dynamicallyScaleFBO = !g_dynamicallyScaleFBO; break;
 
         case '`':
             if (g_pAuxWindow == NULL)
