@@ -34,6 +34,7 @@ RenderingMode g_renderMode;
 Timer g_timer;
 double g_lastFrameTime = 0.0;
 FPSTimer g_fps;
+Timer g_logDumpTimer;
 
 int m_keyStates[4096];
 
@@ -752,6 +753,13 @@ int main(void)
                 SDL_SetWindowTitle(g_pAuxWindow, oss.str().c_str());
         }
 #endif
+
+        const float dumpInterval = 1.f;
+        if (g_logDumpTimer.seconds() > dumpInterval)
+        {
+            LOG_INFO("Frame rate: %d fps", static_cast<int>(g_fps.GetFPS()));
+            g_logDumpTimer.reset();
+        }
 
         // Optionally display to auxiliary mono view
         if (g_pAuxWindow != NULL)
