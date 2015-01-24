@@ -331,6 +331,7 @@ void mouseDown(int button, int state, int x, int y)
     {
         which_button = -1;
     }
+    g_app.OnMouseButton(button, state);
 }
 
 void mouseMove(int x, int y)
@@ -355,6 +356,17 @@ void mouseMove(int x, int y)
         const float moveMagnitude = 0.5f;
         g_app.m_mouseMove.x += static_cast<float>(mmx) * moveMagnitude;
         g_app.m_mouseMove.z += static_cast<float>(mmy) * moveMagnitude;
+    }
+    else if (which_button == SDL_BUTTON_MIDDLE)
+    {
+        const float moveMagnitude = 0.5f;
+        g_app.m_mouseMove.x += static_cast<float>(mmx) * moveMagnitude;
+        g_app.m_mouseMove.y -= static_cast<float>(mmy) * moveMagnitude;
+    }
+    else
+    {
+        // Passive motion, no mouse button pressed
+        g_app.OnMouseMove(static_cast<int>(x), static_cast<int>(y));
     }
 }
 
