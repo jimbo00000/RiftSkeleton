@@ -270,8 +270,38 @@ void joystick()
         glm::vec3( 0.f, -1.f,  0.f),
     };
 
+    // Xbox controller layout:
+    // numAxes 5, numButtons 14
+    // 0 A (down position)
+    // 1 B (right position)
+    // 2 X (left position)
+    // 3 Y (up position)
+    // 4 L bumper
+    // 5 R bumper
+    // 6 Back (left center)
+    // 7 Start (right center)
+    // Axis 0 1 Left stick x y
+    // Axis 2 triggers, left positive right negative
+    // Axis 3 4 right stick x y
+    const glm::vec3 moveDirsXboxController[8] = {
+        glm::vec3( 0.f,  0.f,  1.f),
+        glm::vec3( 1.f,  0.f,  0.f),
+        glm::vec3(-1.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f, -1.f),
+        glm::vec3( 0.f, -1.f,  0.f),
+        glm::vec3( 0.f,  1.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+    };
+
     ///@todo Different mappings for different controllers.
     const glm::vec3* moveDirs = moveDirsGravisGamepadPro;
+    const std::string joyName(SDL_JoystickName(g_pJoy));
+    if (!joyName.compare("XInput Controller #1"))
+    {
+        ///@todo SDL2 does not seem to receive Xbox controller button states
+        moveDirs = moveDirsXboxController;
+    }
 
     glm::vec3 joystickMove(0.0f, 0.0f, 0.0f);
     for (int i=0; i<std::min(8,numButtons); ++i)
