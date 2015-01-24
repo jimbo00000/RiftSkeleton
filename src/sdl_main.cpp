@@ -98,8 +98,6 @@ void timestep()
     g_app.timestep(absT, dt);
 }
 
-
-
 void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
 {
     (void)codes;
@@ -107,12 +105,13 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
 
     const int KEYUP = 0;
     const int KEYDOWN = 1;
-    if ((key > -1) && (key <= 4096))
+    const int keyMasked = key & 0xfff;
+    if ((key > -1) && (keyMasked <= 4096))
     {
         int keystate = KEYUP;
         if (action == SDL_KEYDOWN)
             keystate = 1;
-        m_keyStates[key] = keystate;
+        m_keyStates[keyMasked] = keystate;
         //printf("key ac  %d %d\n", key, action);
     }
 
@@ -160,10 +159,12 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
         case '`':
             if (g_pAuxWindow == NULL)
             {
+                LOG_INFO("Creating auxiliary window.");
                 g_pAuxWindow = initializeAuxiliaryWindow();
             }
             else
             {
+                LOG_INFO("Destroying auxiliary window.");
                 destroyAuxiliaryWindow(g_pAuxWindow);
                 g_pAuxWindow = NULL;
             }
@@ -203,34 +204,21 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
 
     //g_app.keyboard(key, action, 0,0);
 
-
+    const glm::vec3 forward(0.f, 0.f, -1.f);
+    const glm::vec3 up(0.f, 1.f, 0.f);
+    const glm::vec3 right(1.f, 0.f, 0.f);
     // Handle keyboard movement(WASD & QE keys)
-    // Are these reversed??
     glm::vec3 keyboardMove(0.0f, 0.0f, 0.0f);
-    if (m_keyStates['w'] != KEYUP)
-    {
-        keyboardMove += glm::vec3(0.0f, 0.0f, -1.0f);
-    }
-    if (m_keyStates['s'] != KEYUP)
-    {
-        keyboardMove += glm::vec3(0.0f, 0.0f, 1.0f);
-    }
-    if (m_keyStates['a'] != KEYUP)
-    {
-        keyboardMove += glm::vec3(-1.0f, 0.0f, 0.0f);
-    }
-    if (m_keyStates['d'] != KEYUP)
-    {
-        keyboardMove += glm::vec3(1.0f, 0.0f, 0.0f);
-    }
-    if (m_keyStates['q'] != KEYUP)
-    {
-        keyboardMove += glm::vec3(0.0f, -1.0f, 0.0f);
-    }
-    if (m_keyStates['e'] != KEYUP)
-    {
-        keyboardMove += glm::vec3(0.0f, 1.0f, 0.0f);
-    }
+    if (m_keyStates['w'] != KEYUP) { keyboardMove += forward; }
+    if (m_keyStates['s'] != KEYUP) { keyboardMove -= forward; }
+    if (m_keyStates['a'] != KEYUP) { keyboardMove -= right; }
+    if (m_keyStates['d'] != KEYUP) { keyboardMove += right; }
+    if (m_keyStates['q'] != KEYUP) { keyboardMove -= up; }
+    if (m_keyStates['e'] != KEYUP) { keyboardMove += up; }
+    if (m_keyStates[SDLK_UP] != KEYUP) { keyboardMove += forward; }
+    if (m_keyStates[SDLK_DOWN] != KEYUP) { keyboardMove -= forward; }
+    if (m_keyStates[SDLK_LEFT] != KEYUP) { keyboardMove -= right; }
+    if (m_keyStates[SDLK_RIGHT] != KEYUP) { keyboardMove += right; }
 
     float mag = 1.0f;
     if (SDL_GetModState() & KMOD_LSHIFT)
