@@ -29,18 +29,19 @@ public:
     void initHMD();
     void initVR();
     void exitVR();
-
     void RecenterPose();
-    ovrSizei getHmdResolution() const;
-    ovrVector2i getHmdWindowPos() const;
-    bool UsingDebugHmd() const { return m_usingDebugHmd; }
-    bool UsingDirectMode() const { return m_directHmdMode; }
-    void AttachToWindow(void* pWindow) { ovrHmd_AttachToWindow(m_Hmd, pWindow, nullptr, nullptr); }
-
     int ConfigureRendering();
     int ConfigureSDKRendering();
     int ConfigureClientRendering();
+    void DismissHealthAndSafetyWarning() const;
+    void CheckForTapToDismissHealthAndSafetyWarning() const;
 
+    void display_stereo_undistorted() const;
+    void display_sdk() const;
+    void display_client() const;
+
+    // Direct mode and SDK rendering hooks
+    void AttachToWindow(void* pWindow) { ovrHmd_AttachToWindow(m_Hmd, pWindow, nullptr, nullptr); }
 #if defined(OVR_OS_WIN32)
     void setWindow(HWND w) { m_Cfg.OGL.Window = w; }
 #elif defined(OVR_OS_LINUX)
@@ -51,13 +52,12 @@ public:
     }
 #endif
 
-    void DismissHealthAndSafetyWarning() const;
-    void CheckForTapToDismissHealthAndSafetyWarning() const;
-
-    void display_stereo_undistorted() const;
-    void display_sdk() const;
-    void display_client() const;
     virtual void timestep(double absTime, double dt);
+
+    ovrSizei getHmdResolution() const;
+    ovrVector2i getHmdWindowPos() const;
+    bool UsingDebugHmd() const { return m_usingDebugHmd; }
+    bool UsingDirectMode() const { return m_directHmdMode; }
 
 protected:
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);
