@@ -488,6 +488,21 @@ int main(void)
         if (g_app.UsingDirectMode())
         {
             LOG_INFO("Using Direct to Rift mode.");
+
+            g_pHMDWindow = SDL_CreateWindow(
+                "GL Skeleton - SDL2",
+                pos.x, pos.y,
+                sz.w, sz.h,
+                SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+#if defined(_WIN32)
+            SDL_SysWMinfo info;
+            SDL_VERSION(&info.version);
+            const bool ret = SDL_GetWindowWMInfo(g_pHMDWindow, &info);
+            if (ret)
+            {
+                g_app.AttachToWindow(info.info.win.window);
+            }
+#endif
         }
         else
         {
@@ -530,9 +545,6 @@ int main(void)
   #endif
 #endif //USE_OCULUSSDK
 
-
-
-
     // thank you http://www.brandonfoltz.com/2013/12/example-using-opengl-3-0-with-sdl2-and-glew/
     SDL_GLContext glContext = SDL_GL_CreateContext(g_pHMDWindow);
     if (glContext == NULL)
@@ -547,9 +559,6 @@ int main(void)
         LOG_ERROR("There was an error creating the OpenGL context!");
         return 1;
     }
-
-
-
 
     // Joysticks/gamepads
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
