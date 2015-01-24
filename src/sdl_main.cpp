@@ -147,6 +147,13 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
             {
                 if (event.key.windowID == g_HMDWindowID)
                 {
+                    //SDL_GL_DeleteContext(glContext);
+                    SDL_DestroyWindow(g_pHMDWindow);
+
+                    g_app.exitVR();
+                    if (g_pJoy != NULL)
+                        SDL_JoystickClose(g_pJoy);
+                    SDL_Quit();
                     exit(0);
                 }
                 else
