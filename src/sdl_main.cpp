@@ -54,7 +54,7 @@ SDL_Joystick* g_pJoy = NULL;
 
 float g_fpsSmoothingFactor = 0.02f;
 float g_fpsDeltaThreshold = 5.0f;
-bool g_dynamicallyScaleFBO = true;
+bool g_dynamicallyScaleFBO = false;
 int g_targetFPS = 100;
 
 #ifdef USE_ANTTWEAKBAR
@@ -492,39 +492,22 @@ int main(void)
         else
         {
             LOG_INFO("Using Extended desktop mode.");
-        }
-    }
 
-    // According to the OVR SDK 0.3.2 Overview, WindowsPos will be set to (0,0)
-    // if not supported. This will also be the case if the Rift DK1 display is
-    // cloned/duplicated to the main(convenient for debug).
-    int wx = SDL_WINDOWPOS_UNDEFINED;
-    int wy = SDL_WINDOWPOS_UNDEFINED;
-    if ((pos.x == 0) && (pos.y == 0))
-    {
-        // Windowed mode
-    }
-    else
-    {
-        wx = pos.x;
-        wy = pos.y;
+            g_pHMDWindow = SDL_CreateWindow(
+                "GL Skeleton - SDL2",
+                pos.x, pos.y,
+                sz.w, sz.h,
+                SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+
+        }
         g_renderMode.outputType = RenderingMode::OVR_SDK;
     }
-
-    g_pHMDWindow = SDL_CreateWindow(
-        "GL Skeleton - SDL2",
-        wx, wy,
-        sz.w, sz.h,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
 #else
-    int wx = SDL_WINDOWPOS_UNDEFINED;
-    int wy = SDL_WINDOWPOS_UNDEFINED;
     g_pHMDWindow = SDL_CreateWindow(
         "GL Skeleton - SDL2",
-        wx, wy,
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         sz.w, sz.h,
         SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-
 #endif //USE_OCULUSSDK
 
 
