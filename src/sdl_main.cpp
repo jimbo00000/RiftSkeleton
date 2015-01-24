@@ -370,6 +370,18 @@ void mouseMove(int x, int y)
     }
 }
 
+void mouseWheel(int x, int y)
+{
+    const int delta = static_cast<int>(y);
+    const float curscale = g_app.GetFBOScale();
+    const float incr = 1.05f;
+    g_app.SetFBOScale(curscale * pow(incr, static_cast<float>(delta)));
+    if (fabs(static_cast<float>(x)) > 0.f)
+    {
+        g_app.OnMouseWheel(x,y);
+    }
+}
+
 void mouseDown_Aux(int button, int state, int x, int y)
 {
 #ifdef USE_ANTTWEAKBAR
@@ -465,6 +477,10 @@ void PollEvents()
             break;
 
         case SDL_MOUSEWHEEL:
+            if (event.window.windowID == g_AuxWindowID)
+                mouseWheel(event.wheel.x, event.wheel.y);
+            else
+                mouseWheel(event.wheel.x, event.wheel.y);
             break;
 
         case SDL_WINDOWEVENT:
