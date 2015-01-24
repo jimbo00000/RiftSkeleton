@@ -215,10 +215,10 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
     if (m_keyStates['d'] != KEYUP) { keyboardMove += right; }
     if (m_keyStates['q'] != KEYUP) { keyboardMove -= up; }
     if (m_keyStates['e'] != KEYUP) { keyboardMove += up; }
-    if (m_keyStates[SDLK_UP] != KEYUP) { keyboardMove += forward; }
-    if (m_keyStates[SDLK_DOWN] != KEYUP) { keyboardMove -= forward; }
-    if (m_keyStates[SDLK_LEFT] != KEYUP) { keyboardMove -= right; }
-    if (m_keyStates[SDLK_RIGHT] != KEYUP) { keyboardMove += right; }
+    if (m_keyStates[SDLK_UP &0xfff] != KEYUP) { keyboardMove += forward; }
+    if (m_keyStates[SDLK_DOWN &0xfff] != KEYUP) { keyboardMove -= forward; }
+    if (m_keyStates[SDLK_LEFT &0xfff] != KEYUP) { keyboardMove -= right; }
+    if (m_keyStates[SDLK_RIGHT &0xfff] != KEYUP) { keyboardMove += right; }
 
     float mag = 1.0f;
     if (SDL_GetModState() & KMOD_LSHIFT)
@@ -247,39 +247,39 @@ void joystick()
     if (g_pJoy == NULL)
         return;
 
-    glm::vec3 joystickMove(0.0f, 0.0f, 0.0f);
+    if (SDL_JoystickGetAttached(g_pJoy) == SDL_FALSE)
+        return;
 
-    if (SDL_JoystickGetButton(g_pJoy, 0) != 0)
+    const int MAX_BUTTONS = 32;
+    Uint8 buttonStates[MAX_BUTTONS];
+    int numButtons = SDL_JoystickNumButtons(g_pJoy);
+    for (int i=0; i<std::min(numButtons, MAX_BUTTONS); ++i)
     {
-        joystickMove += glm::vec3(-1.0f, 0.0f, 0.0f);
+        buttonStates[i] = SDL_JoystickGetButton(g_pJoy, i);
     }
-    if (SDL_JoystickGetButton(g_pJoy, 1) != 0)
+
+    // Map joystick buttons to move directions
+    const glm::vec3 moveDirsGravisGamepadPro[8] = {
+        glm::vec3(-1.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  1.f),
+        glm::vec3( 1.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f, -1.f),
+        glm::vec3( 0.f,  1.f,  0.f),
+        glm::vec3( 0.f,  1.f,  0.f),
+        glm::vec3( 0.f, -1.f,  0.f),
+        glm::vec3( 0.f, -1.f,  0.f),
+    };
+
+    ///@todo Different mappings for different controllers.
+    const glm::vec3* moveDirs = moveDirsGravisGamepadPro;
+
+    glm::vec3 joystickMove(0.0f, 0.0f, 0.0f);
+    for (int i=0; i<std::min(8,numButtons); ++i)
     {
-        joystickMove += glm::vec3(0.0f, 0.0f, 1.0f);
-    }
-    if (SDL_JoystickGetButton(g_pJoy, 2) != 0)
-    {
-        joystickMove += glm::vec3(1.0f, 0.0f, 0.0f);
-    }
-    if (SDL_JoystickGetButton(g_pJoy, 3) != 0)
-    {
-        joystickMove += glm::vec3(0.0f, 0.0f, -1.0f);
-    }
-    if (SDL_JoystickGetButton(g_pJoy, 4) != 0)
-    {
-        joystickMove += glm::vec3(0.0f, 2.0f, 0.0f);
-    }
-    if (SDL_JoystickGetButton(g_pJoy, 6) != 0)
-    {
-        joystickMove += glm::vec3(0.0f, -2.0f, 0.0f);
-    }
-    if (SDL_JoystickGetButton(g_pJoy, 5) != 0)
-    {
-        joystickMove += glm::vec3(0.0f, 1.0f, 0.0f);
-    }
-    if (SDL_JoystickGetButton(g_pJoy, 7) != 0)
-    {
-        joystickMove += glm::vec3(0.0f, -1.0f, 0.0f);
+        if (buttonStates[i] != 0)
+        {
+            joystickMove += moveDirs[i];
+        }
     }
 
     float mag = 1.0f;
