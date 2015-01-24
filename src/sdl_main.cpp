@@ -532,6 +532,32 @@ int main(void)
 
     SDL_GL_MakeCurrent(g_pHMDWindow, glContext);
 
+    // Joysticks/gamepads
+    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+
+    const int numjoys = SDL_NumJoysticks();
+    for (int i=0; i<numjoys; ++i)
+    {
+        SDL_Joystick* pJoy = SDL_JoystickOpen(i);
+        if (pJoy == NULL)
+            continue;
+
+        LOG_INFO("SDL2 opened Joystick #%d: %s w/ %d axes, %d buttons, %d balls",
+            i,
+            SDL_JoystickName(pJoy),
+            SDL_JoystickNumAxes(pJoy),
+            SDL_JoystickNumButtons(pJoy),
+            SDL_JoystickNumBalls(pJoy));
+
+        SDL_JoystickClose(g_pJoy);
+    }
+
+    if (numjoys > 0)
+    {
+        g_pJoy = SDL_JoystickOpen(0);
+    }
+
+
     // Don't forget to initialize Glew, turn glewExperimental on to
     // avoid problems fetching function pointers...
     glewExperimental = GL_TRUE;
@@ -559,21 +585,6 @@ int main(void)
 
     memset(m_keyStates, 0, 4096*sizeof(int));
 
-    // Joysticks/gamepads
-    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-    // Check for joystick
-    if (SDL_NumJoysticks() > 0)
-    {
-        g_pJoy = SDL_JoystickOpen(0);
-    }
-    if (g_pJoy != NULL)
-    {
-        printf("Opened Joystick 0\n");
-        printf("Name: %s\n", SDL_JoystickName(0));
-        printf("Number of Axes: %d\n", SDL_JoystickNumAxes(g_pJoy));
-        printf("Number of Buttons: %d\n", SDL_JoystickNumButtons(g_pJoy));
-        printf("Number of Balls: %d\n", SDL_JoystickNumBalls(g_pJoy));
-    }
 
     int quit = 0;
     while (quit == 0)
