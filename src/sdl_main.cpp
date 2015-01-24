@@ -450,17 +450,12 @@ void destroyAuxiliaryWindow(SDL_Window* pAuxWindow)
 
 int main(void)
 {
-    ///@todo cmd line aargs
+    ///@todo Command line options
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
         return false;
     }
-
-    // This call assumes the Rift display is in extended mode.
-    g_app.initHMD();
-    const ovrSizei sz = g_app.getHmdResolution();
-    const ovrVector2i pos = g_app.getHmdWindowPos();
 
 #ifdef USE_CORE_CONTEXT
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -471,6 +466,34 @@ int main(void)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #endif
+
+#ifdef USE_OCULUSSDK
+    g_app.initHMD();
+    const ovrSizei sz = g_app.getHmdResolution();
+    const ovrVector2i pos = g_app.getHmdWindowPos();
+
+    if (g_app.UsingDebugHmd() == true)
+    {
+        // Create a normal, decorated application window
+        LOG_INFO("Using Debug HMD mode.");
+        g_pHMDWindow = SDL_CreateWindow(
+            "GL Skeleton - SDL2",
+            SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+            sz.w, sz.h,
+            SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+    }
+    else
+    {
+        // HMD active - position undecorated window to fill HMD viewport
+        if (g_app.UsingDirectMode())
+        {
+            LOG_INFO("Using Direct to Rift mode.");
+        }
+        else
+        {
+            LOG_INFO("Using Extended desktop mode.");
+        }
+    }
 
     // According to the OVR SDK 0.3.2 Overview, WindowsPos will be set to (0,0)
     // if not supported. This will also be the case if the Rift DK1 display is
@@ -493,14 +516,39 @@ int main(void)
         wx, wy,
         sz.w, sz.h,
         SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+#else
+    int wx = SDL_WINDOWPOS_UNDEFINED;
+    int wy = SDL_WINDOWPOS_UNDEFINED;
+    g_pHMDWindow = SDL_CreateWindow(
+        "GL Skeleton - SDL2",
+        wx, wy,
+        sz.w, sz.h,
+        SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+
+#endif //USE_OCULUSSDK
+
 
     if (g_pHMDWindow == NULL)
     {
-        LOG_ERROR("%s", SDL_GetError());
+        LOG_ERROR("SDL_CreateWindow failed with error: %s", SDL_GetError());
         SDL_Quit();
     }
 
     g_HMDWindowID = SDL_GetWindowID(g_pHMDWindow);
+
+#ifdef USE_OCULUSSDK
+    SDL_SysWMinfo info;
+    SDL_VERSION(&info.version);
+    SDL_GetWindowWMInfo(g_pHMDWindow, &info);
+  #if defined(OVR_OS_WIN32)
+    g_app.setWindow(info.info.win.window);
+  #elif defined(OVR_OS_LINUX)
+    g_app.setWindow(info.info.x11.window, info.info.x11.display);
+  #endif
+#endif //USE_OCULUSSDK
+
+
+
 
     // thank you http://www.brandonfoltz.com/2013/12/example-using-opengl-3-0-with-sdl2-and-glew/
     SDL_GLContext glContext = SDL_GL_CreateContext(g_pHMDWindow);
@@ -517,20 +565,8 @@ int main(void)
         return 1;
     }
 
-    SDL_SysWMinfo info;
-    SDL_VERSION(&info.version);
-    SDL_GetWindowWMInfo(g_pHMDWindow, &info);
-#if defined(OVR_OS_WIN32)
-    g_app.setWindow(info.info.win.window);
-#elif defined(OVR_OS_LINUX)
-    g_app.setWindow(info.info.x11.window, info.info.x11.display);
-#endif
 
-    LOG_INFO("OpenGL: %s", version);
-    LOG_INFO("Vendor: %s", (char*)glGetString(GL_VENDOR));
-    LOG_INFO("Renderer: %s", (char*)glGetString(GL_RENDERER));
 
-    SDL_GL_MakeCurrent(g_pHMDWindow, glContext);
 
     // Joysticks/gamepads
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
@@ -574,6 +610,12 @@ int main(void)
                 i, current.w, current.h, current.refresh_rate);
         }
     }
+
+    LOG_INFO("OpenGL: %s", version);
+    LOG_INFO("Vendor: %s", (char*)glGetString(GL_VENDOR));
+    LOG_INFO("Renderer: %s", (char*)glGetString(GL_RENDERER));
+
+    SDL_GL_MakeCurrent(g_pHMDWindow, glContext);
 
     // Don't forget to initialize Glew, turn glewExperimental on to
     // avoid problems fetching function pointers...
