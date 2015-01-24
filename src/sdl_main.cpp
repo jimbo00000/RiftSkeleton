@@ -557,6 +557,23 @@ int main(void)
         g_pJoy = SDL_JoystickOpen(0);
     }
 
+    // Log system monitor information
+    // Get current display mode of all displays.
+    for (int i=0; i<SDL_GetNumVideoDisplays(); ++i)
+    {
+        SDL_DisplayMode current;
+        const int should_be_zero = SDL_GetCurrentDisplayMode(i, &current);
+
+        if(should_be_zero != 0)
+        {
+            LOG_ERROR("Could not get display mode for video display #%d: %s", i, SDL_GetError());
+        }
+        else
+        {
+            LOG_INFO("Monitor #%d: %dx%d @ %dHz",
+                i, current.w, current.h, current.refresh_rate);
+        }
+    }
 
     // Don't forget to initialize Glew, turn glewExperimental on to
     // avoid problems fetching function pointers...
