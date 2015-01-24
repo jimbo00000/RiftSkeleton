@@ -677,6 +677,11 @@ int main(void)
 {
     ///@todo Command line options
 
+    bool useOpenGLCoreContext = false;
+#ifdef USE_CORE_CONTEXT
+    useOpenGLCoreContext = true;
+#endif
+
     GLFWwindow* l_Window = NULL;
 
     glfwSetErrorCallback(ErrorCallback);
@@ -686,16 +691,17 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-#ifdef USE_CORE_CONTEXT
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    if (useOpenGLCoreContext)
+    {
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 #if defined(_MACOS)
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 #else
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 #endif
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    }
 
     glfwWindowHint(GLFW_SAMPLES, 0);
 
@@ -823,11 +829,7 @@ int main(void)
 
 #ifdef USE_ANTTWEAKBAR
     LOG_INFO("Using AntTweakbar.");
-  #ifdef USE_CORE_CONTEXT
-    TwInit(TW_OPENGL_CORE, NULL);
-  #else
-    TwInit(TW_OPENGL, NULL);
-  #endif
+    TwInit(useOpenGLCoreContext ? TW_OPENGL_CORE : TW_OPENGL, NULL);
     InitializeBar();
 #endif
 

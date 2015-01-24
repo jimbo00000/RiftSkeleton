@@ -541,20 +541,28 @@ int main(void)
 {
     ///@todo Command line options
 
+    bool useOpenGLCoreContext = false;
+#ifdef USE_CORE_CONTEXT
+    useOpenGLCoreContext = true;
+#endif
+
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
         return false;
     }
 
-#ifdef USE_CORE_CONTEXT
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-#else
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-#endif
+    if (useOpenGLCoreContext)
+    {
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    }
+    else
+    {
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    }
 
 #ifdef USE_OCULUSSDK
     g_app.initHMD();
@@ -709,11 +717,8 @@ int main(void)
     }
 
 #ifdef USE_ANTTWEAKBAR
-  #ifdef USE_CORE_CONTEXT
-    TwInit(TW_OPENGL_CORE, NULL);
-  #else
-    TwInit(TW_OPENGL, NULL);
-  #endif
+    LOG_INFO("Using AntTweakbar.");
+    TwInit(useOpenGLCoreContext ? TW_OPENGL_CORE : TW_OPENGL, NULL);
     InitializeBar();
 #endif
 
