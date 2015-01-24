@@ -69,8 +69,19 @@ void destroyAuxiliaryWindow(SDL_Window* pAuxWindow);
 static void SetVsync(int state)
 {
     LOG_INFO("SetVsync(%d)", state);
-    ///@todo Handle aux window
-    int ret = SDL_GL_SetSwapInterval(state);
+
+    int ret = 0;
+    if (g_pAuxWindow != NULL)
+    {
+        SDL_GL_MakeCurrent(g_pAuxWindow, g_HMDglContext);
+        ret = SDL_GL_SetSwapInterval(state);
+        if (ret != 0)
+        {
+            LOG_INFO("Error occurred in SDL_GL_SetSwapInterval: %s", SDL_GetError());
+        }
+    }
+    SDL_GL_MakeCurrent(g_pHMDWindow, g_HMDglContext);
+    ret = SDL_GL_SetSwapInterval(state);
     if (ret != 0)
     {
         LOG_INFO("Error occurred in SDL_GL_SetSwapInterval: %s", SDL_GetError());
