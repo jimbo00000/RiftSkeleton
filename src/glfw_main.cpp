@@ -769,6 +769,7 @@ int main(void)
 
     if (!l_Window)
     {
+        LOG_INFO("Glfw failed to create a window. Exiting.");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
