@@ -673,19 +673,44 @@ void destroyAuxiliaryWindow(GLFWwindow* pAuxWindow)
     g_AuxWindow = NULL;
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
-    ///@todo Command line options
-
     bool useOpenGLCoreContext = false;
+
+    RenderingMode renderMode;
+    renderMode.outputType = RenderingMode::OVR_SDK;
+
 #ifdef USE_CORE_CONTEXT
     useOpenGLCoreContext = true;
 #endif
 
+    // Command line options
+    for (int i=0; i<argc; ++i)
+    {
+        const std::string a = argv[i];
+        LOG_INFO("argv[%d]: %s", i, a.c_str());
+        if (!a.compare("-sdk"))
+        {
+            g_renderMode.outputType = RenderingMode::OVR_SDK;
+            renderMode.outputType = RenderingMode::OVR_SDK;
+        }
+        else if (!a.compare("-client"))
+        {
+            g_renderMode.outputType = RenderingMode::OVR_Client;
+            renderMode.outputType = RenderingMode::OVR_Client;
+        }
+        else if (!a.compare("-core"))
+        {
+            useOpenGLCoreContext = true;
+        }
+        else if (!a.compare("-compat"))
+        {
+            useOpenGLCoreContext = false;
+        }
+    }
+
     GLFWwindow* l_Window = NULL;
-
     glfwSetErrorCallback(ErrorCallback);
-
     if (!glfwInit())
     {
         exit(EXIT_FAILURE);
@@ -693,6 +718,7 @@ int main(void)
 
     if (useOpenGLCoreContext)
     {
+        LOG_INFO("Using OpenGL core context.");
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 #if defined(_MACOS)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
@@ -740,7 +766,7 @@ int main(void)
         }
 
         glfwSetWindowPos(l_Window, pos.x, pos.y);
-        g_renderMode.outputType = RenderingMode::OVR_SDK;
+        g_renderMode = renderMode;
     }
     resize(l_Window, sz.w, sz.h); // inform AppSkeleton of window size
 #else
