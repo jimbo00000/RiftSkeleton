@@ -1,6 +1,6 @@
 RiftSkel-testlogs.txt
 
-Test Matrix:
+Test Matrix Dimensions:
 CPU: Intel, AMD, ARM
  OS: Win7, Win8, Linux, MacOS
   GPU: AMD, NVIDIA, Qualcomm
@@ -11,6 +11,7 @@ CPU: Intel, AMD, ARM
        Framework: GLFW, SDL2
         Render Path: SDK, Client
          Build Configuration: Debug, Release
+          Debugger attached, not attached
 
 
 AMD Phenom II X4 965 3.4 GHZ
@@ -57,18 +58,35 @@ Win 7 Pro
 
     DK2 - test scene works in direct and extended
       AntTweakBar off
-        GLFW
-          DebugHMD - VSync appears to have no effect
-          Extended
+      GLFW
+        DebugHMD
+          SDK
+            smearing, or crash in BindVao depending on when render mode is switched
+            getting a GLError: invalid value
+            Could DismissInternal be deleting an incorrect VAO?
+          Client
+            works fine, VSync appears to have no effect
+        Extended
+          SDK
+            looks OK when HSW is up, display won't refresh after it's dismissed until eventually, crash
+          Client
             works, but very juddery
             VSync appears to stay off regardless of toggle, ~250 FPS
-          Direct
-             crashes at glfw_main.cpp:620 glfwSwapBuffers(g_pHMDWindow);
-        SDL2
-          DebugHMD - works fine
-          Extended
+        Direct
+          SDK, Client
+            crashes at glfw_main.cpp:620 glfwSwapBuffers(g_pHMDWindow);
+      SDL2
+        DebugHMD
+            SDK - crash in bindVAO, invalid operation
+            Client - works fine
+        Extended
+          SDK
+            get a GL Error: invalid operation on (maybe) the first VAO bind after DismissHSW
+            Turn on vsync, wait until frame rate increases from 33 to 66(for only one reading), then switch: no GL error
+          Client
             works, but very juddery
             VSync toggle appears to work, but yields sustained 33fps on, 250 off
-          Direct
+        Direct
+          SDK, Client
             crashes at sdl_main.cpp:646  g_HMDglContext = SDL_GL_CreateContext(g_pHMDWindow);
 
