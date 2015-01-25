@@ -537,14 +537,33 @@ void destroyAuxiliaryWindow(SDL_Window* pAuxWindow)
     g_AuxWindowID = -1;
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
-    ///@todo Command line options
-
     bool useOpenGLCoreContext = false;
+
+    RenderingMode renderMode;
+    renderMode.outputType = RenderingMode::OVR_SDK;
+
 #ifdef USE_CORE_CONTEXT
     useOpenGLCoreContext = true;
 #endif
+
+    // Command line options
+    for (int i=0; i<argc; ++i)
+    {
+        const std::string a = argv[i];
+        LOG_INFO("argv[%d]: %s", i, a.c_str());
+        if (!a.compare("-sdk"))
+        {
+            g_renderMode.outputType = RenderingMode::OVR_SDK;
+            renderMode.outputType = RenderingMode::OVR_SDK;
+        }
+        else if (!a.compare("-client"))
+        {
+            g_renderMode.outputType = RenderingMode::OVR_Client;
+            renderMode.outputType = RenderingMode::OVR_Client;
+        }
+    }
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
@@ -610,9 +629,8 @@ int main(void)
                 pos.x, pos.y,
                 sz.w, sz.h,
                 SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-
         }
-        g_renderMode.outputType = RenderingMode::OVR_SDK;
+        g_renderMode = renderMode;
     }
 #else
     g_pHMDWindow = SDL_CreateWindow(
