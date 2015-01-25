@@ -563,6 +563,14 @@ int main(int argc, char** argv)
             g_renderMode.outputType = RenderingMode::OVR_Client;
             renderMode.outputType = RenderingMode::OVR_Client;
         }
+        else if (!a.compare("-core"))
+        {
+            useOpenGLCoreContext = true;
+        }
+        else if (!a.compare("-compat"))
+        {
+            useOpenGLCoreContext = false;
+        }
     }
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
@@ -572,12 +580,14 @@ int main(int argc, char** argv)
 
     if (useOpenGLCoreContext)
     {
+        LOG_INFO("Using OpenGL core context.");
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     }
     else
     {
+        LOG_INFO("Using OpenGL compatibility context.");
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
