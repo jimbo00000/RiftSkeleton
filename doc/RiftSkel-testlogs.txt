@@ -1,0 +1,74 @@
+RiftSkel-testlogs.txt
+
+Test Matrix:
+CPU: Intel, AMD, ARM
+ OS: Win7, Win8, Linux, MacOS
+  GPU: AMD, NVIDIA, Qualcomm
+   Driver Version
+    HMD: DK1, DK2
+     Display Mode: Direct, Extended, DebugHMD
+      GL: CoreContext, CompatContext
+       Framework: GLFW, SDL2
+        Render Path: SDK, Client
+         Build Configuration: Debug, Release
+
+
+AMD Phenom II X4 965 3.4 GHZ
+Win 7 Pro
+  AMD Radeon HD 6670
+  Driver 14.301.1001-.....OpenGL 6.14.10.13084
+    DK1 - test scene does not work in Direct mode, display gets no signal
+      AntTweakBar off
+      SDL2
+        DebugHMD
+          CRASH sdl_main.cpp:646
+          g_HMDglContext = SDL_GL_CreateContext(g_pHMDWindow);
+        Extended
+          SDK
+            crashes on glBindVertexArray()
+          Client
+            works fine, vsync toggle works - off yields noticeably less latency
+        Direct
+          CRASH sdl_main.cpp:646
+          g_HMDglContext = SDL_GL_CreateContext(g_pHMDWindow);
+      GLFW
+        DebugHMD
+          SDK
+            A clear appears to be failing on rendertarget
+            Any pixel without depth written to it after a clear is smeared
+          Client - looks fine, no vsync control
+        Extended
+          SDK
+            Compat
+              smearing artifact feels odd in HMD - color buffer fails to clear
+            Core
+              depth buffer smears as well
+
+              CRASH in ovrHmd_EndFrame(m_Hmd, renderPose, eyeTexture);
+              CAPI_GL_DistortionRenderer.cpp:369
+              BOOL success = SwapBuffers(dc);
+          Client
+            works great, sustained 750fps, vsync won't turn on
+        Direct
+          SDK
+            CRASH in ovrHmd_EndFrame()
+          Client
+             crashes at glfw_main.cpp:620 glfwSwapBuffers(g_pHMDWindow);
+
+    DK2 - test scene works in direct and extended
+      AntTweakBar off
+        GLFW
+          DebugHMD - VSync appears to have no effect
+          Extended
+            works, but very juddery
+            VSync appears to stay off regardless of toggle, ~250 FPS
+          Direct
+             crashes at glfw_main.cpp:620 glfwSwapBuffers(g_pHMDWindow);
+        SDL2
+          DebugHMD - works fine
+          Extended
+            works, but very juddery
+            VSync toggle appears to work, but yields sustained 33fps on, 250 off
+          Direct
+            crashes at sdl_main.cpp:646  g_HMDglContext = SDL_GL_CreateContext(g_pHMDWindow);
+
