@@ -716,17 +716,21 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+#if defined(_MACOS)
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+#else
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+#endif
     if (useOpenGLCoreContext)
     {
         LOG_INFO("Using OpenGL core context.");
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-#if defined(_MACOS)
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-#else
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-#endif
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    }
+    else
+    {
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
     }
 
     glfwWindowHint(GLFW_SAMPLES, 0);
