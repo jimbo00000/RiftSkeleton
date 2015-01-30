@@ -709,6 +709,10 @@ int main(int argc, char** argv)
         }
     }
 
+#ifdef USE_OCULUSSDK
+    g_app.initHMD();
+#endif
+
     GLFWwindow* l_Window = NULL;
     glfwSetErrorCallback(ErrorCallback);
     if (!glfwInit())
@@ -736,7 +740,6 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_SAMPLES, 0);
 
 #ifdef USE_OCULUSSDK
-    g_app.initHMD();
     const ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
 
