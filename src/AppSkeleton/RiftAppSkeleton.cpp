@@ -106,10 +106,7 @@ void RiftAppSkeleton::initHMD()
     }
 
     m_ovrScene.SetHmdPointer(m_Hmd);
-}
 
-void RiftAppSkeleton::initVR()
-{
     if (m_Hmd != NULL)
     {
         const ovrBool ret = ovrHmd_ConfigureTracking(m_Hmd,
@@ -120,7 +117,10 @@ void RiftAppSkeleton::initVR()
             std::cerr << "Error calling ovrHmd_ConfigureTracking." << std::endl;
         }
     }
+}
 
+void RiftAppSkeleton::initVR()
+{
     m_Cfg.OGL.Header.BackBufferSize = getHmdResolution();
 
     ConfigureRendering();
