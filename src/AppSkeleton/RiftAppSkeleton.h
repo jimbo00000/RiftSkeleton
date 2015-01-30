@@ -45,11 +45,7 @@ public:
 #if defined(OVR_OS_WIN32)
     void setWindow(HWND w) { m_Cfg.OGL.Window = w; }
 #elif defined(OVR_OS_LINUX)
-    void setWindow(Window Win, Display* Disp)
-    {
-        m_Cfg.OGL.Win = Win;
-        m_Cfg.OGL.Disp = Disp;
-    }
+    void setWindow(Display* Disp) { m_Cfg.OGL.Disp = Disp; }
 #endif
 
     virtual void timestep(double absTime, double dt);

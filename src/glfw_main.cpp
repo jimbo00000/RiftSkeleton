@@ -792,7 +792,7 @@ int main(int argc, char** argv)
   #if defined(_WIN32)
     g_app.setWindow(glfwGetWin32Window(l_Window));
   #elif defined(__linux__)
-    g_app.setWindow(glfwGetX11Window(l_Window), glfwGetX11Display());
+    g_app.setWindow(glfwGetX11Display());
   #endif
 #endif //USE_OCULUSSDK
 
