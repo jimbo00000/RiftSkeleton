@@ -326,10 +326,17 @@ void joystick()
         }
     }
 
-    float mag = 1.0f;
-    g_app.m_joystickMove = mag * joystickMove;
-
     const int numAxes = SDL_JoystickNumAxes(g_pJoy);
+    float mag = 1.f;
+    if (numAxes > 5)
+    {
+        const Sint16 axisVal = SDL_JoystickGetAxis(g_pJoy, 5);
+        const int axisVal32 = static_cast<Sint32>(axisVal);
+        const int posval = axisVal32 + -SHRT_MIN;
+        const float normVal = static_cast<float>(posval) / ( static_cast<float>(SHRT_MAX) - static_cast<float>(SHRT_MIN) );
+        mag = pow(10.f, normVal);
+    }
+    g_app.m_joystickMove = mag * joystickMove;
 
     Sint16 x_move = SDL_JoystickGetAxis(g_pJoy, 0);
     const int deadZone = 4096;
