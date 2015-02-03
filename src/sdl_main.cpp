@@ -271,28 +271,42 @@ void joystick()
         glm::vec3( 0.f, -1.f,  0.f),
     };
 
+    ///@note Application must have focus to receive gamepad events!
     // Xbox controller layout:
     // numAxes 5, numButtons 14
-    // 0 A (down position)
-    // 1 B (right position)
-    // 2 X (left position)
-    // 3 Y (up position)
-    // 4 L bumper
-    // 5 R bumper
-    // 6 Back (left center)
-    // 7 Start (right center)
+    // 0 DPad up
+    // 1 Dpad Down
+    // 2 DPad left
+    // 3 DPad right
+    // 4 Start
+    // 5 Back
+    // 6 Left analog stick click
+    // 7 Right analog stick click
+    // 8 L bumper
+    // 9 R bumper
+    // 10 A (down position)
+    // 11 B (right position)
+    // 12 X (left position)
+    // 13 Y (up position)
     // Axis 0 1 Left stick x y
     // Axis 2 triggers, left positive right negative
     // Axis 3 4 right stick x y
-    const glm::vec3 moveDirsXboxController[8] = {
-        glm::vec3( 0.f,  0.f,  1.f),
+    const glm::vec3 moveDirsXboxController[15] = {
+        glm::vec3( 0.f,  1.f,  0.f),
+        glm::vec3( 0.f, -1.f,  0.f),
+        glm::vec3(-1.f,  0.f,  0.f),
+        glm::vec3( 1.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  1.f), // 10
         glm::vec3( 1.f,  0.f,  0.f),
         glm::vec3(-1.f,  0.f,  0.f),
         glm::vec3( 0.f,  0.f, -1.f),
         glm::vec3( 0.f, -1.f,  0.f),
-        glm::vec3( 0.f,  1.f,  0.f),
-        glm::vec3( 0.f,  0.f,  0.f),
-        glm::vec3( 0.f,  0.f,  0.f),
     };
 
     ///@todo Different mappings for different controllers.
