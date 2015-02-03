@@ -5,10 +5,10 @@ CPU: Intel, AMD, ARM
  OS: Win7, Win8, Linux, MacOS
   GPU: AMD, NVIDIA, Qualcomm
    Driver Version
-    HMD: DK1, DK2
-     Display Mode: Direct, Extended, DebugHMD
-      GL: CoreContext, CompatContext
-       Framework: GLFW, SDL2
+    HMD: DK1, DK2, DebugHMD
+     Display Mode: Direct, Extended, Windowed
+      Framework: GLFW, SDL2
+       GL: CoreContext, CompatContext
         Render Path: SDK, Client
          Build Configuration: Debug, Release
           Debugger attached, not attached
