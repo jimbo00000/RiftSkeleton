@@ -253,7 +253,7 @@ void joystick()
 
     const int MAX_BUTTONS = 32;
     Uint8 buttonStates[MAX_BUTTONS];
-    int numButtons = SDL_JoystickNumButtons(g_pJoy);
+    const int numButtons = SDL_JoystickNumButtons(g_pJoy);
     for (int i=0; i<std::min(numButtons, MAX_BUTTONS); ++i)
     {
         buttonStates[i] = SDL_JoystickGetButton(g_pJoy, i);
@@ -288,9 +288,9 @@ void joystick()
     // 11 B (right position)
     // 12 X (left position)
     // 13 Y (up position)
-    // Axis 0 1 Left stick x y
-    // Axis 2 triggers, left positive right negative
-    // Axis 3 4 right stick x y
+    // Axis 0 1 Left stick x y -32768, 32767
+    // Axis 2 3 right stick x y -32768, 32767
+    // Axis 4 5 triggers, -32768(released), 32767
     const glm::vec3 moveDirsXboxController[15] = {
         glm::vec3( 0.f,  1.f,  0.f),
         glm::vec3( 0.f, -1.f,  0.f),
@@ -314,7 +314,6 @@ void joystick()
     const std::string joyName(SDL_JoystickName(g_pJoy));
     if (!joyName.compare("XInput Controller #1"))
     {
-        ///@todo SDL2 does not seem to receive Xbox controller button states
         moveDirs = moveDirsXboxController;
     }
 
@@ -329,6 +328,8 @@ void joystick()
 
     float mag = 1.0f;
     g_app.m_joystickMove = mag * joystickMove;
+
+    const int numAxes = SDL_JoystickNumAxes(g_pJoy);
 
     Sint16 x_move = SDL_JoystickGetAxis(g_pJoy, 0);
     const int deadZone = 4096;
