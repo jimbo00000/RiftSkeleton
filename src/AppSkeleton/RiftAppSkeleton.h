@@ -17,7 +17,6 @@
 #include <OVR_CAPI.h>
 #include <OVR_CAPI_GL.h>
 
-
 ///@brief Encapsulates as much of the VR viewer state as possible,
 /// pushing all viewer-independent stuff to Scene.
 class RiftAppSkeleton : public AppSkeleton
@@ -41,11 +40,11 @@ public:
     void display_client() const;
 
     // Direct mode and SDK rendering hooks
-    void AttachToWindow(void* pWindow) { ovrHmd_AttachToWindow(m_Hmd, pWindow, nullptr, nullptr); }
+    void AttachToWindow(void* pWindow) { ovrHmd_AttachToWindow(m_Hmd, pWindow, NULL, NULL); }
 #if defined(OVR_OS_WIN32)
     void setWindow(HWND w) { m_Cfg.OGL.Window = w; }
 #elif defined(OVR_OS_LINUX)
-    void setWindow(Display* Disp) { m_Cfg.OGL.Disp = Disp; }
+    void setWindow(_XDisplay* Disp) { m_Cfg.OGL.Disp = Disp; }
 #endif
 
     virtual void timestep(double absTime, double dt);

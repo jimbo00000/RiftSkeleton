@@ -275,6 +275,8 @@ ELSEIF( UNIX )
         -lXxf86vm
         -lXi
         -lX11
+        -lXinerama # GLFW 3.1
+        -lXcursor # GLFW 3.1
         ${HYDRA_LIBS}
         ${ANT_LIBS}
         )
