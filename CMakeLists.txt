@@ -151,7 +151,7 @@ ELSEIF( APPLE )
     INCLUDE_DIRECTORIES( "${GLM_ROOT}" )
     ADD_DEFINITIONS( -DGLM_FORCE_RADIANS )
 
-    SET( GLFW3_ROOT "${LIBS_HOME}/glfw-3.0.3/" )
+    SET( GLFW3_ROOT "${LIBS_HOME}/glfw-3.1/" )
     INCLUDE_DIRECTORIES( "${GLFW3_ROOT}/include" )
     LINK_DIRECTORIES   ( "${GLFW3_ROOT}/lib" )
 
@@ -170,8 +170,8 @@ ELSEIF( APPLE )
     MARK_AS_ADVANCED (COCOA_LIBRARY
                       IOKIT_LIBRARY
                       )
-    # Todo - build OVR with RTTI suppo
-    SET(CMAKE_CXX_FLAGS "-fno-rtti")
+    # Todo - build OVR with RTTI support
+    SET(CMAKE_CXX_FLAGS "-fno-rtti -framework CoreVideo")
 
     IF( USE_SIXENSE )
         MESSAGE("Using Sixense SDK.")
@@ -196,7 +196,7 @@ ELSEIF( APPLE )
         ${GLUT_LIBRARY}
         ${OpenGL_LIBRARY}
         -lGLEW
-        -lglfw
+        -lglfw3
         -lovr
         ${HYDRA_LIBS}
         ${ANT_LIBS}
