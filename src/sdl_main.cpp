@@ -305,7 +305,7 @@ void joystick()
     }
 
     glm::vec3 joystickMove(0.0f, 0.0f, 0.0f);
-    for (int i=0; i<std::min(8,numButtons); ++i)
+    for (int i=0; i<std::min(32,numButtons); ++i)
     {
         if (buttonStates[i] != 0)
         {
@@ -317,7 +317,7 @@ void joystick()
     g_app.m_joystickMove = mag * joystickMove;
 
     Sint16 x_move = SDL_JoystickGetAxis(g_pJoy, 0);
-    const int deadZone = 512;
+    const int deadZone = 4096;
     if (abs(x_move) < deadZone)
         x_move = 0;
     g_app.m_joystickYaw = 0.00005f * static_cast<float>(x_move);
