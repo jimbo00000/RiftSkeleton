@@ -621,13 +621,16 @@ int main(int argc, char** argv)
     g_app.initHMD();
     const ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
+    std::string windowTitle = "";
 
     if (g_app.UsingDebugHmd() == true)
     {
         // Create a normal, decorated application window
         LOG_INFO("Using Debug HMD mode.");
+        windowTitle = "RiftSkeleton-SDL2-DebugHMD";
+
         g_pHMDWindow = SDL_CreateWindow(
-            "GL Skeleton - SDL2",
+            windowTitle.c_str(),
             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
             sz.w, sz.h,
             SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
@@ -638,9 +641,10 @@ int main(int argc, char** argv)
         if (g_app.UsingDirectMode())
         {
             LOG_INFO("Using Direct to Rift mode.");
+            windowTitle = "RiftSkeleton-SDL2-Direct";
 
             g_pHMDWindow = SDL_CreateWindow(
-                "GL Skeleton - SDL2",
+                windowTitle.c_str(),
                 pos.x, pos.y,
                 sz.w, sz.h,
                 SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
@@ -657,9 +661,10 @@ int main(int argc, char** argv)
         else
         {
             LOG_INFO("Using Extended desktop mode.");
+            windowTitle = "RiftSkeleton-SDL2-Extended";
 
             g_pHMDWindow = SDL_CreateWindow(
-                "GL Skeleton - SDL2",
+                windowTitle.c_str(),
                 pos.x, pos.y,
                 sz.w, sz.h,
                 SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
@@ -802,7 +807,8 @@ int main(int argc, char** argv)
         // This is absolute death for performance in Ubuntu Linux 12.04
         {
             std::ostringstream oss;
-            oss << "SDL Oculus Rift Test - "
+            oss << windowTitle
+                << " "
                 << static_cast<int>(g_fps.GetFPS())
                 << " fps";
             SDL_SetWindowTitle(g_pHMDWindow, oss.str().c_str());
