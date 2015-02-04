@@ -600,6 +600,7 @@ int main(int argc, char** argv)
         return false;
     }
 
+#ifndef _LINUX
     if (useOpenGLCoreContext)
     {
         LOG_INFO("Using OpenGL core context.");
@@ -614,6 +615,7 @@ int main(int argc, char** argv)
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     }
+#endif
 
 #ifdef USE_OCULUSSDK
     g_app.initHMD();
@@ -688,7 +690,7 @@ int main(int argc, char** argv)
   #if defined(OVR_OS_WIN32)
     g_app.setWindow(info.info.win.window);
   #elif defined(OVR_OS_LINUX)
-    g_app.setWindow(info.info.x11.window, info.info.x11.display);
+    g_app.setWindow(info.info.x11.display);
   #endif
 #endif //USE_OCULUSSDK
 
