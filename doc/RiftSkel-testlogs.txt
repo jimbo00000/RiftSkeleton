@@ -90,3 +90,30 @@ Win 7 Pro
           SDK, Client
             crashes at sdl_main.cpp:646  g_HMDglContext = SDL_GL_CreateContext(g_pHMDWindow);
 
+Linux mahler 3.13.0-37-generic #64-Ubuntu SMP x86_64 GNU/Linux
+GeForce GTX 275
+AMD Sempron(tm) 140 Processor
+NVIDIA-SMI 331.38     Driver Version: 331.38
+  SDL2
+    Throws GLXBadDrawable on exit(full text below***)
+    DebugHMD
+      works fine
+    Extended
+      SDK, Client
+        turn off Ubuntu Launcher placement on all screens in System Settings->Display
+        very juddery, timer also seems off
+  GLFW
+    Takes a long time to quit
+    DebugHMD
+      works fine
+    Extended
+      Window only created at half width(one eye)
+
+
+***
+Error: [Context] Unable to obtain x11 visual from context
+X Error of failed request:  GLXBadDrawable
+  Major opcode of failed request:  155 (GLX)
+  Minor opcode of failed request:  5 (X_GLXMakeCurrent)
+  Serial number of failed request:  7797
+  Current serial number in output stream:  7797
