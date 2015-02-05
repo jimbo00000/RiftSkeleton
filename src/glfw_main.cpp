@@ -72,6 +72,7 @@ float g_fpsSmoothingFactor = 0.02f;
 float g_fpsDeltaThreshold = 5.0f;
 bool g_dynamicallyScaleFBO = false;
 int g_targetFPS = 100;
+bool g_drawToAuxWindow = false;
 
 #ifdef USE_ANTTWEAKBAR
 TwBar* g_pTweakbar = NULL;
@@ -933,8 +934,8 @@ int main(int argc, char** argv)
         if (g_AuxWindow != NULL)
         {
             glfwMakeContextCurrent(g_AuxWindow);
-            glClearColor(0,0,0,1);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClearColor(0.f, 0.f, 0.f, 0.f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             ///@note VAOs *cannot* be shared between contexts.
             ///@note GLFW windows are inextricably tied to their own unique context.
@@ -943,7 +944,10 @@ int main(int argc, char** argv)
             /// rendering cost.
             /// Instead, we share the render target texture from the stereo render and present
             /// just the left eye to the aux window.
-            presentSharedFboTexture();
+            if (g_drawToAuxWindow)
+            {
+                presentSharedFboTexture();
+            }
 
 #ifdef USE_ANTTWEAKBAR
             TwDraw(); ///@todo Should this go first? Will it write to a depth buffer?

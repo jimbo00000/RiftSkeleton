@@ -58,6 +58,7 @@ float g_fpsSmoothingFactor = 0.02f;
 float g_fpsDeltaThreshold = 5.0f;
 bool g_dynamicallyScaleFBO = false;
 int g_targetFPS = 100;
+bool g_drawToAuxWindow = false;
 
 #ifdef USE_ANTTWEAKBAR
 TwBar* g_pTweakbar = NULL;
@@ -838,10 +839,18 @@ int main(int argc, char** argv)
             int w, h;
             SDL_GetWindowSize(g_pAuxWindow, &w, &h);
 
-            glPushAttrib(GL_VIEWPORT_BIT);
-            glViewport(0, 0, w, h);
-            g_app.display_buffered(false);
-            glPopAttrib(); // GL_VIEWPORT_BIT - if this is not misused!
+            if (g_drawToAuxWindow)
+            {
+                glPushAttrib(GL_VIEWPORT_BIT);
+                glViewport(0, 0, w, h);
+                g_app.display_buffered(false);
+                glPopAttrib(); // GL_VIEWPORT_BIT - if this is not misused!
+            }
+            else
+            {
+                glClearColor(0.f, 0.f, 0.f, 0.f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            }
 
 #ifdef USE_ANTTWEAKBAR
             TwRefreshBar(g_pTweakbar);

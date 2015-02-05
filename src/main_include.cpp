@@ -46,6 +46,8 @@ void InitializeBar()
                " min=0.001 max=1.0 step=0.001 group='Performance' ");
     TwAddVarRW(g_pTweakbar, "FPS Delta Threshold", TW_TYPE_FLOAT, &g_fpsDeltaThreshold,
                " min=0.0 max=100.0 step=1.0 group='Performance' ");
+    TwAddVarRW(g_pTweakbar, "Draw to Aux Window", TW_TYPE_BOOLCPP, &g_drawToAuxWindow,
+               "  group='Performance' ");
 
 
     TwAddButton(g_pTweakbar, "Recenter Pose", RecenterPoseCB, NULL, " group='Position' ");
