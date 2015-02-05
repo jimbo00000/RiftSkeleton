@@ -648,6 +648,8 @@ int main(int argc, char** argv)
                 pos.x, pos.y,
                 sz.w, sz.h,
                 SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+            SDL_SetRelativeMouseMode(SDL_TRUE);
+
 #if defined(_WIN32)
             SDL_SysWMinfo info;
             SDL_VERSION(&info.version);
@@ -668,6 +670,7 @@ int main(int argc, char** argv)
                 pos.x, pos.y,
                 sz.w, sz.h,
                 SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+            SDL_SetRelativeMouseMode(SDL_TRUE);
         }
         g_renderMode = renderMode;
     }

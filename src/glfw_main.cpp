@@ -771,6 +771,7 @@ int main(int argc, char** argv)
 
             l_Window = glfwCreateWindow(sz.w, sz.h, "RiftSkeleton-GLFW-Direct", NULL, NULL);
             glfwSetWindowPos(l_Window, pos.x, pos.y);
+            glfwSetInputMode(l_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 #if defined(_WIN32)
             g_app.AttachToWindow((void*)glfwGetWin32Window(l_Window));
@@ -784,6 +785,7 @@ int main(int argc, char** argv)
             glfwWindowHint(GLFW_DECORATED, 0);
             l_Window = glfwCreateWindow(sz.w, sz.h, "RiftSkeleton-GLFW-Extended", NULL, NULL);
             glfwWindowHint(GLFW_DECORATED, 1);
+            glfwSetInputMode(l_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
 
         glfwSetWindowPos(l_Window, pos.x, pos.y);
