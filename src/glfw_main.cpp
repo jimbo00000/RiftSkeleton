@@ -761,7 +761,7 @@ int main(int argc, char** argv)
         LOG_INFO("Using Debug HMD mode.");
         windowTitle = "RiftSkeleton-GLFW-DebugHMD";
 
-        l_Window = glfwCreateWindow(sz.w, sz.h, "RiftSkeleton-GLFW-DebugHMD", NULL, NULL);
+        l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
     }
     else
     {
@@ -771,7 +771,7 @@ int main(int argc, char** argv)
             LOG_INFO("Using Direct to Rift mode.");
             windowTitle = "RiftSkeleton-GLFW-Direct";
 
-            l_Window = glfwCreateWindow(sz.w, sz.h, "RiftSkeleton-GLFW-Direct", NULL, NULL);
+            l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
             glfwSetWindowPos(l_Window, pos.x, pos.y);
             glfwSetInputMode(l_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -785,7 +785,7 @@ int main(int argc, char** argv)
             windowTitle = "RiftSkeleton-GLFW-Extended";
 
             glfwWindowHint(GLFW_DECORATED, 0);
-            l_Window = glfwCreateWindow(sz.w, sz.h, "RiftSkeleton-GLFW-Extended", NULL, NULL);
+            l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
             glfwWindowHint(GLFW_DECORATED, 1);
             glfwSetInputMode(l_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
