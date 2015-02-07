@@ -86,6 +86,8 @@ void destroyAuxiliaryWindow(GLFWwindow* pAuxWindow);
 // Set vsync for both contexts.
 static void SetVsync(int state)
 {
+    LOG_INFO("SetVsync(%d)", state);
+
     // Since AuxWindow holds the tweakbar, this should never be NULL
     if (g_AuxWindow != NULL)
     {
@@ -94,14 +96,13 @@ static void SetVsync(int state)
     }
     glfwMakeContextCurrent(g_pHMDWindow);
     glfwSwapInterval(state);
-    LOG_INFO("SetVsync(%d)", state);
 }
 
 #include "main_include.cpp"
 
 static void ErrorCallback(int p_Error, const char* p_Description)
 {
-    LOG_INFO("ERROR: %d, %s\n", p_Error, p_Description);
+    LOG_INFO("ERROR: %d, %s", p_Error, p_Description);
 }
 
 
