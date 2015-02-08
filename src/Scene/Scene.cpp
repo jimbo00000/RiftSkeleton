@@ -279,8 +279,8 @@ bool Scene::RayIntersects(
     const glm::vec3 origin3 = glm::make_vec3(pRayOrigin);
     const glm::vec3 dir3 = glm::make_vec3(pRayDirection);
 
-    const glm::vec3 minPt(-10.0f, 0.0f, -10.0f);
-    const glm::vec3 maxPt(10.0f, 0.0f, 10.0f);
+    const glm::vec3 minPt(-10.f, 0.f, -10.f);
+    const glm::vec3 maxPt( 10.f, 0.f,  10.f);
 
     std::vector<glm::vec3> pts;
     pts.push_back(glm::vec3(minPt.x, minPt.y, minPt.z));
@@ -295,43 +295,35 @@ bool Scene::RayIntersects(
     if ( !(hit1||hit2) )
         return false;
 
-    glm::vec3 hitval(0.0f);
-    glm::vec3 cartesianpos(0.0f);
+    glm::vec3 cartesianpos(0.f);
     if (hit1)
     {
-        hitval = retval1;
         // At this point, retval1 or retval2 contains hit data returned from glm::intersectLineTriangle.
         // This does not appear to be raw - y and z appear to be barycentric coordinates.
+        // X coordinate of retval1 appears to be the t parameter of the intersection point along dir3.
         // Fill out the x coord with the barycentric identity then convert using simple weighted sum.
-        hitval.x = 1.0f - hitval.y - hitval.z;
+        if (retval1.x < 0.f) // Hit behind origin
+            return false;
+        *pTParameter = retval1.x;
+        const float bary_x = 1.f - retval1.y - retval1.z;
         cartesianpos = 
-            hitval.x * pts[0] +
-            hitval.y * pts[1] +
-            hitval.z * pts[2];
+               bary_x * pts[0] +
+            retval1.y * pts[1] +
+            retval1.z * pts[2];
     }
     else if (hit2)
     {
-        hitval = retval2;
-        hitval.x = 1.0f - hitval.y - hitval.z;
+        if (retval2.x < 0.f) // Hit behind origin
+            return false;
+        *pTParameter = retval2.x;
+        const float bary_x = 1.f - retval2.y - retval2.z;
         cartesianpos = 
-            hitval.x * pts[0] +
-            hitval.y * pts[2] +
-            hitval.z * pts[3];
+               bary_x * pts[0] +
+            retval2.y * pts[2] +
+            retval2.z * pts[3];
     }
 
-    const glm::vec3 originToHitPt = cartesianpos - origin3;
-    const float tParam = glm::length(originToHitPt);
-    *pTParameter = tParam;
-    if (tParam < 0.f)
-        return false;
-
-    //const glm::vec3 v1 = pts[1] - pts[0]; // x axis
-    //const glm::vec3 v2 = pts[3] - pts[0]; // y axis
-    //const float len = glm::length(v1); // v2 length should be equal
-    //const glm::vec3 vh = (cartesianpos - pts[0]) / len;
-
     const glm::vec3 hitPos = origin3 + *pTParameter * dir3;
-
     pHitLocation[0] = hitPos.x;
     pHitLocation[1] = hitPos.y;
     pHitLocation[2] = hitPos.z;
