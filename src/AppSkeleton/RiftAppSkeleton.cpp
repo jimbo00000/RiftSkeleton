@@ -340,6 +340,26 @@ void RiftAppSkeleton::timestep(double absTime, double dt)
 #endif
 }
 
+/// Scale the parallax translation and head pose motion vector by the head size
+/// dictated by the shader. Thanks to the elegant design decision of putting the
+/// head's default position at the origin, this is simple.
+OVR::Matrix4f makeModelviewMatrix(
+    ovrPosef eyePose,
+    float chassisYaw,
+    ovrVector3f chassisPos)
+{
+    const OVR::Matrix4f eyePoseMatrix =
+        OVR::Matrix4f::Translation(OVR::Vector3f(eyePose.Position))
+        * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
+
+    const OVR::Matrix4f view =
+        eyePoseMatrix.Inverted()
+        * OVR::Matrix4f::RotationY(chassisYaw)
+        * OVR::Matrix4f::Translation(-OVR::Vector3f(chassisPos));
+
+    return view;
+}
+
 ///@todo Even though this function shares most of its code with client rendering,
 /// which appears to work fine, it is non-convergable. It appears that the projection
 /// matrices for each eye are too far apart? Could be modelview...
@@ -571,14 +591,10 @@ void RiftAppSkeleton::display_client() const
         ///@todo Should we be using this variable?
         //m_EyeRenderDesc[eye].DistortedViewport;
 
-        const OVR::Matrix4f eyePoseMatrix =
-            OVR::Matrix4f::Translation(eyePose.Position)
-            * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
-
-        const OVR::Matrix4f view =
-            eyePoseMatrix.Inverted()
-            * OVR::Matrix4f::RotationY(m_chassisYaw)
-            * OVR::Matrix4f::Translation(-OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
+        const OVR::Matrix4f view = makeModelviewMatrix(
+            eyePose,
+            m_chassisYaw,
+            OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
 
         _resetGLState();
 
