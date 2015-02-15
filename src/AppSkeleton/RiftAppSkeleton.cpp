@@ -417,18 +417,10 @@ void RiftAppSkeleton::display_stereo_undistorted() const
             m_EyeRenderDesc[e].Fov,
             0.01f, 10000.0f, true);
 
-        const OVR::Matrix4f eyePoseMatrix =
-            OVR::Matrix4f::Translation(OVR::Vector3f(eyePose.Position))
-            * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
-
-        const OVR::Matrix4f view =
-            eyePoseMatrix.Inverted()
-            * OVR::Matrix4f::RotationY(m_chassisYaw)
-            * OVR::Matrix4f::Translation(-OVR::Vector3f(
-                m_chassisPos.x,
-                m_chassisPos.y,
-                m_chassisPos.z
-                ));
+        const OVR::Matrix4f view = makeModelviewMatrix(
+            eyePose,
+            m_chassisYaw,
+            OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
 
         _resetGLState();
 
@@ -510,21 +502,17 @@ void RiftAppSkeleton::display_sdk() const
             static_cast<int>(m_fboScale * rvp.Size.h)
             );
 
-        const OVR::Matrix4f l_ProjectionMatrix = ovrMatrix4f_Projection(
+        const OVR::Matrix4f proj = ovrMatrix4f_Projection(
             m_EyeRenderDesc[e].Fov, 0.01f, 100.0f, true);
-
-        const OVR::Matrix4f eyePoseMatrix =
-            OVR::Matrix4f::Translation(eyePose.Position)
-            * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
-
-        const OVR::Matrix4f l_ModelViewMatrix =
-            eyePoseMatrix.Inverted()
-            * OVR::Matrix4f::RotationY(m_chassisYaw)
-            * OVR::Matrix4f::Translation(-OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
+        
+        const OVR::Matrix4f view = makeModelviewMatrix(
+            eyePose,
+            m_chassisYaw,
+            OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
 
         _resetGLState();
 
-        _DrawScenes(&l_ModelViewMatrix.Transposed().M[0][0], &l_ProjectionMatrix.Transposed().M[0][0]);
+        _DrawScenes(&view.Transposed().M[0][0], &proj.Transposed().M[0][0]);
     }
     unbindFBO();
 
