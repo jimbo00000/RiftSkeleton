@@ -387,9 +387,7 @@ void AppSkeleton::OnMouseMove(int x, int y)
         tanHalfFov * uv_11.y * up);
 
     // Transform ray into world space
-    const glm::mat4 mv =
-        glm::translate(glm::mat4(1.f), m_chassisPos)
-        * getUserViewMatrix();
+    const glm::mat4 mv = getUserViewMatrix();
     const glm::vec3 origin3 = glm::vec3(mv * glm::vec4(localOrigin,1.f));
     const glm::vec3 dir3 = glm::vec3(mv * glm::vec4(localRay,0.f));
 
