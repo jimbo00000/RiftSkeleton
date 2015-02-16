@@ -242,7 +242,7 @@ void FlyingMouse::GetControllerOriginAndDirection(Hand h, glm::vec3& origin, glm
     const glm::vec4 ori4 = mR * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     const glm::vec4 dir4 = mR * glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
 
-    origin = glm::vec3(ori4) + m_baseOffset + GetChassisPos();
+    origin = glm::vec3(ori4) + m_baseOffset;
     direction = glm::normalize(glm::vec3(dir4));
 }
 

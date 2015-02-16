@@ -331,6 +331,8 @@ void AppSkeleton::timestep(double absTime, double dt)
         glm::vec3 origin3;
         glm::vec3 dir3;
         m_fm.GetControllerOriginAndDirection(h, origin3, dir3);
+        origin3 += m_chassisPos;
+
         _checkSceneIntersections(origin3, dir3);
     }
 }
