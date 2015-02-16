@@ -230,9 +230,10 @@ void AppSkeleton::_drawSceneMono() const
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::mat4 lookat(1.f);
-    lookat = glm::rotate(lookat, m_chassisYaw, glm::vec3(0.0f, 1.0f, 0.0f));
-    lookat = glm::translate(lookat, -m_chassisPos);
+    const glm::mat4 mvLocal = glm::mat4(1.f);
+    const glm::mat4 mvWorld = mvLocal *
+        glm::rotate(glm::mat4(1.f), m_chassisYaw, glm::vec3(0.f, 1.f, 0.f)) *
+        glm::translate(glm::mat4(1.f), -m_chassisPos);
 
     const glm::ivec2 vp = getRTSize();
     const glm::mat4 persp = glm::perspective(
@@ -241,9 +242,7 @@ void AppSkeleton::_drawSceneMono() const
         0.004f,
         500.0f);
 
-    const glm::mat4 mvLocal = glm::mat4(1.f);
-
-    _DrawScenes(glm::value_ptr(lookat), glm::value_ptr(persp), glm::value_ptr(mvLocal));
+    _DrawScenes(glm::value_ptr(mvWorld), glm::value_ptr(persp), glm::value_ptr(mvLocal));
 }
 
 void AppSkeleton::display_raw() const
