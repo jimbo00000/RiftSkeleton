@@ -78,9 +78,18 @@ void AppSkeleton::ResetAllTransformations()
     m_chassisYaw = 0.0f;
 }
 
+glm::mat4 makeChassisMatrix_glm(
+    float chassisYaw,
+    glm::vec3 chassisPos)
+{
+    return
+        glm::translate(glm::mat4(1.f), chassisPos) *
+        glm::rotate(glm::mat4(1.f), -chassisYaw, glm::vec3(0,1,0));
+}
+
 glm::mat4 AppSkeleton::getUserViewMatrix() const
 {
-    return glm::rotate(glm::mat4(1.0f), -m_chassisYaw, glm::vec3(0,1,0));
+    return makeChassisMatrix_glm(m_chassisYaw, m_chassisPos);
 }
 
 void AppSkeleton::initGL()
@@ -279,15 +288,6 @@ void AppSkeleton::display_buffered(bool setViewport) const
     }
     glBindVertexArray(0);
     glUseProgram(0);
-}
-
-glm::mat4 makeChassisMatrix_glm(
-    float chassisYaw,
-    glm::vec3 chassisPos)
-{
-    return
-        glm::translate(glm::mat4(1.f), chassisPos) *
-        glm::rotate(glm::mat4(1.f), -chassisYaw, glm::vec3(0,1,0));
 }
 
 void AppSkeleton::timestep(double absTime, double dt)
