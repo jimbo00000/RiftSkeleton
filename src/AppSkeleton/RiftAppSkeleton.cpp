@@ -73,11 +73,9 @@ glm::ivec2 RiftAppSkeleton::getRTSize() const
 
 glm::mat4 RiftAppSkeleton::getUserViewMatrix() const
 {
-    const OVR::Matrix4f rotmtx = 
-          OVR::Matrix4f::RotationY(-m_chassisYaw)
-        * OVR::Matrix4f(m_eyeOri);
-
-    return glm::make_mat4(&rotmtx.Transposed().M[0][0]);
+    const glm::quat q(m_eyeOri.w, m_eyeOri.x, m_eyeOri.y, m_eyeOri.z);
+    return glm::rotate(glm::mat4(1.f), -m_chassisYaw, glm::vec3(0,1,0)) *
+        glm::mat4_cast(q);
 }
 
 ///@brief Set this up early so we can get the HMD's display dimensions to create a window.
