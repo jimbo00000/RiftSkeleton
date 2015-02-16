@@ -232,8 +232,7 @@ void AppSkeleton::_drawSceneMono() const
 
     const glm::mat4 mvLocal = glm::mat4(1.f);
     const glm::mat4 mvWorld = mvLocal *
-        glm::rotate(glm::mat4(1.f), m_chassisYaw, glm::vec3(0.f, 1.f, 0.f)) *
-        glm::translate(glm::mat4(1.f), -m_chassisPos);
+        glm::inverse(makeChassisMatrix_glm(m_chassisYaw, m_chassisPos));
 
     const glm::ivec2 vp = getRTSize();
     const glm::mat4 persp = glm::perspective(
