@@ -230,12 +230,11 @@ void AppSkeleton::_drawSceneMono() const
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const glm::vec3 EyePos(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z);
     const glm::vec3 LookVec(0.0f, 0.0f, -1.0f);
     const glm::vec3 up(0.0f, 1.0f, 0.0f);
     glm::mat4 lookat = glm::lookAt(glm::vec3(0.f), LookVec, up);
     lookat = glm::rotate(lookat, m_chassisYaw, glm::vec3(0.0f, 1.0f, 0.0f));
-    lookat = glm::translate(lookat, -EyePos);
+    lookat = glm::translate(lookat, -m_chassisPos);
 
     const glm::ivec2 vp = getRTSize();
     const glm::mat4 persp = glm::perspective(
