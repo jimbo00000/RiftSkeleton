@@ -32,8 +32,6 @@
 OVRScene::OVRScene()
 : m_basic()
 , m_pHmd(NULL)
-, m_pPos(NULL)
-, m_pYaw(NULL)
 , m_frustumVerts()
 , m_distanceToFrustum(999.0f)
 , m_tanFromCameraCenterline(0.0f, 0.0f)

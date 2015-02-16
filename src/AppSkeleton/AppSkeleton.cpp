@@ -106,11 +106,6 @@ void AppSkeleton::initGL()
     allocateFBO(m_renderBuffer, 800, 600);
     m_fm.Init();
 
-#ifdef USE_OCULUSSDK
-    m_ovrScene.SetChassisPosPointer(&m_chassisPos);
-    m_ovrScene.SetChassisYawPointer(&m_chassisYaw);
-#endif
-
     m_spaceCursor.initGL();
 
     // Both ovrVector3f and glm::vec3 are at heart a float[3], so this works fine.
