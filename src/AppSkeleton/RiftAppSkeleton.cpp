@@ -338,9 +338,6 @@ void RiftAppSkeleton::timestep(double absTime, double dt)
 #endif
 }
 
-/// Scale the parallax translation and head pose motion vector by the head size
-/// dictated by the shader. Thanks to the elegant design decision of putting the
-/// head's default position at the origin, this is simple.
 OVR::Matrix4f makeModelviewMatrix(
     ovrPosef eyePose,
     float chassisYaw,
