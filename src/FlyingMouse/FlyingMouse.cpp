@@ -80,8 +80,6 @@ int getHandArrayIndex(
 FlyingMouse::FlyingMouse()
 : m_active(false)
 , m_baseOffset(0.0f, -0.4f, -0.1f)
-, m_pChassisPos(NULL)
-, m_pChassisYaw(NULL)
 {
 }
 
