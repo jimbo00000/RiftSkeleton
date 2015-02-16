@@ -417,9 +417,12 @@ void RiftAppSkeleton::display_stereo_undistorted() const
             m_chassisYaw,
             OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
 
+        const OVR::Matrix4f viewLocal = makeModelviewMatrix(
+            eyePose, 0.f, OVR::Vector3f());
+
         _resetGLState();
 
-        _DrawScenes(&view.Transposed().M[0][0], &proj.Transposed().M[0][0]);
+        _DrawScenes(&view.Transposed().M[0][0], &proj.Transposed().M[0][0], &viewLocal.Transposed().M[0][0]);
     }
     unbindFBO();
 
@@ -505,9 +508,12 @@ void RiftAppSkeleton::display_sdk() const
             m_chassisYaw,
             OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
 
+        const OVR::Matrix4f viewLocal = makeModelviewMatrix(
+            eyePose, 0.f, OVR::Vector3f());
+
         _resetGLState();
 
-        _DrawScenes(&view.Transposed().M[0][0], &proj.Transposed().M[0][0]);
+        _DrawScenes(&view.Transposed().M[0][0], &proj.Transposed().M[0][0], &viewLocal.Transposed().M[0][0]);
     }
     unbindFBO();
 
@@ -579,9 +585,12 @@ void RiftAppSkeleton::display_client() const
             m_chassisYaw,
             OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
 
+        const OVR::Matrix4f viewLocal = makeModelviewMatrix(
+            eyePose, 0.f, OVR::Vector3f());
+
         _resetGLState();
 
-        _DrawScenes(&view.Transposed().M[0][0], &proj.Transposed().M[0][0]);
+        _DrawScenes(&view.Transposed().M[0][0], &proj.Transposed().M[0][0], &viewLocal.Transposed().M[0][0]);
     }
     unbindFBO();
 

@@ -32,7 +32,7 @@ public:
 
     void ResetAllTransformations();
     void initGL();
-    void _DrawScenes(const float* pMview, const float* pPersp) const;
+    void _DrawScenes(const float* pMvWorld, const float* pPersp, const float* pMvLocal=NULL) const;
     void display_raw() const;
     void display_buffered(bool setViewport=true) const;
     virtual void timestep(double absTime, double dt);

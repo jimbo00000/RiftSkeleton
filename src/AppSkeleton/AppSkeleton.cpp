@@ -175,7 +175,10 @@ void AppSkeleton::_resetGLState() const
     glFrontFace(GL_CCW);
 }
 
-void AppSkeleton::_DrawScenes(const float* pMview, const float* pPersp) const
+void AppSkeleton::_DrawScenes(
+    const float* pMvWorld,
+    const float* pPersp,
+    const float* pMvLocal) const
 {
     for (std::vector<IScene*>::const_iterator it = m_scenes.begin();
         it != m_scenes.end();
@@ -184,14 +187,15 @@ void AppSkeleton::_DrawScenes(const float* pMview, const float* pPersp) const
         const IScene* pScene = *it;
         if (pScene != NULL)
         {
-            pScene->RenderForOneEye(pMview, pPersp);
+            const float* pMv = pScene->m_bChassisLocalSpace ? pMvLocal : pMvWorld;
+            pScene->RenderForOneEye(pMv, pPersp);
         }
     }
 
     // Draw scene hit cursor
     if (m_rayHitsScene)
     {
-        const glm::mat4 modelview = glm::make_mat4(pMview);
+        const glm::mat4 modelview = glm::make_mat4(pMvWorld);
         glm::mat4 cursMtx = glm::translate(modelview, m_spaceCursorPos);
         m_spaceCursor.RenderForOneEye(glm::value_ptr(cursMtx), pPersp);
     }
@@ -241,7 +245,9 @@ void AppSkeleton::_drawSceneMono() const
         0.004f,
         500.0f);
 
-    _DrawScenes(glm::value_ptr(lookat), glm::value_ptr(persp));
+    const glm::mat4 mvLocal = glm::lookAt(glm::vec3(0.f), LookVec, up);
+
+    _DrawScenes(glm::value_ptr(lookat), glm::value_ptr(persp), glm::value_ptr(mvLocal));
 }
 
 void AppSkeleton::display_raw() const
