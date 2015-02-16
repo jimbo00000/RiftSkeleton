@@ -233,8 +233,7 @@ void AppSkeleton::_drawSceneMono() const
     const glm::vec3 EyePos(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z);
     const glm::vec3 LookVec(0.0f, 0.0f, -1.0f);
     const glm::vec3 up(0.0f, 1.0f, 0.0f);
-    glm::mat4 lookat = glm::lookAt(EyePos, EyePos + LookVec, up);
-    lookat = glm::translate(lookat, EyePos);
+    glm::mat4 lookat = glm::lookAt(glm::vec3(0.f), LookVec, up);
     lookat = glm::rotate(lookat, m_chassisYaw, glm::vec3(0.0f, 1.0f, 0.0f));
     lookat = glm::translate(lookat, -EyePos);
 
