@@ -338,6 +338,14 @@ void RiftAppSkeleton::timestep(double absTime, double dt)
 #endif
 }
 
+OVR::Matrix4f makeChassisMatrix(
+    float chassisYaw,
+    ovrVector3f chassisPos)
+{
+    return OVR::Matrix4f::RotationY(chassisYaw)
+        * OVR::Matrix4f::Translation(-OVR::Vector3f(chassisPos));
+}
+
 OVR::Matrix4f makeModelviewMatrix(
     ovrPosef eyePose,
     float chassisYaw,
@@ -347,12 +355,8 @@ OVR::Matrix4f makeModelviewMatrix(
         OVR::Matrix4f::Translation(OVR::Vector3f(eyePose.Position))
         * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
 
-    const OVR::Matrix4f view =
-        eyePoseMatrix.Inverted()
-        * OVR::Matrix4f::RotationY(chassisYaw)
-        * OVR::Matrix4f::Translation(-OVR::Vector3f(chassisPos));
-
-    return view;
+    return eyePoseMatrix.Inverted()
+        * makeChassisMatrix(chassisYaw, chassisPos);
 }
 
 ///@todo Even though this function shares most of its code with client rendering,
