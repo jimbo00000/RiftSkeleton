@@ -317,8 +317,7 @@ void AppSkeleton::timestep(double absTime, double dt)
     glm::vec3 move_dt = (m_keyboardMove + m_joystickMove + m_mouseMove + hydraMove) * static_cast<float>(dt);
 
     // Move in the direction the viewer is facing.
-    const glm::mat4 tx = getUserViewMatrix();
-    const glm::vec4 mv4 = tx * glm::vec4(move_dt, 0.0f);
+    const glm::vec4 mv4 = getUserViewMatrix() * glm::vec4(move_dt, 0.0f);
     m_chassisPos += glm::vec3(mv4);
 
     m_chassisYaw += (m_keyboardYaw + m_joystickYaw + m_mouseDeltaYaw) * dt;
