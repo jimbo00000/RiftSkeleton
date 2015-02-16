@@ -281,6 +281,15 @@ void AppSkeleton::display_buffered(bool setViewport) const
     glUseProgram(0);
 }
 
+glm::mat4 makeChassisMatrix_glm(
+    float chassisYaw,
+    glm::vec3 chassisPos)
+{
+    return
+        glm::translate(glm::mat4(1.f), chassisPos) *
+        glm::rotate(glm::mat4(1.f), -chassisYaw, glm::vec3(0,1,0));
+}
+
 void AppSkeleton::timestep(double absTime, double dt)
 {
     for (std::vector<IScene*>::iterator it = m_scenes.begin();
@@ -328,7 +337,10 @@ void AppSkeleton::timestep(double absTime, double dt)
         glm::vec3 origin3;
         glm::vec3 dir3;
         m_fm.GetControllerOriginAndDirection(h, origin3, dir3);
-        origin3 += m_chassisPos;
+
+        const glm::mat4 chasMat = makeChassisMatrix_glm(m_chassisYaw, m_chassisPos);
+        origin3 = glm::vec3(chasMat * glm::vec4(origin3, 1.f));
+        dir3 = glm::vec3(chasMat * glm::vec4(dir3, 0.f));
 
         _checkSceneIntersections(origin3, dir3);
     }
