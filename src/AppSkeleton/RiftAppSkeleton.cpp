@@ -338,21 +338,6 @@ void RiftAppSkeleton::timestep(double absTime, double dt)
 #endif
 }
 
-OVR::Matrix4f makeChassisMatrix(
-    float chassisYaw,
-    ovrVector3f chassisPos)
-{
-    const glm::vec3 cpglm(chassisPos.x, chassisPos.y, chassisPos.z);
-    const glm::mat4 mvglm = makeChassisMatrix_glm(chassisYaw, cpglm);
-    OVR::Matrix4f mvovr;
-    memcpy(
-        (float*)(&mvovr.M[0][0]),
-        glm::value_ptr(glm::transpose(mvglm)),
-        16*sizeof(float));
-
-    return mvovr;
-}
-
 OVR::Matrix4f makeModelviewMatrix(
     ovrPosef eyePose,
     float chassisYaw,
