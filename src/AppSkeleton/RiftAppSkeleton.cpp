@@ -16,6 +16,7 @@
 
 #include "RiftAppSkeleton.h"
 #include "ShaderFunctions.h"
+#include "MatrixFunctions.h"
 #include "GLUtils.h"
 
 #define USE_OVR_PERF_LOGGING
@@ -341,9 +342,15 @@ OVR::Matrix4f makeChassisMatrix(
     float chassisYaw,
     ovrVector3f chassisPos)
 {
-    return
-        OVR::Matrix4f::Translation(OVR::Vector3f(chassisPos))
-        * OVR::Matrix4f::RotationY(-chassisYaw);
+    const glm::vec3 cpglm(chassisPos.x, chassisPos.y, chassisPos.z);
+    const glm::mat4 mvglm = makeChassisMatrix_glm(chassisYaw, cpglm);
+    OVR::Matrix4f mvovr;
+    memcpy(
+        (float*)(&mvovr.M[0][0]),
+        glm::value_ptr(glm::transpose(mvglm)),
+        16*sizeof(float));
+
+    return mvovr;
 }
 
 OVR::Matrix4f makeModelviewMatrix(
