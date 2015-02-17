@@ -324,7 +324,7 @@ void AppSkeleton::timestep(double absTime, double dt)
         glm::vec3 dir3;
         m_fm.GetControllerOriginAndDirection(h, origin3, dir3);
 
-        const glm::mat4 chasMat = getUserViewMatrix();
+        const glm::mat4 chasMat = AppSkeleton::getUserViewMatrix();
         origin3 = glm::vec3(chasMat * glm::vec4(origin3, 1.f));
         dir3 = glm::vec3(chasMat * glm::vec4(dir3, 0.f));
 
