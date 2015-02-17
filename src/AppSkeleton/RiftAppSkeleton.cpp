@@ -341,8 +341,9 @@ OVR::Matrix4f makeChassisMatrix(
     float chassisYaw,
     ovrVector3f chassisPos)
 {
-    return OVR::Matrix4f::RotationY(chassisYaw)
-        * OVR::Matrix4f::Translation(-OVR::Vector3f(chassisPos));
+    return
+        OVR::Matrix4f::Translation(OVR::Vector3f(chassisPos))
+        * OVR::Matrix4f::RotationY(-chassisYaw);
 }
 
 OVR::Matrix4f makeModelviewMatrix(
@@ -351,11 +352,11 @@ OVR::Matrix4f makeModelviewMatrix(
     ovrVector3f chassisPos)
 {
     const OVR::Matrix4f eyePoseMatrix =
-        OVR::Matrix4f::Translation(OVR::Vector3f(eyePose.Position))
+        makeChassisMatrix(chassisYaw, chassisPos)
+        * OVR::Matrix4f::Translation(OVR::Vector3f(eyePose.Position))
         * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
 
-    return eyePoseMatrix.Inverted()
-        * makeChassisMatrix(chassisYaw, chassisPos);
+    return eyePoseMatrix.Inverted();
 }
 
 ///@todo Even though this function shares most of its code with client rendering,
