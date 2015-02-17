@@ -358,12 +358,20 @@ OVR::Matrix4f makeModelviewMatrix(
     float chassisYaw,
     ovrVector3f chassisPos)
 {
-    const OVR::Matrix4f eyePoseMatrix =
-        makeChassisMatrix(chassisYaw, chassisPos)
-        * OVR::Matrix4f::Translation(OVR::Vector3f(eyePose.Position))
-        * OVR::Matrix4f(OVR::Quatf(eyePose.Orientation));
+    const OVR::Vector3f& p = eyePose.Position;
+    const OVR::Quatf& q = eyePose.Orientation;
+    const glm::vec3 cpglm(chassisPos.x, chassisPos.y, chassisPos.z);
+    const glm::mat4 mvinv = 
+        makeChassisMatrix_glm(chassisYaw, cpglm)
+        * glm::translate(glm::mat4(1.f), glm::vec3(p.x, p.y, p.z))
+        * glm::mat4_cast(glm::quat(q.w, q.x, q.y, q.z));
 
-    return eyePoseMatrix.Inverted();
+    OVR::Matrix4f mvovr;
+    memcpy(
+        (float*)(&mvovr.M[0][0]),
+        glm::value_ptr(glm::transpose(glm::inverse(mvinv))),
+        16*sizeof(float));
+    return mvovr;
 }
 
 ///@todo Even though this function shares most of its code with client rendering,
