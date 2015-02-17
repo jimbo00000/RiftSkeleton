@@ -15,6 +15,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "AppSkeleton.h"
+#include "MatrixFunctions.h"
 
 AppSkeleton::AppSkeleton()
 : m_scene()
@@ -76,15 +77,6 @@ void AppSkeleton::ResetAllTransformations()
     m_chassisPos.y = 1.27f; // my sitting height
     m_chassisPos.z = 1.0f;
     m_chassisYaw = 0.0f;
-}
-
-glm::mat4 makeChassisMatrix_glm(
-    float chassisYaw,
-    glm::vec3 chassisPos)
-{
-    return
-        glm::translate(glm::mat4(1.f), chassisPos) *
-        glm::rotate(glm::mat4(1.f), -chassisYaw, glm::vec3(0,1,0));
 }
 
 glm::mat4 AppSkeleton::getUserViewMatrix() const
