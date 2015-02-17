@@ -341,13 +341,12 @@ void RiftAppSkeleton::timestep(double absTime, double dt)
 OVR::Matrix4f makeModelviewMatrix(
     ovrPosef eyePose,
     float chassisYaw,
-    ovrVector3f chassisPos)
+    glm::vec3 chassisPos)
 {
     const OVR::Vector3f& p = eyePose.Position;
     const OVR::Quatf& q = eyePose.Orientation;
-    const glm::vec3 cpglm(chassisPos.x, chassisPos.y, chassisPos.z);
     const glm::mat4 mvinv = 
-        makeChassisMatrix_glm(chassisYaw, cpglm)
+        makeChassisMatrix_glm(chassisYaw, chassisPos)
         * glm::translate(glm::mat4(1.f), glm::vec3(p.x, p.y, p.z))
         * glm::mat4_cast(glm::quat(q.w, q.x, q.y, q.z));
 
@@ -419,10 +418,10 @@ void RiftAppSkeleton::display_stereo_undistorted() const
         const OVR::Matrix4f view = makeModelviewMatrix(
             eyePose,
             m_chassisYaw,
-            OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
+            m_chassisPos);
 
         const OVR::Matrix4f viewLocal = makeModelviewMatrix(
-            eyePose, 0.f, OVR::Vector3f());
+            eyePose, 0.f, glm::vec3(0.f));
 
         _resetGLState();
 
@@ -510,10 +509,10 @@ void RiftAppSkeleton::display_sdk() const
         const OVR::Matrix4f view = makeModelviewMatrix(
             eyePose,
             m_chassisYaw,
-            OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
+            m_chassisPos);
 
         const OVR::Matrix4f viewLocal = makeModelviewMatrix(
-            eyePose, 0.f, OVR::Vector3f());
+            eyePose, 0.f, glm::vec3(0.f));
 
         _resetGLState();
 
@@ -587,10 +586,10 @@ void RiftAppSkeleton::display_client() const
         const OVR::Matrix4f view = makeModelviewMatrix(
             eyePose,
             m_chassisYaw,
-            OVR::Vector3f(m_chassisPos.x, m_chassisPos.y, m_chassisPos.z));
+            m_chassisPos);
 
         const OVR::Matrix4f viewLocal = makeModelviewMatrix(
-            eyePose, 0.f, OVR::Vector3f());
+            eyePose, 0.f, glm::vec3(0.f));
 
         _resetGLState();
 
