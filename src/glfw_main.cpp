@@ -256,6 +256,18 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
         g_app.m_keyboardYaw = dyaw;
     }
 
+#if 0
+    g_app.m_keyboardPitch = 0.0f;
+    if (m_keyStates['2'] != GLFW_RELEASE)
+    {
+        g_app.m_keyboardPitch = -dyaw;
+    }
+    if (m_keyStates['X'] != GLFW_RELEASE)
+    {
+        g_app.m_keyboardPitch = dyaw;
+    }
+#endif
+
     g_app.m_keyboardMove = mag * keyboardMove;
 }
 

@@ -7,6 +7,7 @@
 
 glm::mat4 makeChassisMatrix_glm(
     float chassisYaw,
+    float chassisPitch,
     glm::vec3 chassisPos);
 
 glm::mat4 makeMatrixFromPose(const ovrPosef& eyePose);

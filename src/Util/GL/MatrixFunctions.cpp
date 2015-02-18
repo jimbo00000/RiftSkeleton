@@ -8,11 +8,14 @@
 
 glm::mat4 makeChassisMatrix_glm(
     float chassisYaw,
+    float chassisPitch,
     glm::vec3 chassisPos)
 {
     return
-        glm::translate(glm::mat4(1.f), chassisPos) *
-        glm::rotate(glm::mat4(1.f), -chassisYaw, glm::vec3(0,1,0));
+        glm::translate(glm::mat4(1.f), chassisPos)
+        * glm::rotate(glm::mat4(1.f), -chassisYaw, glm::vec3(0,1,0))
+        * glm::rotate(glm::mat4(1.f), -chassisPitch, glm::vec3(1,0,0))
+        ;
 }
 
 /// Turn ovrPosef of the HMD into a glm matrix. Pose is delivered by libOVR per-frame
