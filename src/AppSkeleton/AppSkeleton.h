@@ -30,7 +30,7 @@ public:
     AppSkeleton();
     virtual ~AppSkeleton();
 
-    void ResetAllTransformations();
+    void ResetChassisTransformations();
     void initGL();
     void _DrawScenes(const float* pMvWorld, const float* pPersp, const float* pMvLocal=NULL) const;
     void display_raw() const;

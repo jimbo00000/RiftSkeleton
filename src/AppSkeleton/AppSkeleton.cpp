@@ -56,7 +56,7 @@ AppSkeleton::AppSkeleton()
     // Give this scene a pointer to get live Hydra data for display
     m_hydraScene.SetFlyingMousePointer(&m_fm);
 
-    ResetAllTransformations();
+    ResetChassisTransformations();
 }
 
 AppSkeleton::~AppSkeleton()
@@ -71,11 +71,9 @@ void AppSkeleton::SetFBOScale(float s)
     m_fboScale = std::min(1.0f, m_fboScale);
 }
 
-void AppSkeleton::ResetAllTransformations()
+void AppSkeleton::ResetChassisTransformations()
 {
-    m_chassisPos.x = 0.0f;
-    m_chassisPos.y = 1.27f; // my sitting height
-    m_chassisPos.z = 1.0f;
+    m_chassisPos = glm::vec3(0.f, 1.27f, 1.f); // my sitting height
     m_chassisYaw = 0.0f;
 }
 

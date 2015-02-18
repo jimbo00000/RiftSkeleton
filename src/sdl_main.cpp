@@ -177,7 +177,7 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
             break;
 
         case 'r':
-            g_app.ResetAllTransformations();
+            g_app.ResetChassisTransformations();
             break;
 
         case SDLK_ESCAPE:

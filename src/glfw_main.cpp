@@ -191,7 +191,7 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
             break;
 
         case 'R':
-            g_app.ResetAllTransformations();
+            g_app.ResetChassisTransformations();
             break;
 
         case GLFW_KEY_ESCAPE:
