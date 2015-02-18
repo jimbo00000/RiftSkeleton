@@ -338,23 +338,6 @@ void RiftAppSkeleton::timestep(double absTime, double dt)
 #endif
 }
 
-glm::mat4 makeModelviewMatrix(
-    ovrPosef eyePose,
-    float chassisYaw,
-    glm::vec3 chassisPos)
-{
-    const OVR::Vector3f& p = eyePose.Position;
-    const OVR::Quatf& q = eyePose.Orientation;
-    const glm::mat4 mvinv = 
-        makeChassisMatrix_glm(chassisYaw, chassisPos)
-        * glm::translate(glm::mat4(1.f), glm::vec3(p.x, p.y, p.z))
-        * glm::mat4_cast(glm::quat(q.w, q.x, q.y, q.z));
-    return glm::inverse(mvinv);
-}
-
-///@todo Even though this function shares most of its code with client rendering,
-/// which appears to work fine, it is non-convergable. It appears that the projection
-/// matrices for each eye are too far apart? Could be modelview...
 void RiftAppSkeleton::display_stereo_undistorted() const
 {
     ovrHmd hmd = m_Hmd;
@@ -390,10 +373,7 @@ void RiftAppSkeleton::display_stereo_undistorted() const
     {
         const ovrEyeType e = hmd->EyeRenderOrder[eyeIndex];
 
-        const ovrPosef eyePose = outEyePoses[e];
-        renderPose[e] = eyePose;
         eyeTexture[e] = m_EyeTexture[e].Texture;
-        m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
         const ovrGLTexture& otex = m_EyeTexture[e];
         const ovrRecti& rvp = otex.OGL.Header.RenderViewport;
@@ -409,17 +389,17 @@ void RiftAppSkeleton::display_stereo_undistorted() const
             m_EyeRenderDesc[e].Fov,
             0.01f, 10000.0f, true);
 
-        const glm::mat4 view = makeModelviewMatrix(
-            eyePose,
-            m_chassisYaw,
-            m_chassisPos);
-
-        const glm::mat4 viewLocal = makeModelviewMatrix(
-            eyePose, 0.f, glm::vec3(0.f));
+        const ovrPosef eyePose = outEyePoses[e];
+        m_eyeOri = eyePose.Orientation; // cache this for movement direction
+        const glm::mat4 viewLocal = makeMatrixFromPose(eyePose);
+        const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
 
         _resetGLState();
 
-        _DrawScenes(glm::value_ptr(view), &proj.Transposed().M[0][0], glm::value_ptr(viewLocal));
+        _DrawScenes(
+            glm::value_ptr(glm::inverse(viewWorld)),
+            &proj.Transposed().M[0][0],
+            glm::value_ptr(glm::inverse(viewLocal)));
     }
     unbindFBO();
 
@@ -499,18 +479,16 @@ void RiftAppSkeleton::display_sdk() const
 
         const OVR::Matrix4f proj = ovrMatrix4f_Projection(
             m_EyeRenderDesc[e].Fov, 0.01f, 100.0f, true);
-        
-        const glm::mat4 view = makeModelviewMatrix(
-            eyePose,
-            m_chassisYaw,
-            m_chassisPos);
 
-        const glm::mat4 viewLocal = makeModelviewMatrix(
-            eyePose, 0.f, glm::vec3(0.f));
+        const glm::mat4 viewLocal = makeMatrixFromPose(eyePose);
+        const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
 
         _resetGLState();
 
-        _DrawScenes(glm::value_ptr(view), &proj.Transposed().M[0][0], glm::value_ptr(viewLocal));
+        _DrawScenes(
+            glm::value_ptr(glm::inverse(viewWorld)),
+            &proj.Transposed().M[0][0],
+            glm::value_ptr(glm::inverse(viewLocal)));
     }
     unbindFBO();
 
