@@ -26,7 +26,7 @@ RiftAppSkeleton::RiftAppSkeleton()
 , m_usingDebugHmd(false)
 , m_directHmdMode(true)
 {
-    m_eyeOri = OVR::Quatf();
+    m_eyePoseCached = OVR::Posef();
     memset(m_logUserData, 0, 256);
 #ifdef USE_OVR_PERF_LOGGING
     sprintf(m_logUserData, "RiftSkeleton");
@@ -73,11 +73,10 @@ glm::ivec2 RiftAppSkeleton::getRTSize() const
 }
 
 /// Uses a cached copy of HMD orientation written to in display(which are const
-/// functions, but m_eyeOri is a mutable member).
+/// functions, but m_eyePoseCached is a mutable member).
 glm::mat4 RiftAppSkeleton::makeWorldToEyeMatrix() const
 {
-    return AppSkeleton::makeWorldToChassisMatrix() *
-        glm::mat4_cast(glm::quat(m_eyeOri.w, m_eyeOri.x, m_eyeOri.y, m_eyeOri.z));
+    return makeWorldToChassisMatrix() * makeMatrixFromPose(m_eyePoseCached);
 }
 
 ///@brief Set this up early so we can get the HMD's display dimensions to create a window.
@@ -392,7 +391,7 @@ void RiftAppSkeleton::display_stereo_undistorted() const
             0.01f, 10000.0f, true);
 
         const ovrPosef eyePose = outEyePoses[e];
-        m_eyeOri = eyePose.Orientation; // cache this for movement direction
+        m_eyePoseCached = eyePose; // cache this for movement direction
         const glm::mat4 viewLocal = makeMatrixFromPose(eyePose);
         const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
 
@@ -468,7 +467,7 @@ void RiftAppSkeleton::display_sdk() const
         const ovrPosef eyePose = outEyePoses[e];
         renderPose[e] = eyePose;
         eyeTexture[e] = m_EyeTexture[e].Texture;
-        m_eyeOri = eyePose.Orientation; // cache this for chassis movement direction
+        m_eyePoseCached = eyePose; // cache this for movement direction
 
         const ovrGLTexture& otex = m_EyeTexture[e];
         const ovrRecti& rvp = otex.OGL.Header.RenderViewport;
@@ -555,7 +554,7 @@ void RiftAppSkeleton::display_client() const
             0.01f, 10000.0f, true);
 
         const ovrPosef eyePose = outEyePoses[eye];
-        m_eyeOri = eyePose.Orientation; // cache this for movement direction
+        m_eyePoseCached = eyePose; // cache this for movement direction
         const glm::mat4 viewLocal = makeMatrixFromPose(eyePose);
         const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
 

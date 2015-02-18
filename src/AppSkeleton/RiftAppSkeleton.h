@@ -59,7 +59,6 @@ protected:
     virtual glm::ivec2 getRTSize() const;
 
     virtual glm::mat4 makeWorldToEyeMatrix() const;
-    glm::mat4 makeChassisToEyeMatrix(ovrPosef eyePose) const;
 
     ovrHmd m_Hmd;
     ovrFovPort m_EyeFov[2];
@@ -72,7 +71,7 @@ protected:
     // For client rendering
     ovrRecti m_RenderViewports[2];
     ovrDistortionMesh m_DistMeshes[2];
-    mutable ovrQuatf m_eyeOri;
+    mutable ovrPosef m_eyePoseCached;
 
     char m_logUserData[256];
 
