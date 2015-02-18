@@ -350,12 +350,7 @@ OVR::Matrix4f makeModelviewMatrix(
         * glm::translate(glm::mat4(1.f), glm::vec3(p.x, p.y, p.z))
         * glm::mat4_cast(glm::quat(q.w, q.x, q.y, q.z));
 
-    OVR::Matrix4f mvovr;
-    memcpy(
-        (float*)(&mvovr.M[0][0]),
-        glm::value_ptr(glm::transpose(glm::inverse(mvinv))),
-        16*sizeof(float));
-    return mvovr;
+    return makeOVRMatrixFromGlmMatrix(glm::inverse(mvinv));
 }
 
 ///@todo Even though this function shares most of its code with client rendering,
