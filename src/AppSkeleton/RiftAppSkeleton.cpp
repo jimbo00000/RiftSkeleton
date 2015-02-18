@@ -338,7 +338,7 @@ void RiftAppSkeleton::timestep(double absTime, double dt)
 #endif
 }
 
-OVR::Matrix4f makeModelviewMatrix(
+glm::mat4 makeModelviewMatrix(
     ovrPosef eyePose,
     float chassisYaw,
     glm::vec3 chassisPos)
@@ -349,8 +349,7 @@ OVR::Matrix4f makeModelviewMatrix(
         makeChassisMatrix_glm(chassisYaw, chassisPos)
         * glm::translate(glm::mat4(1.f), glm::vec3(p.x, p.y, p.z))
         * glm::mat4_cast(glm::quat(q.w, q.x, q.y, q.z));
-
-    return makeOVRMatrixFromGlmMatrix(glm::inverse(mvinv));
+    return glm::inverse(mvinv);
 }
 
 ///@todo Even though this function shares most of its code with client rendering,
@@ -410,17 +409,17 @@ void RiftAppSkeleton::display_stereo_undistorted() const
             m_EyeRenderDesc[e].Fov,
             0.01f, 10000.0f, true);
 
-        const OVR::Matrix4f view = makeModelviewMatrix(
+        const glm::mat4 view = makeModelviewMatrix(
             eyePose,
             m_chassisYaw,
             m_chassisPos);
 
-        const OVR::Matrix4f viewLocal = makeModelviewMatrix(
+        const glm::mat4 viewLocal = makeModelviewMatrix(
             eyePose, 0.f, glm::vec3(0.f));
 
         _resetGLState();
 
-        _DrawScenes(&view.Transposed().M[0][0], &proj.Transposed().M[0][0], &viewLocal.Transposed().M[0][0]);
+        _DrawScenes(glm::value_ptr(view), &proj.Transposed().M[0][0], glm::value_ptr(viewLocal));
     }
     unbindFBO();
 
@@ -501,17 +500,17 @@ void RiftAppSkeleton::display_sdk() const
         const OVR::Matrix4f proj = ovrMatrix4f_Projection(
             m_EyeRenderDesc[e].Fov, 0.01f, 100.0f, true);
         
-        const OVR::Matrix4f view = makeModelviewMatrix(
+        const glm::mat4 view = makeModelviewMatrix(
             eyePose,
             m_chassisYaw,
             m_chassisPos);
 
-        const OVR::Matrix4f viewLocal = makeModelviewMatrix(
+        const glm::mat4 viewLocal = makeModelviewMatrix(
             eyePose, 0.f, glm::vec3(0.f));
 
         _resetGLState();
 
-        _DrawScenes(&view.Transposed().M[0][0], &proj.Transposed().M[0][0], &viewLocal.Transposed().M[0][0]);
+        _DrawScenes(glm::value_ptr(view), &proj.Transposed().M[0][0], glm::value_ptr(viewLocal));
     }
     unbindFBO();
 
@@ -578,17 +577,17 @@ void RiftAppSkeleton::display_client() const
         ///@todo Should we be using this variable?
         //m_EyeRenderDesc[eye].DistortedViewport;
 
-        const OVR::Matrix4f view = makeModelviewMatrix(
+        const glm::mat4 view = makeModelviewMatrix(
             eyePose,
             m_chassisYaw,
             m_chassisPos);
 
-        const OVR::Matrix4f viewLocal = makeModelviewMatrix(
+        const glm::mat4 viewLocal = makeModelviewMatrix(
             eyePose, 0.f, glm::vec3(0.f));
 
         _resetGLState();
 
-        _DrawScenes(&view.Transposed().M[0][0], &proj.Transposed().M[0][0], &viewLocal.Transposed().M[0][0]);
+        _DrawScenes(glm::value_ptr(view), &proj.Transposed().M[0][0], glm::value_ptr(viewLocal));
     }
     unbindFBO();
 
