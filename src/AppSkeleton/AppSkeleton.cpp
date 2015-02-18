@@ -79,7 +79,7 @@ void AppSkeleton::ResetAllTransformations()
     m_chassisYaw = 0.0f;
 }
 
-glm::mat4 AppSkeleton::getUserViewMatrix() const
+glm::mat4 AppSkeleton::makeWorldToChassisMatrix() const
 {
     return makeChassisMatrix_glm(m_chassisYaw, m_chassisPos);
 }
@@ -224,7 +224,7 @@ void AppSkeleton::_drawSceneMono() const
 
     const glm::mat4 mvLocal = glm::mat4(1.f);
     const glm::mat4 mvWorld = mvLocal *
-        glm::inverse(getUserViewMatrix());
+        glm::inverse(makeWorldToChassisMatrix());
 
     const glm::ivec2 vp = getRTSize();
     const glm::mat4 persp = glm::perspective(
@@ -324,7 +324,7 @@ void AppSkeleton::timestep(double absTime, double dt)
         glm::vec3 dir3;
         m_fm.GetControllerOriginAndDirection(h, origin3, dir3);
 
-        const glm::mat4 chasMat = AppSkeleton::getUserViewMatrix();
+        const glm::mat4 chasMat = AppSkeleton::makeWorldToChassisMatrix();
         origin3 = glm::vec3(chasMat * glm::vec4(origin3, 1.f));
         dir3 = glm::vec3(chasMat * glm::vec4(dir3, 0.f));
 

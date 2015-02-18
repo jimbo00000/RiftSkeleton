@@ -74,7 +74,7 @@ glm::ivec2 RiftAppSkeleton::getRTSize() const
 
 glm::mat4 RiftAppSkeleton::getUserViewMatrix() const
 {
-    return AppSkeleton::getUserViewMatrix() *
+    return AppSkeleton::makeWorldToChassisMatrix() *
         glm::mat4_cast(glm::quat(m_eyeOri.w, m_eyeOri.x, m_eyeOri.y, m_eyeOri.z));
 }
 

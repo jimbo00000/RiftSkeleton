@@ -76,7 +76,8 @@ protected:
     void _drawSceneMono() const;
     void _checkSceneIntersections(glm::vec3 origin, glm::vec3 dir);
     virtual glm::ivec2 getRTSize() const { return m_rtSize; }
-    virtual glm::mat4 getUserViewMatrix() const;
+    virtual glm::mat4 getUserViewMatrix() const { return makeWorldToChassisMatrix(); }
+    glm::mat4 makeWorldToChassisMatrix() const;
 
     std::vector<IScene*> m_scenes;
     FBO m_renderBuffer;
