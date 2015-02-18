@@ -307,7 +307,7 @@ void AppSkeleton::timestep(double absTime, double dt)
     glm::vec3 move_dt = (m_keyboardMove + m_joystickMove + m_mouseMove + hydraMove) * static_cast<float>(dt);
 
     // Move in the direction the viewer is facing.
-    const glm::vec4 mv4 = getUserViewMatrix() * glm::vec4(move_dt, 0.0f);
+    const glm::vec4 mv4 = makeWorldToEyeMatrix() * glm::vec4(move_dt, 0.0f);
     m_chassisPos += glm::vec3(mv4);
 
     m_chassisYaw += (m_keyboardYaw + m_joystickYaw + m_mouseDeltaYaw) * dt;
@@ -371,7 +371,7 @@ void AppSkeleton::OnMouseMove(int x, int y)
         tanHalfFov * uv_11.y * up);
 
     // Transform ray into world space
-    const glm::mat4 mv = getUserViewMatrix();
+    const glm::mat4 mv = makeWorldToEyeMatrix();
     const glm::vec3 origin3 = glm::vec3(mv * glm::vec4(localOrigin,1.f));
     const glm::vec3 dir3 = glm::vec3(mv * glm::vec4(localRay,0.f));
 

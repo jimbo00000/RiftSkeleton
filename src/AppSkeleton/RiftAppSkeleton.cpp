@@ -72,7 +72,9 @@ glm::ivec2 RiftAppSkeleton::getRTSize() const
     return glm::ivec2(sz.w, sz.h);
 }
 
-glm::mat4 RiftAppSkeleton::getUserViewMatrix() const
+/// Uses a cached copy of HMD orientation written to in display(which are const
+/// functions, but m_eyeOri is a mutable member).
+glm::mat4 RiftAppSkeleton::makeWorldToEyeMatrix() const
 {
     return AppSkeleton::makeWorldToChassisMatrix() *
         glm::mat4_cast(glm::quat(m_eyeOri.w, m_eyeOri.x, m_eyeOri.y, m_eyeOri.z));
