@@ -15,6 +15,16 @@ glm::mat4 makeChassisMatrix_glm(
         glm::rotate(glm::mat4(1.f), -chassisYaw, glm::vec3(0,1,0));
 }
 
+/// Turn ovrPosef of the HMD into a glm matrix. Pose is delivered by libOVR per-frame
+/// as close to render time as possible to reduce latency.
+glm::mat4 makeMatrixFromPose(const ovrPosef& eyePose)
+{
+    const OVR::Vector3f& p = eyePose.Position;
+    const OVR::Quatf& q = eyePose.Orientation;
+    return glm::translate(glm::mat4(1.f), glm::vec3(p.x, p.y, p.z))
+        * glm::mat4_cast(glm::quat(q.w, q.x, q.y, q.z));
+}
+
 ///@return an equivalent OVR matrix to the given glm one.
 /// OVR uses DX's left-handed convention, so transpose is necessary.
 OVR::Matrix4f makeOVRMatrixFromGlmMatrix(const glm::mat4& glm_m)

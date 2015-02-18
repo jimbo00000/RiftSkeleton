@@ -559,8 +559,6 @@ void RiftAppSkeleton::display_client() const
     for (int eyeIndex = 0; eyeIndex < ovrEye_Count; eyeIndex++)
     {
         const ovrEyeType eye = hmd->EyeRenderOrder[eyeIndex];
-        const ovrPosef eyePose = outEyePoses[eye];
-        m_eyeOri = eyePose.Orientation; // cache this for movement direction
 
         const ovrGLTexture& otex = m_EyeTexture[eye];
         const ovrRecti& rvp = otex.OGL.Header.RenderViewport;
@@ -570,24 +568,23 @@ void RiftAppSkeleton::display_client() const
             static_cast<int>(m_fboScale * rvp.Size.w),
             static_cast<int>(m_fboScale * rvp.Size.h));
 
+        ///@todo Should we be using this variable?
+        //m_EyeRenderDesc[eye].DistortedViewport;
         const OVR::Matrix4f proj = ovrMatrix4f_Projection(
             m_EyeRenderDesc[eye].Fov,
             0.01f, 10000.0f, true);
 
-        ///@todo Should we be using this variable?
-        //m_EyeRenderDesc[eye].DistortedViewport;
-
-        const glm::mat4 view = makeModelviewMatrix(
-            eyePose,
-            m_chassisYaw,
-            m_chassisPos);
-
-        const glm::mat4 viewLocal = makeModelviewMatrix(
-            eyePose, 0.f, glm::vec3(0.f));
+        const ovrPosef eyePose = outEyePoses[eye];
+        m_eyeOri = eyePose.Orientation; // cache this for movement direction
+        const glm::mat4 viewLocal = makeMatrixFromPose(eyePose);
+        const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
 
         _resetGLState();
 
-        _DrawScenes(glm::value_ptr(view), &proj.Transposed().M[0][0], glm::value_ptr(viewLocal));
+        _DrawScenes(
+            glm::value_ptr(glm::inverse(viewWorld)),
+            &proj.Transposed().M[0][0],
+            glm::value_ptr(glm::inverse(viewLocal)));
     }
     unbindFBO();
 
