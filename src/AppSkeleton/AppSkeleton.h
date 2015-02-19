@@ -90,6 +90,7 @@ protected:
     glm::vec3 m_chassisPos;
     float m_chassisYaw;
     float m_chassisPitch;
+    float m_chassisRoll;
 
     VirtualTrackball m_hyif;
 
@@ -108,6 +109,7 @@ public:
     float m_joystickYaw;
     float m_mouseDeltaYaw;
     float m_keyboardPitch;
+    float m_keyboardRoll;
 
 private: // Disallow copy ctor and assignment operator
     AppSkeleton(const AppSkeleton&);

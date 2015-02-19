@@ -44,6 +44,7 @@ AppSkeleton::AppSkeleton()
 , m_joystickYaw(0.f)
 , m_mouseDeltaYaw(0.f)
 , m_keyboardPitch(0.f)
+, m_keyboardRoll(0.f)
 {
     // Add as many scenes here as you like. They will share color and depth buffers,
     // so drawing one after the other should just result in pixel-perfect integration -
@@ -78,11 +79,12 @@ void AppSkeleton::ResetChassisTransformations()
     m_chassisPos = glm::vec3(0.f, 1.27f, 1.f); // my sitting height
     m_chassisYaw = 0.f;
     m_chassisPitch = 0.f;
+    m_chassisRoll = 0.f;
 }
 
 glm::mat4 AppSkeleton::makeWorldToChassisMatrix() const
 {
-    return makeChassisMatrix_glm(m_chassisYaw, m_chassisPitch, m_chassisPos);
+    return makeChassisMatrix_glm(m_chassisYaw, m_chassisPitch, m_chassisRoll, m_chassisPos);
 }
 
 void AppSkeleton::initGL()
@@ -316,6 +318,7 @@ void AppSkeleton::timestep(double absTime, double dt)
     m_chassisYaw += (m_keyboardYaw + m_joystickYaw + m_mouseDeltaYaw) * dt;
 
     m_chassisPitch += m_keyboardPitch * dt;
+    m_chassisRoll += m_keyboardRoll * dt;
 
     m_fm.updateHydraData();
     m_hyif.updateHydraData(m_fm, 1.0f);
