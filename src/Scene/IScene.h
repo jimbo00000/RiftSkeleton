@@ -15,6 +15,8 @@ public:
 
     virtual void timestep(double absTime, double dt) = 0;
 
+    virtual void RenderPrePass() const {}
+
     virtual void RenderForOneEye(
         const float* pMview,
         const float* pPersp) const = 0;
