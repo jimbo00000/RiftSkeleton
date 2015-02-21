@@ -53,6 +53,9 @@ void InitializeBar()
     TwAddButton(g_pTweakbar, "Recenter Pose", RecenterPoseCB, NULL, " group='Position' ");
     TwAddButton(g_pTweakbar, "Standing", StandingCB, NULL, " group='Position' ");
     TwAddButton(g_pTweakbar, "Sitting", SittingCB, NULL, " group='Position' ");
+    TwAddVarRW(g_pTweakbar, "Allow Pitch", TW_TYPE_BOOLCPP, &g_allowPitch, " group='Position' ");
+    TwAddVarRW(g_pTweakbar, "Allow Roll", TW_TYPE_BOOLCPP, &g_allowRoll, " group='Position' ");
+
 
 
     TwAddVarRW(g_pTweakbar, "Draw Scene", TW_TYPE_BOOLCPP, &g_app.m_scene.m_bDraw,

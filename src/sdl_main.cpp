@@ -59,6 +59,8 @@ float g_fpsDeltaThreshold = 5.0f;
 bool g_dynamicallyScaleFBO = false;
 int g_targetFPS = 100;
 bool g_drawToAuxWindow = false;
+bool g_allowPitch = false;
+bool g_allowRoll = false;
 
 #ifdef USE_ANTTWEAKBAR
 TwBar* g_pTweakbar = NULL;
@@ -231,13 +233,22 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
     // Yaw keys
     g_app.m_keyboardYaw = 0.0f;
     const float dyaw = 0.5f * mag; // radians at 60Hz timestep
-    if (m_keyStates['1'] != KEYUP)
+    if (m_keyStates['1'] != KEYUP) { g_app.m_keyboardYaw = -dyaw; }
+    if (m_keyStates['3'] != KEYUP) { g_app.m_keyboardYaw = dyaw; }
+
+    // Pitch and roll controls - if yaw is VR poison,
+    // this is torture and death!
+    g_app.m_keyboardPitch = 0.0f;
+    g_app.m_keyboardRoll = 0.0f;
+    if (g_allowPitch)
     {
-        g_app.m_keyboardYaw = -dyaw;
+        if (m_keyStates['2'] != KEYUP) { g_app.m_keyboardPitch = -dyaw; }
+        if (m_keyStates['x'] != KEYUP) { g_app.m_keyboardPitch = dyaw; }
     }
-    if (m_keyStates['3'] != KEYUP)
+    if (g_allowRoll)
     {
-        g_app.m_keyboardYaw = dyaw;
+        if (m_keyStates['z'] != KEYUP) { g_app.m_keyboardRoll = -dyaw; }
+        if (m_keyStates['c'] != KEYUP) { g_app.m_keyboardRoll = dyaw; }
     }
 
     g_app.m_keyboardMove = mag * keyboardMove;
