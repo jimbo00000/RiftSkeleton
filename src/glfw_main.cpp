@@ -246,38 +246,19 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
 
     // Yaw keys
     g_app.m_keyboardYaw = 0.0f;
+    g_app.m_keyboardPitch = 0.0f;
+    g_app.m_keyboardRoll = 0.0f;
     const float dyaw = 0.5f * mag; // radians at 60Hz timestep
-    if (m_keyStates['1'] != GLFW_RELEASE)
-    {
-        g_app.m_keyboardYaw = -dyaw;
-    }
-    if (m_keyStates['3'] != GLFW_RELEASE)
-    {
-        g_app.m_keyboardYaw = dyaw;
-    }
+    if (m_keyStates['1'] != GLFW_RELEASE) { g_app.m_keyboardYaw = -dyaw; }
+    if (m_keyStates['3'] != GLFW_RELEASE) { g_app.m_keyboardYaw = dyaw; }
 
 #if 0
     // Pitch and roll controls - if yaw is VR poison,
     // this is torture and death!
-    g_app.m_keyboardPitch = 0.0f;
-    if (m_keyStates['2'] != GLFW_RELEASE)
-    {
-        g_app.m_keyboardPitch = -dyaw;
-    }
-    if (m_keyStates['X'] != GLFW_RELEASE)
-    {
-        g_app.m_keyboardPitch = dyaw;
-    }
-
-    g_app.m_keyboardRoll = 0.0f;
-    if (m_keyStates['Z'] != GLFW_RELEASE)
-    {
-        g_app.m_keyboardRoll = -dyaw;
-    }
-    if (m_keyStates['C'] != GLFW_RELEASE)
-    {
-        g_app.m_keyboardRoll = dyaw;
-    }
+    if (m_keyStates['2'] != GLFW_RELEASE) { g_app.m_keyboardPitch = -dyaw; }
+    if (m_keyStates['X'] != GLFW_RELEASE) { g_app.m_keyboardPitch = dyaw; }
+    if (m_keyStates['Z'] != GLFW_RELEASE) { g_app.m_keyboardRoll = -dyaw; }
+    if (m_keyStates['C'] != GLFW_RELEASE) { g_app.m_keyboardRoll = dyaw; }
 #endif
 
     g_app.m_keyboardMove = mag * keyboardMove;
