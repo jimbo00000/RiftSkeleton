@@ -108,8 +108,8 @@ public:
     float m_keyboardYaw;
     float m_joystickYaw;
     float m_mouseDeltaYaw;
-    float m_keyboardPitch;
-    float m_keyboardRoll;
+    float m_keyboardDeltaPitch;
+    float m_keyboardDeltaRoll;
 
 private: // Disallow copy ctor and assignment operator
     AppSkeleton(const AppSkeleton&);
