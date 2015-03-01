@@ -368,7 +368,6 @@ void RiftAppSkeleton::display_stereo_undistorted() const
         &outHmdTrackingState);
 
     // For passing to EndFrame once rendering is done
-    ovrPosef renderPose[2];
     ovrTexture eyeTexture[2];
     for (int eyeIndex = 0; eyeIndex < ovrEye_Count; eyeIndex++)
     {

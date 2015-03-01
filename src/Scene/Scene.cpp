@@ -262,7 +262,7 @@ void Scene::RenderForOneEye(const float* pMview, const float* pPersp) const
     DrawScene(modelview, projection, object);
 }
 
-void Scene::timestep(double absTime, double dt)
+void Scene::timestep(double /*absTime*/, double dt)
 {
     m_phaseVal += static_cast<float>(dt);
 }
