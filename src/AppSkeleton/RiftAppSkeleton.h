@@ -14,6 +14,7 @@
 
 #include "AppSkeleton.h"
 
+#include <Kernel/OVR_Types.h> // Pull in OVR_OS_* defines 
 #include <OVR_CAPI.h>
 #include <OVR_CAPI_GL.h>
 
