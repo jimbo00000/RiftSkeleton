@@ -309,16 +309,13 @@ void AppSkeleton::timestep(double absTime, double dt)
     }
 #endif
 
-    glm::vec3 move_dt = (m_keyboardMove + m_joystickMove + m_mouseMove + hydraMove) * static_cast<float>(dt);
-
     // Move in the direction the viewer is facing.
+    const glm::vec3 move_dt = (m_keyboardMove + m_joystickMove + m_mouseMove + hydraMove) * static_cast<float>(dt);
     const glm::vec4 mv4 = makeWorldToEyeMatrix() * glm::vec4(move_dt, 0.0f);
     m_chassisPos += glm::vec3(mv4);
-
-    m_chassisYaw += (m_keyboardYaw + m_joystickYaw + m_mouseDeltaYaw) * dt;
-
-    m_chassisPitch += m_keyboardDeltaPitch * dt;
-    m_chassisRoll += m_keyboardDeltaRoll * dt;
+    m_chassisYaw += (m_keyboardYaw + m_joystickYaw + m_mouseDeltaYaw) * static_cast<float>(dt);
+    m_chassisPitch += m_keyboardDeltaPitch * static_cast<float>(dt);
+    m_chassisRoll += m_keyboardDeltaRoll * static_cast<float>(dt);
 
     m_fm.updateHydraData();
     m_hyif.updateHydraData(m_fm, 1.0f);
@@ -386,8 +383,8 @@ void AppSkeleton::OnMouseMove(int x, int y)
     _checkSceneIntersections(origin3, dir3);
 }
 
-void AppSkeleton::OnMouseWheel(double x, double y)
+void AppSkeleton::OnMouseWheel(double x, double /*y*/)
 {
-    const float rotationIncrement = 30.f * M_PI / 180.f;
-    m_chassisYaw += x * rotationIncrement;
+    const float rotationIncrement = 30.f * static_cast<float>(M_PI) / 180.f;
+    m_chassisYaw += static_cast<float>(x) * rotationIncrement;
 }
