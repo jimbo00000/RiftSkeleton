@@ -80,7 +80,6 @@ IF( WIN32 )
             LINK_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Lib/Win32/VS2013" )
         ENDIF()
         SET( OVR_LIBS optimized libovr.lib debug libovrd.lib )
-        ADD_DEFINITIONS( -DOVR_OS_WIN32 )
         ADD_DEFINITIONS( -DUSE_OCULUSSDK )
     ENDIF( USE_OCULUSSDK )
 
