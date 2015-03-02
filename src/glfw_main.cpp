@@ -104,6 +104,8 @@ static void SetVsync(int state)
 
 static void ErrorCallback(int p_Error, const char* p_Description)
 {
+    (void)p_Error;
+    (void)p_Description;
     LOG_INFO("ERROR: %d, %s", p_Error, p_Description);
 }
 
@@ -522,6 +524,7 @@ void printGLContextInfo(GLFWwindow* pW)
             LOG_INFO("GLFW_OPENGL_CORE_PROFILE");
         }
     }
+    (void)l_Minor;
     LOG_INFO("OpenGL: %d.%d", l_Major, l_Minor);
     LOG_INFO("Vendor: %s", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
     LOG_INFO("Renderer: %s", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
@@ -864,6 +867,7 @@ int main(int argc, char** argv)
         const GLFWvidmode* mode = glfwGetVideoMode(pCur);
         if (mode != NULL)
         {
+            (void)pPrimary;
             LOG_INFO("Monitor #%d: %dx%d @ %dHz %s",
                 i,
                 mode->width,
