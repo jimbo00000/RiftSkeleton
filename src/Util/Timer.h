@@ -68,7 +68,7 @@ class Timer {
       clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &time2);
       timespec ts = diff(time1_, time2);
       ///@note Time empirically appeared about 10x too slow, so this number was fudged by 1/10...
-      double dt = ts.tv_sec + (1.0/100000000) * ts.tv_nsec;
+      double dt = ts.tv_sec + 1.e-9 * ts.tv_nsec;
       return dt;
     }
     /// seconds() returns the number of milliseconds (to very high resolution)
