@@ -117,7 +117,7 @@ IF( WIN32 )
         ${ANT_LIBS}
         )
 
-    ADD_DEFINITIONS( /W4 )
+    ADD_DEFINITIONS( /W4 -D_CRT_SECURE_NO_WARNINGS )
 
     # These lines will silence some linker warnings on VS2010,
     # but also remove debug info from the debug build.
