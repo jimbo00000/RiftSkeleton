@@ -25,6 +25,8 @@ commonDllList = [
 debugDllList = [
 	["SixenseSDK/", "bin/win32/debug_dll/", "sixensed.dll" ],
 	["SixenseSDK/", "bin/win32/debug_dll/", "sixense_utilsd.dll" ],
+	["SFML-2.2/",   "bin/", "sfml-system-2.dll"],
+	["SFML-2.2/",   "bin/", "sfml-window-2.dll"]
 ]
 
 releaseDllList = [
