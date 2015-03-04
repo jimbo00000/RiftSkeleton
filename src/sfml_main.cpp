@@ -318,15 +318,12 @@ int main(int argc, char** argv)
             g_window = new sf::Window(
                 sf::VideoMode(sz.w, sz.h),
                 windowTitle.c_str(),
-                sf::Style::Default,
-                contextSettings);
+                sf::Style::None);
             g_window->setPosition(sf::Vector2i(pos.x, pos.y));
 
 #if defined(_WIN32)
-            //if (ret)
-            {
-                //g_app.AttachToWindow(info.info.win.window);
-            }
+            sf::WindowHandle winh = g_window->getSystemHandle();
+            g_app.AttachToWindow(winh);
 #endif
         }
         else
