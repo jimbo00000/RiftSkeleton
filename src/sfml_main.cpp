@@ -78,22 +78,51 @@ void timestep()
     g_app.timestep(absT, dt);
 }
 
-void keyboard(const sf::Event::KeyEvent& event)
+void keyboard(const sf::Event& event)
 {
-    //if (ev.type == sf::Event::KeyPressed)
+    const sf::Event::KeyEvent& kevent = event.key;
+    const float f = 0.9f;
+    const float ff = 0.99f;
+
+    if (event.type == sf::Event::KeyPressed)
     {
-        switch(event.code)
+        switch(kevent.code)
         {
-        case sf::Keyboard::Escape:
-            g_window->close();
-            g_app.exitVR();
+        default:
+            g_app.DismissHealthAndSafetyWarning();
             break;
+
+        case sf::Keyboard::F1:
+            if (kevent.control)
+                g_renderMode.toggleRenderingTypeReverse();
+            else
+                g_renderMode.toggleRenderingType();
+            break;
+
+        case sf::Keyboard::F2:
+            g_renderMode.toggleRenderingTypeMono();
+            break;
+
+        case sf::Keyboard::F3:
+            g_renderMode.toggleRenderingTypeHMD();
+            break;
+
+        case sf::Keyboard::F4:
+            g_renderMode.toggleRenderingTypeDistortion();
+            break;
+
+        case sf::Keyboard::F5: g_dynamicallyScaleFBO = false; g_app.SetFBOScale(f * g_app.GetFBOScale()); break;
+        case sf::Keyboard::F6: g_dynamicallyScaleFBO = false; g_app.SetFBOScale(ff * g_app.GetFBOScale()); break;
+        case sf::Keyboard::F7: g_dynamicallyScaleFBO = false; g_app.SetFBOScale((1.f/ff) * g_app.GetFBOScale()); break;
+        case sf::Keyboard::F8: g_dynamicallyScaleFBO = false; g_app.SetFBOScale((1.f/f) * g_app.GetFBOScale()); break;
 
         case sf::Keyboard::F9: SetVsync(0); break;
         case sf::Keyboard::F10: SetVsync(1); break;
         case sf::Keyboard::F11: SetVsync(-1); break;
 
-        default:
+        case sf::Keyboard::Escape:
+            g_window->close();
+            g_app.exitVR();
             break;
         }
     }
@@ -239,7 +268,7 @@ void PollEvents()
             g_window->close();
 
         if (event.type == sf::Event::KeyPressed)
-            keyboard(event.key);
+            keyboard(event);
 
         // Resize event: adjust the viewport
         if (event.type == sf::Event::Resized)
