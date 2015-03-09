@@ -6,7 +6,7 @@ INVOKEPYTHON( "tools/hardcode_shaders.py" )
 # Python script will dump generated headers to autogen/
 INCLUDE_DIRECTORIES("autogen/")
 
-# GLFW, SDL
+# GLFW, SDL, SFML
 SET( GL_FRAMEWORK "GLFW" CACHE STRING "Which OpenGL windowing framework to use" )
 
 # Control linking to AntTweakBar and Sixense libraries by toggling a config flag.
@@ -65,7 +65,7 @@ IF( WIN32 )
         LINK_DIRECTORIES   ( "${SFML_ROOT}/lib" )
         SET( FRAMEWORK_LIBS sfml-main.lib sfml-system.lib sfml-window.lib )
     ELSE()
-        MESSAGE("Unknown GL_FRAMEWORK: choose GLFW or SDL.")
+        MESSAGE("Unknown GL_FRAMEWORK: choose GLFW, SDL or SFML.")
     ENDIF()
 
     SET( GLEW_ROOT "${LIBS_HOME}/glew-1.12.0" CACHE STRING "glew root" )
@@ -228,7 +228,7 @@ ELSEIF( UNIX )
         LINK_DIRECTORIES   ( "/usr/local/lib/x86" )
         SET( FRAMEWORK_LIBS -lSDL2 )
     ELSE()
-        MESSAGE("Unknown GL_FRAMEWORK: choose GLFW or SDL.")
+        MESSAGE("Unknown GL_FRAMEWORK: choose GLFW, SDL or SFML.")
     ENDIF()
 
     IF( USE_OCULUSSDK )

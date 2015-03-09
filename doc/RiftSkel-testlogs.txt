@@ -7,12 +7,28 @@ CPU: Intel, AMD, ARM
    Driver Version
     HMD: DK1, DK2, DebugHMD
      Display Mode: Direct, Extended, Windowed
-      Framework: GLFW, SDL2
+      Framework: GLFW3, SDL2, SFML
        GL: CoreContext, CompatContext
         Render Path: SDK, Client
          Build Configuration: Debug, Release
           Debugger attached, not attached
 
+
+Intel i7 920
+Win 7 Pro
+  NVidia 780 Ti
+  Driver 347.09
+    DK2
+      SDL2 - works
+      GLFW3 - works
+      SFML
+        DebugHMD - works
+        Extended
+          SDK
+          Client - works, vsync defaulting off
+        Direct
+          SDK - broken, appears to freeze with <1fps
+          Client - works
 
 AMD Phenom II X4 965 3.4 GHZ
 Win 7 Pro

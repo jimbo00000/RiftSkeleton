@@ -13,7 +13,7 @@ The skeleton app targets the OVR SDK v0.4.4 and provides a simple framework for 
 
 ## Dependencies 
  - [CMake](http://www.cmake.org/) (for building)
- - [GLFW](http://www.glfw.org/download.html) or [SDL2](https://www.libsdl.org/download-2.0.php)
+ - [GLFW](http://www.glfw.org/download.html), [SDL2](https://www.libsdl.org/download-2.0.php) or [SFML](http://www.sfml-dev.org/download.php)
  - [GLEW](http://glew.sourceforge.net/)
  - [GLM](http://glm.g-truc.net/0.9.6/index.html)
  - [Oculus SDK](https://developer.oculus.com/downloads/) (optional)
@@ -31,7 +31,7 @@ I set up my local build environment with libraries installed under a single dire
  - Mouse click to teleport in Scene, wheel tilt for "comfort mode" rotation  
  - Sixense SDK Hydra support  
  - Keyboard and gamepad world motion support  
- - Interchangeable GLFW and SDL2 backends  
+ - Interchangeable GLFW, SDL2 and SFML backends  
 
 ## Similar Projects 
  - [OculusRiftInAction](https://github.com/jherico/OculusRiftInAction)  
