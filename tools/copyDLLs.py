@@ -8,6 +8,7 @@
 #   cd tools/; python copyDLLs.py
 #   Or just double-click tools/copyDLLs.py
 
+from __future__ import print_function
 import os
 import sys
 import shutil
@@ -38,7 +39,7 @@ def assembleBuild(buildHome, buildname, libsHome, dllList):
 	""" Copy a list of dlls into a build directory."""
 	#print buildHome
 	dllDest = os.path.join(buildHome, buildname)
-	print "  Assembling: " + dllDest
+	print("  Assembling: " + dllDest)
 
 	if not os.path.isdir(dllDest):
 		os.makedirs(dllDest)
@@ -47,11 +48,11 @@ def assembleBuild(buildHome, buildname, libsHome, dllList):
 		src = os.path.join(libsHome, f[0], f[1], f[2])
 		dst = os.path.join(dllDest, f[2])
 		#print "  copy\n    ",src,"\n    ",dst
-		print "    copying dll:", f[2]
+		print("    copying dll:", f[2])
 		try:
 			shutil.copyfile(src, dst)
 		except IOError as e:
-			print e
+			print(e)
 
 
 #
