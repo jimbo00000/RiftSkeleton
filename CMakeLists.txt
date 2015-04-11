@@ -79,7 +79,7 @@ IF( WIN32 )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Src" )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVRKernel/Src" )
         IF( MSVC_VERSION STREQUAL "1600" )
-            IF( TRUE ) #DEBUG )
+            IF( DEBUG )
                 LINK_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Lib/Windows/Win32/Debug/VS2010" )
             ELSE()
                 LINK_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Lib/Windows/Win32/Release/VS2010" )
@@ -170,13 +170,14 @@ ELSEIF( APPLE )
 
     SET( GLFW3_ROOT "${LIBS_HOME}/glfw-3.1/" )
     INCLUDE_DIRECTORIES( "${GLFW3_ROOT}/include" )
-    LINK_DIRECTORIES   ( "${GLFW3_ROOT}/lib" )
 
     IF( USE_OCULUSSDK )
         SET( OCULUSSDK_ROOT "${LIBS_HOME}/OculusSDK" )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Include" )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Src" )
-        LINK_DIRECTORIES   ( "${OCULUSSDK_ROOT}/LibOVR/Lib/Mac/Debug/" )
+        INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVRKernel/Src" )
+        LINK_DIRECTORIES   ( "${OCULUSSDK_ROOT}/LibOVR/Lib/Mac/Debug/LibOVR.framework/Versions/A/" )
+        LINK_DIRECTORIES   ( "${OCULUSSDK_ROOT}/LibOVR/Lib/Mac/Release/LibOVR.framework/Versions/A/" )
         ADD_DEFINITIONS( -DOVR_OS_MAC )
         ADD_DEFINITIONS( -DUSE_OCULUSSDK )
     ENDIF( USE_OCULUSSDK )
@@ -188,7 +189,7 @@ ELSEIF( APPLE )
                       IOKIT_LIBRARY
                       )
     # Todo - build OVR with RTTI support
-    SET(CMAKE_CXX_FLAGS "-fno-rtti -framework CoreVideo")
+    SET(CMAKE_CXX_FLAGS "-fno-rtti" )
 
     IF( USE_SIXENSE )
         MESSAGE("Using Sixense SDK.")
@@ -214,7 +215,7 @@ ELSEIF( APPLE )
         ${OpenGL_LIBRARY}
         -lGLEW
         -lglfw3
-        -lovr
+        LibOVR # How do I link to this file?
         ${HYDRA_LIBS}
         ${ANT_LIBS}
         )
