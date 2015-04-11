@@ -287,6 +287,7 @@ int main(int argc, char** argv)
     useOpenGLCoreContext = true;
 #endif
 
+    LOG_INFO("Using SFML2 backend.");
     // Command line options
     for (int i=0; i<argc; ++i)
     {
