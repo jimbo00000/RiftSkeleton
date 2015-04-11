@@ -257,9 +257,12 @@ int RiftAppSkeleton::ConfigureSDKRendering()
     m_Cfg.OGL.Header.API = ovrRenderAPI_OpenGL;
     m_Cfg.OGL.Header.Multisample = 0;
 
-    const int distortionCaps =
+    int distortionCaps =
         ovrDistortionCap_TimeWarp |
         ovrDistortionCap_Vignette;
+#ifdef OVR_OS_LINUX
+    distortionCaps |= ovrDistortionCap_LinuxDevFullscreen;
+#endif
     ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, distortionCaps, m_EyeFov, m_EyeRenderDesc);
 
     return 0;
