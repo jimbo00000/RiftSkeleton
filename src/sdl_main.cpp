@@ -582,6 +582,7 @@ int main(int argc, char** argv)
     useOpenGLCoreContext = true;
 #endif
 
+    LOG_INFO("Using SDL2 backend.");
     // Command line options
     for (int i=0; i<argc; ++i)
     {
@@ -656,6 +657,7 @@ int main(int argc, char** argv)
             LOG_INFO("Using Direct to Rift mode.");
             windowTitle = "RiftSkeleton-SDL2-Direct";
 
+            LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
             g_pHMDWindow = SDL_CreateWindow(
                 windowTitle.c_str(),
                 pos.x, pos.y,
@@ -678,6 +680,7 @@ int main(int argc, char** argv)
             LOG_INFO("Using Extended desktop mode.");
             windowTitle = "RiftSkeleton-SDL2-Extended";
 
+            LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
             g_pHMDWindow = SDL_CreateWindow(
                 windowTitle.c_str(),
                 pos.x, pos.y,

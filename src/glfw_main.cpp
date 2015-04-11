@@ -705,6 +705,7 @@ int main(int argc, char** argv)
     useOpenGLCoreContext = false;
 #endif
 
+    LOG_INFO("Using GLFW3 backend.");
     // Command line options
     for (int i=0; i<argc; ++i)
     {
@@ -785,6 +786,7 @@ int main(int argc, char** argv)
             LOG_INFO("Using Direct to Rift mode.");
             windowTitle = "RiftSkeleton-GLFW-Direct";
 
+            LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
             l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
             glfwSetWindowPos(l_Window, pos.x, pos.y);
             glfwSetInputMode(l_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -798,6 +800,7 @@ int main(int argc, char** argv)
             LOG_INFO("Using Extended desktop mode.");
             windowTitle = "RiftSkeleton-GLFW-Extended";
 
+            LOG_INFO("Creating GLFW_DECORATED window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
             glfwWindowHint(GLFW_DECORATED, 0);
             l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
             glfwWindowHint(GLFW_DECORATED, 1);
