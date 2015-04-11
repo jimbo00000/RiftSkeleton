@@ -385,7 +385,11 @@ int main(int argc, char** argv)
   #if defined(OVR_OS_WIN32)
     g_app.setWindow(winh);
   #elif defined(OVR_OS_LINUX)
-    g_app.setWindow(info.info.x11.display);
+    g_app.setWindow(NULL);
+    // https://forums.oculus.com/viewtopic.php?t=16984
+    // Where does the variable info come from?
+    //cfg.OGL.Disp = info.info.x11.display;
+    //cfg.OGL.Win = info.info.x11.window;
   #endif
 #endif //USE_OCULUSSDK
 
