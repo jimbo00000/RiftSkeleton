@@ -742,6 +742,26 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
+    // Log system monitor information
+    const GLFWmonitor* pPrimary = glfwGetPrimaryMonitor();
+    int monitorCount = 0;
+    GLFWmonitor** ppMonitors = glfwGetMonitors(&monitorCount);
+    for (int i=0; i<monitorCount; ++i)
+    {
+        GLFWmonitor* pCur = ppMonitors[i];
+        const GLFWvidmode* mode = glfwGetVideoMode(pCur);
+        if (mode != NULL)
+        {
+            (void)pPrimary;
+            LOG_INFO("Monitor #%d: %dx%d @ %dHz %s",
+                i,
+                mode->width,
+                mode->height,
+                mode->refreshRate,
+                pCur==pPrimary ? "Primary":"");
+        }
+    }
+
 #ifndef _LINUX
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 #  if defined(_MACOS)
@@ -858,26 +878,6 @@ int main(int argc, char** argv)
         LOG_INFO("Glfw opened Joystick #%d: %s w/ %d axes, %d buttons", i, pJoyName, numAxes, numButtons);
         if (g_joystickIdx == -1)
             g_joystickIdx = i;
-    }
-
-    // Log system monitor information
-    const GLFWmonitor* pPrimary = glfwGetPrimaryMonitor();
-    int monitorCount = 0;
-    GLFWmonitor** ppMonitors = glfwGetMonitors(&monitorCount);
-    for (int i=0; i<monitorCount; ++i)
-    {
-        GLFWmonitor* pCur = ppMonitors[i];
-        const GLFWvidmode* mode = glfwGetVideoMode(pCur);
-        if (mode != NULL)
-        {
-            (void)pPrimary;
-            LOG_INFO("Monitor #%d: %dx%d @ %dHz %s",
-                i,
-                mode->width,
-                mode->height,
-                mode->refreshRate,
-                pCur==pPrimary ? "Primary":"");
-        }
     }
 
     printGLContextInfo(l_Window);
