@@ -148,48 +148,38 @@ IF( WIN32 )
 ELSEIF( APPLE )
     ADD_DEFINITIONS( -D_MACOS )
 
+    # Todo - build OVR with RTTI support
     SET(CMAKE_CXX_FLAGS "-fno-rtti")
+
+    SET( LIBS_HOME "~/Development/" )
+    SET( OCULUSSDK_ROOT "${LIBS_HOME}/OculusSDK" )
 
     INCLUDE_DIRECTORIES ( /System/Library/Frameworks )
     FIND_LIBRARY(COCOA_LIBRARY Cocoa)
     FIND_LIBRARY(IOKIT_LIBRARY IOKit)
     FIND_LIBRARY(GLUT_LIBRARY GLUT )
+    FIND_LIBRARY(OVR_LIBRARY NAMES LibOVR PATHS ${OCULUSSDK_ROOT}/LibOVR/Lib/Mac/Release NO_DEFAULT_PATH)
     FIND_LIBRARY(OpenGL_LIBRARY OpenGL )
     MARK_AS_ADVANCED (COCOA_LIBRARY
                       GLUT_LIBRARY
                       IOKIT_LIBRARY
-                      OpenGL_LIBRARY)
+                      OpenGL_LIBRARY
+                      OVR_LIBRARY)
     INCLUDE_DIRECTORIES( "/opt/local/include/" )
     LINK_DIRECTORIES   ( "/opt/local/lib" )
-
-    SET( LIBS_HOME "~/Development/" )
 
     SET( GLM_ROOT "${LIBS_HOME}/glm-0.9.5.4/glm" CACHE STRING "glm root" )
     INCLUDE_DIRECTORIES( "${GLM_ROOT}" )
     ADD_DEFINITIONS( -DGLM_FORCE_RADIANS )
-
-    SET( GLFW3_ROOT "${LIBS_HOME}/glfw-3.1/" )
-    INCLUDE_DIRECTORIES( "${GLFW3_ROOT}/include" )
 
     IF( USE_OCULUSSDK )
         SET( OCULUSSDK_ROOT "${LIBS_HOME}/OculusSDK" )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Include" )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Src" )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVRKernel/Src" )
-        LINK_DIRECTORIES   ( "${OCULUSSDK_ROOT}/LibOVR/Lib/Mac/Debug/LibOVR.framework/Versions/A/" )
-        LINK_DIRECTORIES   ( "${OCULUSSDK_ROOT}/LibOVR/Lib/Mac/Release/LibOVR.framework/Versions/A/" )
         ADD_DEFINITIONS( -DOVR_OS_MAC )
         ADD_DEFINITIONS( -DUSE_OCULUSSDK )
     ENDIF( USE_OCULUSSDK )
-
-    FIND_LIBRARY(COCOA_LIBRARY Cocoa)
-    FIND_LIBRARY(IOKIT_LIBRARY IOKit)
-
-    MARK_AS_ADVANCED (COCOA_LIBRARY
-                      IOKIT_LIBRARY
-                      )
-    # Todo - build OVR with RTTI support
-    SET(CMAKE_CXX_FLAGS "-fno-rtti" )
 
     IF( USE_SIXENSE )
         MESSAGE("Using Sixense SDK.")
@@ -213,9 +203,9 @@ ELSEIF( APPLE )
         ${IOKIT_LIBRARY}
         ${GLUT_LIBRARY}
         ${OpenGL_LIBRARY}
+        ${OVR_LIBRARY}
         -lGLEW
-        -lglfw3
-        LibOVR # How do I link to this file?
+        -lglfw
         ${HYDRA_LIBS}
         ${ANT_LIBS}
         )
