@@ -901,7 +901,11 @@ int main(int argc, char** argv)
     LOG_INFO("Calling initGL...");
     g_app.initGL();
     LOG_INFO("Calling initVR...");
+#ifdef _LINUX
+    g_app.initVR(true);
+#else
     g_app.initVR();
+#endif
     LOG_INFO("initVR complete.");
 
     //SetVsync(1);

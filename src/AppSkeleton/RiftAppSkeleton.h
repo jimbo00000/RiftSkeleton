@@ -27,7 +27,7 @@ public:
     virtual ~RiftAppSkeleton();
 
     void initHMD();
-    void initVR();
+    void initVR(bool swapBackBufferDims = false);
     void exitVR();
     void RecenterPose();
     int ConfigureRendering();

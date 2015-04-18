@@ -118,12 +118,18 @@ void RiftAppSkeleton::initHMD()
     }
 }
 
-void RiftAppSkeleton::initVR()
+void RiftAppSkeleton::initVR(bool swapBackBufferDims)
 {
     m_Cfg.OGL.Header.BackBufferSize = getHmdResolution();
-    int tmp = m_Cfg.OGL.Header.BackBufferSize.w;
-    m_Cfg.OGL.Header.BackBufferSize.w = m_Cfg.OGL.Header.BackBufferSize.h;
-    m_Cfg.OGL.Header.BackBufferSize.h = tmp;
+
+    ///@note This operation seems necessary for proper placement of the output window
+    /// in Linux's Direct mode (Rift configured as Screen 1).
+    if (swapBackBufferDims)
+    {
+        int tmp = m_Cfg.OGL.Header.BackBufferSize.w;
+        m_Cfg.OGL.Header.BackBufferSize.w = m_Cfg.OGL.Header.BackBufferSize.h;
+        m_Cfg.OGL.Header.BackBufferSize.h = tmp;
+    }
 
     ConfigureRendering();
     ///@todo Do we need to choose here?
