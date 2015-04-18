@@ -583,6 +583,15 @@ int main(int argc, char** argv)
 #endif
 
     LOG_INFO("Using SDL2 backend.");
+    SDL_version compiled;
+    SDL_version linked;
+    SDL_VERSION(&compiled);
+    SDL_GetVersion(&linked);
+    LOG_INFO("Compiled against SDL version %d.%d.%d.",
+           compiled.major, compiled.minor, compiled.patch);
+    LOG_INFO("Linking against SDL version %d.%d.%d.",
+           linked.major, linked.minor, linked.patch);
+
     // Command line options
     for (int i=0; i<argc; ++i)
     {
