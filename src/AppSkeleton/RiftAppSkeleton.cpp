@@ -101,7 +101,7 @@ void RiftAppSkeleton::initHMD()
     const unsigned int caps = m_Hmd->HmdCaps;
     if ((caps & ovrHmdCap_ExtendDesktop) != 0)
     {
-        m_directHmdMode = false;
+       // m_directHmdMode = false;
     }
 
     m_ovrScene.SetHmdPointer(m_Hmd);
@@ -121,6 +121,9 @@ void RiftAppSkeleton::initHMD()
 void RiftAppSkeleton::initVR()
 {
     m_Cfg.OGL.Header.BackBufferSize = getHmdResolution();
+    int tmp = m_Cfg.OGL.Header.BackBufferSize.w;
+    m_Cfg.OGL.Header.BackBufferSize.w = m_Cfg.OGL.Header.BackBufferSize.h;
+    m_Cfg.OGL.Header.BackBufferSize.h = tmp;
 
     ConfigureRendering();
     ///@todo Do we need to choose here?
@@ -260,9 +263,9 @@ int RiftAppSkeleton::ConfigureSDKRendering()
     int distortionCaps =
         ovrDistortionCap_TimeWarp |
         ovrDistortionCap_Vignette;
-#ifdef OVR_OS_LINUX
+//#ifdef OVR_OS_LINUX
     distortionCaps |= ovrDistortionCap_LinuxDevFullscreen;
-#endif
+//#endif
     ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, distortionCaps, m_EyeFov, m_EyeRenderDesc);
 
     return 0;

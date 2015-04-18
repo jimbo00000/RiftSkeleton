@@ -771,31 +771,9 @@ int main(int argc, char** argv)
         }
     }
 
-#ifndef _LINUX
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-#  if defined(_MACOS)
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-#  else
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-#  endif
-#endif //ndef _LINUX
-    if (useOpenGLCoreContext)
-    {
-        LOG_INFO("Using OpenGL core context.");
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    }
-    else
-    {
-#ifndef _LINUX
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-#endif
-    }
-
-    glfwWindowHint(GLFW_SAMPLES, 0);
 
 #ifdef USE_OCULUSSDK
-    const ovrSizei sz = g_app.getHmdResolution();
+    ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
     std::string windowTitle = "";
 
@@ -805,7 +783,7 @@ int main(int argc, char** argv)
         LOG_INFO("Using Debug HMD mode.");
         windowTitle = "RiftSkeleton-GLFW-DebugHMD";
 
-        l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
+        l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), glfwGetPrimaryMonitor(), NULL);
     }
     else
     {
@@ -815,10 +793,18 @@ int main(int argc, char** argv)
             LOG_INFO("Using Direct to Rift mode.");
             windowTitle = "RiftSkeleton-GLFW-Direct";
 
+            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+            const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+            sz.w = mode->width;
+            sz.h = mode->height;
             LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
-            l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
-            glfwSetWindowPos(l_Window, pos.x, pos.y);
+            l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), monitor, NULL);
+            //glfwSetWindowPos(l_Window, pos.x, pos.y);
             glfwSetInputMode(l_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+            int wout, hout;
+            glfwGetWindowSize(l_Window, &wout, &hout);
+            LOG_INFO("Window size: %dx%d", wout, hout);
 
 #if defined(_WIN32)
             g_app.AttachToWindow((void*)glfwGetWin32Window(l_Window));
@@ -831,12 +817,12 @@ int main(int argc, char** argv)
 
             LOG_INFO("Creating GLFW_DECORATED window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
             glfwWindowHint(GLFW_DECORATED, 0);
-            l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
+            l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), glfwGetPrimaryMonitor(), NULL);
             glfwWindowHint(GLFW_DECORATED, 1);
             glfwSetInputMode(l_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
 
-        glfwSetWindowPos(l_Window, pos.x, pos.y);
+        //glfwSetWindowPos(l_Window, pos.x, pos.y);
         g_renderMode = renderMode;
     }
     resize(l_Window, sz.w, sz.h); // inform AppSkeleton of window size
