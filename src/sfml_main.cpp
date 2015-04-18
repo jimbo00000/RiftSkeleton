@@ -288,6 +288,11 @@ int main(int argc, char** argv)
 #endif
 
     LOG_INFO("Using SFML2 backend.");
+    LOG_INFO("SFML version %d.%d.%d",
+        SFML_VERSION_MAJOR,
+        SFML_VERSION_MINOR,
+        SFML_VERSION_PATCH);
+
     // Command line options
     for (int i=0; i<argc; ++i)
     {
@@ -416,6 +421,15 @@ int main(int argc, char** argv)
     LOG_INFO("Calling initVR...");
     g_app.initVR();
     LOG_INFO("initVR complete.");
+
+    // Display the list of all the video modes available for fullscreen
+    const std::vector<sf::VideoMode>& modes = sf::VideoMode::getFullscreenModes();
+    for (std::size_t i = 0; i < modes.size(); ++i)
+    {
+        const sf::VideoMode& mode = modes[i];
+        LOG_INFO("Mode #%d: %dx%d @ %dHz",
+            i, mode.width, mode.height, mode.bitsPerPixel);
+    }
 
     memset(m_keyStates, 0, 4096*sizeof(int));
 
