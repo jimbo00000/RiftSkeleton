@@ -691,6 +691,14 @@ void destroyAuxiliaryWindow(GLFWwindow* pAuxWindow)
 
 int main(int argc, char** argv)
 {
+#if defined(_WIN32)
+    LOG_INFO("Windows build.");
+#elif defined(_LINUX)
+    LOG_INFO("Linux build.");
+#elif defined(_MACOS)
+    LOG_INFO("MacOS build.");
+#endif
+
     bool useOpenGLCoreContext = false;
 
     RenderingMode renderMode;
