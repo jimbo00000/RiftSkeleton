@@ -776,6 +776,7 @@ int main(int argc, char** argv)
         }
     }
 
+    bool swapBackBufferDims = false;
 
 #ifdef USE_OCULUSSDK
     ovrSizei sz = g_app.getHmdResolution();
@@ -787,6 +788,7 @@ int main(int argc, char** argv)
         // Create a normal, decorated application window
         LOG_INFO("Using Debug HMD mode.");
         windowTitle = "RiftSkeleton-GLFW-DebugHMD";
+        g_renderMode.outputType = RenderingMode::Mono_Buffered;
 
         l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
     }
@@ -808,6 +810,10 @@ int main(int argc, char** argv)
         int wout, hout;
         glfwGetWindowSize(l_Window, &wout, &hout);
         LOG_INFO("Window size: %dx%d", wout, hout);
+
+#ifdef _LINUX
+        swapBackBufferDims = true;
+#endif
 
 #if defined(_WIN32)
         g_app.AttachToWindow((void*)glfwGetWin32Window(l_Window));
@@ -901,12 +907,8 @@ int main(int argc, char** argv)
     LOG_INFO("Calling initGL...");
     g_app.initGL();
     LOG_INFO("Calling initVR...");
-#ifdef _LINUX
-    g_app.initVR(true);
-#else
-    g_app.initVR();
-#endif
-    LOG_INFO("initVR complete.");
+    g_app.initVR(swapBackBufferDims);
+    LOG_INFO("initVR(%d) complete.", swapBackBufferDims);
 
     //SetVsync(1);
 
