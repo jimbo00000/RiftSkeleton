@@ -675,6 +675,7 @@ int main(int argc, char** argv)
         // Create a normal, decorated application window
         LOG_INFO("Using Debug HMD mode.");
         windowTitle = "RiftSkeleton-SDL2-DebugHMD";
+        g_renderMode.outputType = RenderingMode::Mono_Buffered;
 
         g_pHMDWindow = SDL_CreateWindow(
             windowTitle.c_str(),
