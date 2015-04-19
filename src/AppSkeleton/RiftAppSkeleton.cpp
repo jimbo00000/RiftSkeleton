@@ -23,6 +23,7 @@
 
 RiftAppSkeleton::RiftAppSkeleton()
 : m_Hmd(NULL)
+, m_distortionCaps(0)
 , m_usingDebugHmd(false)
 , m_directHmdMode(true)
 {
@@ -266,13 +267,13 @@ int RiftAppSkeleton::ConfigureSDKRendering()
     m_Cfg.OGL.Header.API = ovrRenderAPI_OpenGL;
     m_Cfg.OGL.Header.Multisample = 0;
 
-    int distortionCaps =
+    m_distortionCaps =
         ovrDistortionCap_TimeWarp |
         ovrDistortionCap_Vignette;
-//#ifdef OVR_OS_LINUX
-    distortionCaps |= ovrDistortionCap_LinuxDevFullscreen;
-//#endif
-    ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, distortionCaps, m_EyeFov, m_EyeRenderDesc);
+#ifdef _LINUX
+    m_distortionCaps |= ovrDistortionCap_LinuxDevFullscreen;
+#endif
+    ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, m_distortionCaps, m_EyeFov, m_EyeRenderDesc);
 
     return 0;
 }
@@ -283,9 +284,6 @@ int RiftAppSkeleton::ConfigureClientRendering()
     if (m_Hmd == NULL)
         return 1;
 
-    const int distortionCaps =
-        ovrDistortionCap_TimeWarp |
-        ovrDistortionCap_Vignette;
     for (int eyeIndex = 0; eyeIndex < ovrEye_Count; eyeIndex++)
     {
         // Using an idiomatic loop though initializing in eye render order is not necessary.
@@ -297,7 +295,7 @@ int RiftAppSkeleton::ConfigureClientRendering()
             m_Hmd,
             m_EyeRenderDesc[eye].Eye,
             m_EyeRenderDesc[eye].Fov,
-            distortionCaps,
+            m_distortionCaps,
             &m_DistMeshes[eye]);
     }
     return 0;
@@ -611,7 +609,7 @@ void RiftAppSkeleton::display_client() const
             glUniform2f(eyeShader.GetUniLoc("EyeToSourceUVScale"), uvscale.x, uvscale.y);
 
 #if 0
-            if (distortionCaps & ovrDistortionCap_TimeWarp)
+            if (m_distortionCaps & ovrDistortionCap_TimeWarp)
             { // TIMEWARP - Additional shader constants required
                 ovrMatrix4f timeWarpMatrices[2];
                 ovrHmd_GetEyeTimewarpMatrices(HMD, (ovrEyeType)eyeNum, eyeRenderPoses[eyeNum], timeWarpMatrices);
