@@ -682,45 +682,41 @@ int main(int argc, char** argv)
             sz.w, sz.h,
             SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
     }
-    else
+    else if (g_app.UsingDirectMode())
     {
-        // HMD active - position undecorated window to fill HMD viewport
-        if (g_app.UsingDirectMode())
-        {
-            LOG_INFO("Using Direct to Rift mode.");
-            windowTitle = "RiftSkeleton-SDL2-Direct";
+        LOG_INFO("Using Direct to Rift mode.");
+        windowTitle = "RiftSkeleton-SDL2-Direct";
 
-            LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
-            g_pHMDWindow = SDL_CreateWindow(
-                windowTitle.c_str(),
-                pos.x, pos.y,
-                sz.w, sz.h,
-                SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-            SDL_SetRelativeMouseMode(SDL_TRUE);
+        LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
+        g_pHMDWindow = SDL_CreateWindow(
+            windowTitle.c_str(),
+            pos.x, pos.y,
+            sz.w, sz.h,
+            SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+        SDL_SetRelativeMouseMode(SDL_TRUE);
 
 #if defined(_WIN32)
-            SDL_SysWMinfo info;
-            SDL_VERSION(&info.version);
-            const bool ret = SDL_GetWindowWMInfo(g_pHMDWindow, &info);
-            if (ret)
-            {
-                g_app.AttachToWindow(info.info.win.window);
-            }
-#endif
-        }
-        else
+        SDL_SysWMinfo info;
+        SDL_VERSION(&info.version);
+        const bool ret = SDL_GetWindowWMInfo(g_pHMDWindow, &info);
+        if (ret)
         {
-            LOG_INFO("Using Extended desktop mode.");
-            windowTitle = "RiftSkeleton-SDL2-Extended";
-
-            LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
-            g_pHMDWindow = SDL_CreateWindow(
-                windowTitle.c_str(),
-                pos.x, pos.y,
-                sz.w, sz.h,
-                SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-            SDL_SetRelativeMouseMode(SDL_TRUE);
+            g_app.AttachToWindow(info.info.win.window);
         }
+#endif
+    }
+    else
+    {
+        LOG_INFO("Using Extended desktop mode.");
+        windowTitle = "RiftSkeleton-SDL2-Extended";
+
+        LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
+        g_pHMDWindow = SDL_CreateWindow(
+            windowTitle.c_str(),
+            pos.x, pos.y,
+            sz.w, sz.h,
+            SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+        SDL_SetRelativeMouseMode(SDL_TRUE);
     }
 #else
     g_pHMDWindow = SDL_CreateWindow(
