@@ -301,6 +301,30 @@ int RiftAppSkeleton::ConfigureClientRendering()
     return 0;
 }
 
+// http://nuclear.mutantstargoat.com/hg/oculus2/file/a7a3f89def42/src/main.c
+// Thank you John Tsiombikas.
+void RiftAppSkeleton::ToggleVignette()
+{
+    m_distortionCaps ^= ovrDistortionCap_Vignette;
+    ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, m_distortionCaps, m_EyeFov, m_EyeRenderDesc);
+}
+
+void RiftAppSkeleton::ToggleTimeWarp()
+{
+    m_distortionCaps ^= ovrDistortionCap_TimeWarp;
+    ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, m_distortionCaps, m_EyeFov, m_EyeRenderDesc);
+}
+
+void RiftAppSkeleton::ToggleOverdrive()
+{
+    m_distortionCaps ^= ovrDistortionCap_Overdrive;
+    ovrHmd_ConfigureRendering(m_Hmd, &m_Cfg.Config, m_distortionCaps, m_EyeFov, m_EyeRenderDesc);
+}
+
+void RiftAppSkeleton::ToggleLowPersistence()
+{
+}
+
 ///@brief The HSW will be displayed by default when using SDK rendering.
 void RiftAppSkeleton::DismissHealthAndSafetyWarning() const
 {

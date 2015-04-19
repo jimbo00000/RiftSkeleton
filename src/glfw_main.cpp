@@ -198,6 +198,11 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
             g_app.ResetChassisTransformations();
             break;
 
+        case 'V': g_app.ToggleVignette(); break;
+        case 'T': g_app.ToggleTimeWarp(); break;
+        case 'O': g_app.ToggleOverdrive(); break;
+        case 'L': g_app.ToggleLowPersistence(); break;
+
         case GLFW_KEY_ESCAPE:
             if (g_AuxWindow == NULL)
             {

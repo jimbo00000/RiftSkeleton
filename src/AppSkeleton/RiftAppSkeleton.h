@@ -33,6 +33,12 @@ public:
     int ConfigureRendering();
     int ConfigureSDKRendering();
     int ConfigureClientRendering();
+
+    void ToggleVignette();
+    void ToggleTimeWarp();
+    void ToggleOverdrive();
+    void ToggleLowPersistence();
+
     void DismissHealthAndSafetyWarning() const;
     void CheckForTapToDismissHealthAndSafetyWarning() const;
 
