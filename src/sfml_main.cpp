@@ -318,7 +318,7 @@ int main(int argc, char** argv)
 
     sf::ContextSettings contextSettings;
     contextSettings.depthBits = 32;
-
+    bool swapBackBufferDims = false;
 
 #ifdef USE_OCULUSSDK
     g_app.initHMD();
@@ -339,6 +339,9 @@ int main(int argc, char** argv)
             contextSettings);
         g_window->setActive();
         g_renderMode.outputType = RenderingMode::Mono_Buffered;
+#ifdef _LINUX
+        swapBackBufferDims = true;
+#endif
     }
     else if (g_app.UsingDirectMode())
     {
@@ -346,7 +349,11 @@ int main(int argc, char** argv)
         windowTitle = "RiftSkeleton-SFML2-Direct";
 
         g_window = new sf::Window(
+#ifdef _LINUX
+            sf::VideoMode(sz.h, sz.w),
+#else
             sf::VideoMode(sz.w, sz.h),
+#endif
             windowTitle.c_str(),
             sf::Style::None);
         g_window->setPosition(sf::Vector2i(pos.x, pos.y));
@@ -412,8 +419,8 @@ int main(int argc, char** argv)
     LOG_INFO("Calling initGL...");
     g_app.initGL();
     LOG_INFO("Calling initVR...");
-    g_app.initVR();
-    LOG_INFO("initVR complete.");
+    g_app.initVR(swapBackBufferDims);
+    LOG_INFO("initVR(%d) complete.", swapBackBufferDims);
 
     // Display the list of all the video modes available for fullscreen
     const std::vector<sf::VideoMode>& modes = sf::VideoMode::getFullscreenModes();
