@@ -664,6 +664,8 @@ int main(int argc, char** argv)
     }
 #endif
 
+    bool swapBackBufferDims = false;
+
 #ifdef USE_OCULUSSDK
     g_app.initHMD();
     const ovrSizei sz = g_app.getHmdResolution();
@@ -692,9 +694,18 @@ int main(int argc, char** argv)
         g_pHMDWindow = SDL_CreateWindow(
             windowTitle.c_str(),
             pos.x, pos.y,
+#ifdef _LINUX
+            sz.h, sz.w,
+#else
             sz.w, sz.h,
+#endif
             SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-        SDL_SetRelativeMouseMode(SDL_TRUE);
+        //SDL_SetWindowFullscreen(g_pHMDWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        //SDL_SetRelativeMouseMode(SDL_TRUE);
+
+#ifdef _LINUX
+        swapBackBufferDims = true;
+#endif
 
 #if defined(_WIN32)
         SDL_SysWMinfo info;
@@ -812,8 +823,8 @@ int main(int argc, char** argv)
     LOG_INFO("Calling initGL...");
     g_app.initGL();
     LOG_INFO("Calling initVR...");
-    g_app.initVR();
-    LOG_INFO("initVR complete.");
+    g_app.initVR(swapBackBufferDims);
+    LOG_INFO("initVR(%d) complete.", swapBackBufferDims);
 
     memset(m_keyStates, 0, 4096*sizeof(int));
 
