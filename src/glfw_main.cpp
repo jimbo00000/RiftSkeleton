@@ -830,10 +830,10 @@ int main(int argc, char** argv)
 
         LOG_INFO("Creating GLFW_DECORATED window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
         glfwWindowHint(GLFW_DECORATED, 0);
-        l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), glfwGetPrimaryMonitor(), NULL);
+        l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
         glfwWindowHint(GLFW_DECORATED, 1);
         glfwSetInputMode(l_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        //glfwSetWindowPos(l_Window, pos.x, pos.y);
+        glfwSetWindowPos(l_Window, pos.x, pos.y);
     }
 
     resize(l_Window, sz.w, sz.h); // inform AppSkeleton of window size

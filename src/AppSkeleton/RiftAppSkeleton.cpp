@@ -102,7 +102,7 @@ void RiftAppSkeleton::initHMD()
     const unsigned int caps = m_Hmd->HmdCaps;
     if ((caps & ovrHmdCap_ExtendDesktop) != 0)
     {
-       // m_directHmdMode = false;
+        m_directHmdMode = false;
     }
 
     m_ovrScene.SetHmdPointer(m_Hmd);
