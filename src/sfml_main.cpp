@@ -120,6 +120,11 @@ void keyboard(const sf::Event& event)
         case sf::Keyboard::F10: SetVsync(1); break;
         case sf::Keyboard::F11: SetVsync(-1); break;
 
+        case sf::Keyboard::V: g_app.ToggleVignette(); break;
+        case sf::Keyboard::T: g_app.ToggleTimeWarp(); break;
+        case sf::Keyboard::O: g_app.ToggleOverdrive(); break;
+        case sf::Keyboard::L: g_app.ToggleLowPersistence(); break;
+
         case sf::Keyboard::Escape:
             g_window->close();
             g_app.exitVR();
