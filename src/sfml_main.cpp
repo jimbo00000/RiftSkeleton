@@ -280,8 +280,7 @@ int main(int argc, char** argv)
 {
     bool useOpenGLCoreContext = false;
 
-    RenderingMode renderMode;
-    renderMode.outputType = RenderingMode::OVR_SDK;
+    g_renderMode.outputType = RenderingMode::OVR_SDK;
 
 #ifdef USE_CORE_CONTEXT
     useOpenGLCoreContext = true;
@@ -301,12 +300,10 @@ int main(int argc, char** argv)
         if (!a.compare("-sdk"))
         {
             g_renderMode.outputType = RenderingMode::OVR_SDK;
-            renderMode.outputType = RenderingMode::OVR_SDK;
         }
         else if (!a.compare("-client"))
         {
             g_renderMode.outputType = RenderingMode::OVR_Client;
-            renderMode.outputType = RenderingMode::OVR_Client;
         }
         else if (!a.compare("-core"))
         {
@@ -341,6 +338,7 @@ int main(int argc, char** argv)
             sf::Style::Default,
             contextSettings);
         g_window->setActive();
+        g_renderMode.outputType = RenderingMode::Mono_Buffered;
     }
     else
     {
@@ -373,7 +371,6 @@ int main(int argc, char** argv)
                 contextSettings);
             g_window->setPosition(sf::Vector2i(pos.x, pos.y));
         }
-        g_renderMode = renderMode;
     }
 #else
     g_window = sf::Window(
