@@ -340,39 +340,35 @@ int main(int argc, char** argv)
         g_window->setActive();
         g_renderMode.outputType = RenderingMode::Mono_Buffered;
     }
-    else
+    else if (g_app.UsingDirectMode())
     {
-        // HMD active - position undecorated window to fill HMD viewport
-        if (g_app.UsingDirectMode())
-        {
-            LOG_INFO("Using Direct to Rift mode.");
-            windowTitle = "RiftSkeleton-SFML2-Direct";
+        LOG_INFO("Using Direct to Rift mode.");
+        windowTitle = "RiftSkeleton-SFML2-Direct";
 
-            g_window = new sf::Window(
-                sf::VideoMode(sz.w, sz.h),
-                windowTitle.c_str(),
-                sf::Style::None);
-            g_window->setPosition(sf::Vector2i(pos.x, pos.y));
+        g_window = new sf::Window(
+            sf::VideoMode(sz.w, sz.h),
+            windowTitle.c_str(),
+            sf::Style::None);
+        g_window->setPosition(sf::Vector2i(pos.x, pos.y));
 
 #if defined(_WIN32)
-            sf::WindowHandle winh = g_window->getSystemHandle();
-            g_app.AttachToWindow(winh);
+        sf::WindowHandle winh = g_window->getSystemHandle();
+        g_app.AttachToWindow(winh);
 #endif
-        }
-        else
-        {
-            LOG_INFO("Using Extended desktop mode.");
-            windowTitle = "RiftSkeleton-SFML2-Extended";
-
-            g_window = new sf::Window(
-                sf::VideoMode(sz.w, sz.h),
-                windowTitle.c_str(),
-                sf::Style::Default,
-                contextSettings);
-            g_window->setPosition(sf::Vector2i(pos.x, pos.y));
-        }
     }
-#else
+    else
+    {
+        LOG_INFO("Using Extended desktop mode.");
+        windowTitle = "RiftSkeleton-SFML2-Extended";
+
+        g_window = new sf::Window(
+            sf::VideoMode(sz.w, sz.h),
+            windowTitle.c_str(),
+            sf::Style::Default,
+            contextSettings);
+        g_window->setPosition(sf::Vector2i(pos.x, pos.y));
+    }
+#else // ndef USE_OCULUSSDK
     g_window = sf::Window(
         sf::VideoMode(sz.w, sz.h),
         windowTitle.c_str(),
