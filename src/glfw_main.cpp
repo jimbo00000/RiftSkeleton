@@ -254,8 +254,7 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
     if (m_keyStates['1'] != GLFW_RELEASE) { g_app.m_keyboardYaw = -dyaw; }
     if (m_keyStates['3'] != GLFW_RELEASE) { g_app.m_keyboardYaw = dyaw; }
 
-    // Pitch and roll controls - if yaw is VR poison,
-    // this is torture and death!
+    // Pitch and roll controls - if yaw is VR poison, this is torture and death!
     g_app.m_keyboardDeltaPitch = 0.0f;
     g_app.m_keyboardDeltaRoll = 0.0f;
     if (g_allowPitch)
