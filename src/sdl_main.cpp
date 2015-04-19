@@ -583,8 +583,7 @@ int main(int argc, char** argv)
 
     bool useOpenGLCoreContext = false;
 
-    RenderingMode renderMode;
-    renderMode.outputType = RenderingMode::OVR_SDK;
+    g_renderMode.outputType = RenderingMode::OVR_SDK;
 
 #ifdef USE_CORE_CONTEXT
     useOpenGLCoreContext = true;
@@ -608,12 +607,10 @@ int main(int argc, char** argv)
         if (!a.compare("-sdk"))
         {
             g_renderMode.outputType = RenderingMode::OVR_SDK;
-            renderMode.outputType = RenderingMode::OVR_SDK;
         }
         else if (!a.compare("-client"))
         {
             g_renderMode.outputType = RenderingMode::OVR_Client;
-            renderMode.outputType = RenderingMode::OVR_Client;
         }
         else if (!a.compare("-core"))
         {
@@ -724,7 +721,6 @@ int main(int argc, char** argv)
                 SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
             SDL_SetRelativeMouseMode(SDL_TRUE);
         }
-        g_renderMode = renderMode;
     }
 #else
     g_pHMDWindow = SDL_CreateWindow(
