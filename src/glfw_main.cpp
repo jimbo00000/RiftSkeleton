@@ -808,12 +808,7 @@ int main(int argc, char** argv)
         sz.h = mode->height;
         LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
         l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), monitor, NULL);
-        //glfwSetWindowPos(l_Window, pos.x, pos.y);
         glfwSetInputMode(l_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-        int wout, hout;
-        glfwGetWindowSize(l_Window, &wout, &hout);
-        LOG_INFO("Window size: %dx%d", wout, hout);
 
 #ifdef _LINUX
         swapBackBufferDims = true;
