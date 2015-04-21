@@ -23,6 +23,7 @@
 
 RiftAppSkeleton::RiftAppSkeleton()
 : m_Hmd(NULL)
+, m_hmdCaps(0)
 , m_distortionCaps(0)
 , m_usingDebugHmd(false)
 , m_directHmdMode(true)
@@ -96,10 +97,10 @@ void RiftAppSkeleton::initHMD()
     ovrHmd_StartPerfLog(m_Hmd, "RiftSkeletonxxx-PerfLog.csv", m_logUserData);
 #endif
 
-#ifndef _LINUX
     //const unsigned int caps = ovrHmd_GetEnabledCaps(m_Hmd);
-    const unsigned int caps = m_Hmd->HmdCaps;
-    if ((caps & ovrHmdCap_ExtendDesktop) != 0)
+    m_hmdCaps = m_Hmd->HmdCaps;
+#ifndef _LINUX
+    if ((m_hmdCaps & ovrHmdCap_ExtendDesktop) != 0)
     {
         m_directHmdMode = false;
     }

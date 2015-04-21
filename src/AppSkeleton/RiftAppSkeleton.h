@@ -72,6 +72,7 @@ protected:
     ovrGLConfig m_Cfg;
     ovrEyeRenderDesc m_EyeRenderDesc[2];
     ovrGLTexture m_EyeTexture[2];
+    unsigned int m_hmdCaps;
     unsigned int m_distortionCaps;
     bool m_usingDebugHmd;
     bool m_directHmdMode;
