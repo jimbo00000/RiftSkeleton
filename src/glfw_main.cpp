@@ -203,6 +203,7 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
         case 'O': g_app.ToggleOverdrive(); break;
         case 'L': g_app.ToggleLowPersistence(); break;
         case 'M': g_app.ToggleMirrorToWindow(); break;
+        case 'P': g_app.ToggleDynamicPrediction(); break;
 
         case GLFW_KEY_ESCAPE:
             if (g_AuxWindow == NULL)

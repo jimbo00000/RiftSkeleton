@@ -335,6 +335,12 @@ void RiftAppSkeleton::ToggleMirrorToWindow()
     ovrHmd_SetEnabledCaps(m_Hmd, m_hmdCaps);
 }
 
+void RiftAppSkeleton::ToggleDynamicPrediction()
+{
+    m_hmdCaps ^= ovrHmdCap_DynamicPrediction;
+    ovrHmd_SetEnabledCaps(m_Hmd, m_hmdCaps);
+}
+
 ///@brief The HSW will be displayed by default when using SDK rendering.
 void RiftAppSkeleton::DismissHealthAndSafetyWarning() const
 {

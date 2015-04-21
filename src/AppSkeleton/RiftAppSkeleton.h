@@ -39,6 +39,7 @@ public:
     void ToggleOverdrive();
     void ToggleLowPersistence();
     void ToggleMirrorToWindow();
+    void ToggleDynamicPrediction();
 
     void DismissHealthAndSafetyWarning() const;
     void CheckForTapToDismissHealthAndSafetyWarning() const;
