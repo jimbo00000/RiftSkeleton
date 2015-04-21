@@ -324,6 +324,8 @@ void RiftAppSkeleton::ToggleOverdrive()
 
 void RiftAppSkeleton::ToggleLowPersistence()
 {
+    m_hmdCaps ^= ovrHmdCap_LowPersistence;
+    ovrHmd_SetEnabledCaps(m_Hmd, m_hmdCaps);
 }
 
 ///@brief The HSW will be displayed by default when using SDK rendering.
