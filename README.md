@@ -34,7 +34,9 @@ I set up my local build environment with libraries installed under a single dire
  - Interchangeable GLFW, SDL2 and SFML backends  
 
 ## Similar Projects 
- - [OculusRiftInAction](https://github.com/jherico/OculusRiftInAction)  
- - [Oculus Rift SDL2 OpenGL Demo (Updated for Oculus SDK 0.4.0)](https://forums.oculus.com/viewtopic.php?f=30&t=8948)  
- - [jovr](https://github.com/jherico/jovr) - Java bindings for OVR SDK  
- - [python-ovrsdk](https://github.com/jherico/python-ovrsdk) - Python bindings for OVR SDK  
+ - [OculusRiftInAction](https://github.com/jherico/OculusRiftInAction) - Brad Davis  
+ - [mutantstargoat - oculus2](http://nuclear.mutantstargoat.com/hg/oculus2/file/tip) - John Tsiombikas  
+ - [Oculus Rift SDL2 OpenGL Demo (Updated for Oculus SDK 0.4.0)](https://forums.oculus.com/viewtopic.php?f=30&t=8948) - anarkavre  
+ - [Simple OVR GLFW Example](https://forums.oculus.com/viewtopic.php?t=17842) - DoZo1971
+ - [jovr](https://github.com/jherico/jovr) - Java bindings for OVR SDK - Brad Davis  
+ - [python-ovrsdk](https://github.com/jherico/python-ovrsdk) - Python bindings for OVR SDK - Brad Davis  
