@@ -38,6 +38,7 @@ public:
     void ToggleTimeWarp();
     void ToggleOverdrive();
     void ToggleLowPersistence();
+    void ToggleMirrorToWindow();
 
     void DismissHealthAndSafetyWarning() const;
     void CheckForTapToDismissHealthAndSafetyWarning() const;

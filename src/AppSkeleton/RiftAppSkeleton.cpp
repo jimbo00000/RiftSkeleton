@@ -328,6 +328,13 @@ void RiftAppSkeleton::ToggleLowPersistence()
     ovrHmd_SetEnabledCaps(m_Hmd, m_hmdCaps);
 }
 
+void RiftAppSkeleton::ToggleMirrorToWindow()
+{
+    // Turning this off mid-run shows banded swap artifacts on the main monitor.
+    m_hmdCaps ^= ovrHmdCap_NoMirrorToWindow;
+    ovrHmd_SetEnabledCaps(m_Hmd, m_hmdCaps);
+}
+
 ///@brief The HSW will be displayed by default when using SDK rendering.
 void RiftAppSkeleton::DismissHealthAndSafetyWarning() const
 {
