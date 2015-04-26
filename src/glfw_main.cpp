@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sstream>
+#include <algorithm>
 
 #ifdef USE_OCULUSSDK
 #include "RiftAppSkeleton.h"
