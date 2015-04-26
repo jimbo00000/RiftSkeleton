@@ -17,6 +17,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <algorithm>
 
 #include <OVR_CAPI.h>
 #include "OVR.h"
@@ -188,6 +189,8 @@ void OVRScene::RenderForOneEye(const float* pMview, const float* pPersp) const
 void OVRScene::timestep(double /*absTime*/, double dt)
 {
     (void)dt;
+    if (m_pHmd == NULL)
+        return;
 
     const ovrTrackingState ts = ovrHmd_GetTrackingState(m_pHmd, ovr_GetTimeInSeconds());
     const ovrVector3f& hp = ts.HeadPose.ThePose.Position;

@@ -52,7 +52,7 @@ ovrSizei RiftAppSkeleton::getHmdResolution() const
 {
     if (m_Hmd == NULL)
     {
-        ovrSizei empty = {0, 0};
+        ovrSizei empty = {1200, 800};
         return empty;
     }
     return m_Hmd->Resolution;
@@ -91,6 +91,8 @@ void RiftAppSkeleton::initHMD()
     {
         m_Hmd = ovrHmd_CreateDebug(ovrHmd_DK1);
         m_usingDebugHmd = true;
+        if (m_Hmd == NULL)
+            return;
     }
 
 #ifdef USE_OVR_PERF_LOGGING
