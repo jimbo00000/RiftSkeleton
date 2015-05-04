@@ -650,22 +650,19 @@ void RiftAppSkeleton::display_client() const
             glUniform2f(eyeShader.GetUniLoc("EyeToSourceUVOffset"), uvoff.x, uvoff.y);
             glUniform2f(eyeShader.GetUniLoc("EyeToSourceUVScale"), uvscale.x, uvscale.y);
 
-#if 0
             if (m_distortionCaps & ovrDistortionCap_TimeWarp)
-            { // TIMEWARP - Additional shader constants required
+            {
                 ovrMatrix4f timeWarpMatrices[2];
-                ovrHmd_GetEyeTimewarpMatrices(HMD, (ovrEyeType)eyeNum, eyeRenderPoses[eyeNum], timeWarpMatrices);
-                //WARNING!!! These matrices are transposed in SetUniform4x4f, before being used by the shader.
-                DistortionData.Shaders->SetUniform4x4f("EyeRotationStart", Matrix4f(timeWarpMatrices[0]));
-                DistortionData.Shaders->SetUniform4x4f("EyeRotationEnd", Matrix4f(timeWarpMatrices[1]));
+                ovrHmd_GetEyeTimewarpMatrices(
+                    hmd,
+                    (ovrEyeType)eyeNum,
+                    outEyePoses[eyeNum],
+                    timeWarpMatrices);
+                OVR::Matrix4f twStart(timeWarpMatrices[0]);
+                OVR::Matrix4f twEnd(timeWarpMatrices[1]);
+                glUniformMatrix4fv(eyeShader.GetUniLoc("EyeRotationStart"), 1, false, &twStart.Transposed().M[0][0]);
+                glUniformMatrix4fv(eyeShader.GetUniLoc("EyeRotationEnd"), 1, false, &twEnd.Transposed().M[0][0]);
             }
-
-            // Perform distortion
-            pRender->Render(
-                &distortionShaderFill,
-                DistortionData.MeshVBs[eyeNum],
-                DistortionData.MeshIBs[eyeNum]);
-#endif
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, m_renderBuffer.tex);
