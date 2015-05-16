@@ -300,13 +300,25 @@ void AppSkeleton::timestep(double absTime, double dt)
     {
         const sixenseControllerData& cd = state.controllers[i];
         const float moveScale = pow(10.0f, cd.trigger);
-        hydraMove.x += cd.joystick_x * moveScale;
 
         const FlyingMouse::Hand h = static_cast<FlyingMouse::Hand>(i);
         if (m_fm.IsPressed(h, SIXENSE_BUTTON_JOYSTICK)) ///@note left hand does not work
+        {
+            m_chassisYaw += cd.joystick_x * .01f * moveScale;
             hydraMove.y += cd.joystick_y * moveScale;
+        }
         else
+        {
+            hydraMove.x += cd.joystick_x * moveScale;
             hydraMove.z -= cd.joystick_y * moveScale;
+        }
+    }
+
+    // Check all Hydra buttons for HSW dismissal
+    if ((m_fm.WasJustPressed(FlyingMouse::Left, 0xFF)) ||
+        (m_fm.WasJustPressed(FlyingMouse::Right, 0xFF)))
+    {
+        DismissHealthAndSafetyWarning();
     }
 #endif
 
