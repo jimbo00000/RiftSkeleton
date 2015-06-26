@@ -487,7 +487,9 @@ void mouseMove_Aux(GLFWwindow* pWindow, double xd, double yd)
 void mouseWheel_Aux(GLFWwindow* pWindow, double x, double y)
 {
 #ifdef USE_ANTTWEAKBAR
-    int ant = TwEventMouseWheelGLFW(static_cast<int>(x));
+    static int scrollpos = 0;
+    scrollpos += static_cast<int>(y);
+    int ant = TwEventMouseWheelGLFW(scrollpos);
     if (ant != 0)
         return;
 #endif
