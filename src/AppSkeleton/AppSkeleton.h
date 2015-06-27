@@ -48,7 +48,7 @@ public:
 
     // These vestigial functions match the entry points in RiftAppSkeleton.
     // Having them here is ugly, but doesn't seem as bad as a ton of #ifdefs in main.
-    void initVR() {}
+    void initVR(bool swapBackBufferDims=false) {}
     void exitVR() {}
     void RecenterPose() {}
     bool UsingDebugHmd() const { return true; }

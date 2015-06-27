@@ -172,10 +172,12 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
         case GLFW_KEY_DELETE: g_dynamicallyScaleFBO = !g_dynamicallyScaleFBO; break;
 
         case '`':
+#ifdef USE_OCULUSSDK
             ///@todo Is there a way to create an auxiliary window in Direct to rift mode?
             /// The call to glfwCreateWindow crashes the app in Win7.
             if ((g_app.UsingDirectMode() == false) ||
                 (g_app.UsingDebugHmd() == true))
+#endif
             {
                 if (g_AuxWindow == NULL)
                 {
@@ -199,12 +201,14 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
             g_app.ResetChassisTransformations();
             break;
 
+#ifdef USE_OCULUSSDK
         case 'V': g_app.ToggleVignette(); break;
         case 'T': g_app.ToggleTimeWarp(); break;
         case 'O': g_app.ToggleOverdrive(); break;
         case 'L': g_app.ToggleLowPersistence(); break;
         case 'M': g_app.ToggleMirrorToWindow(); break;
         case 'P': g_app.ToggleDynamicPrediction(); break;
+#endif
 
         case GLFW_KEY_ESCAPE:
             if (g_AuxWindow == NULL)
@@ -756,6 +760,8 @@ int main(int argc, char** argv)
 
 #ifdef USE_OCULUSSDK
     g_app.initHMD();
+#else
+    g_renderMode.outputType = RenderingMode::Mono_Buffered;
 #endif
 
     GLFWwindow* l_Window = NULL;
@@ -839,6 +845,7 @@ int main(int argc, char** argv)
     resize(l_Window, sz.w, sz.h); // inform AppSkeleton of window size
 #else
     l_Window = glfwCreateWindow(800, 600, "GLFW Oculus Rift Test", NULL, NULL);
+    std::string windowTitle = "RiftSkeleton";
 #endif //USE_OCULUSSDK
 
     if (!l_Window)
