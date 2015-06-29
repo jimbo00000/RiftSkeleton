@@ -1,10 +1,12 @@
 # Invokes python on a given string with script name followed by args.
 
-function( INVOKEPYTHON ARGS )
+function( INVOKEPYTHON )
+    message( STATUS "INVOKEPYTHON [${ARGV}]" )
+
     # @TODO This was a pain to get to work and likely not the best solution...
     set (python_cmd "python")
-    message(STATUS "Invoking ${python_cmd} ${ARGS}:" )
-    execute_process(COMMAND ${python_cmd} ${ARGS}
+    message(STATUS "Invoking ${python_cmd} ${ARGV0}:" )
+    execute_process(COMMAND ${python_cmd} ${ARGV0}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         RESULT_VARIABLE python_result
         OUTPUT_VARIABLE python_output)
