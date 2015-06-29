@@ -150,6 +150,7 @@ IF( WIN32 )
         "OCULUSSDK_ROOT=${OCULUSSDK_ROOT}"
         "SIXENSE_ROOT=${SIXENSE_ROOT}"
         "GLEW_ROOT=${GLEW_ROOT}"
+        "SDL2_ROOT=${SDL2_ROOT}"
         "SFML_ROOT=${SFML_ROOT}"
         )
 ELSEIF( APPLE )
