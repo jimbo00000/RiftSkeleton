@@ -48,17 +48,19 @@ def assembleBuild(buildHome, buildname, libsHome, dllList):
 		src = os.path.join(libsHome, f[0], f[1], f[2])
 		dst = os.path.join(dllDest, f[2])
 		#print "  copy\n    ",src,"\n    ",dst
-		print("    copying dll:", f[2])
+		print("    copying dll:", src)
 		try:
 			shutil.copyfile(src, dst)
 		except IOError as e:
-			print(e)
+			print("     ", e)
 
 
 #
 # Main: enter here
 #
 def main(argv=None):
+	print("copyDLLs.py: Assembling DLLs in output directories:")
+	print(argv)
 	# Default values so we can run the script by double-clicking it in its
 	# home location in $PROJECT/tools/.
 	projectHome = ".."
@@ -72,9 +74,6 @@ def main(argv=None):
 		buildHome = argv[1]
 	else:
 		buildHome = os.path.join(projectHome, "build")
-
-	if argv and len(argv) > 2:
-		libsHome = argv[2]
 
 	assembleBuild(buildHome, "Debug", libsHome, commonDllList+debugDllList)
 	assembleBuild(buildHome, "Release", libsHome, commonDllList+releaseDllList)

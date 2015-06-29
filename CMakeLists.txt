@@ -142,9 +142,16 @@ IF( WIN32 )
     #SET( CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\"libcmt.lib\" )
     #SET( CMAKE_EXE_LINKER_FLAGS_DEBUG /NODEFAULTLIB:\"msvcrt.lib\" )
 
-    # Copy DLLs of the included libraries into build/Debug/ and Release/
-    # TODO: pass in respective SDK root directories for finding DLLs to copy.
-    INVOKEPYTHON( "tools/copyDLLs.py" "." ${PROJECT_BINARY_DIR} ${LIBS_HOME} )
+    # Copy DLLs of the included libraries into output directories.
+    INVOKEPYTHON( "tools/copyDLLs.py"
+        ${PROJECT_SOURCE_DIR}
+        ${PROJECT_BINARY_DIR}
+        "ANTTWEAKBAR_ROOT=${ANTTWEAKBAR_ROOT}"
+        "OCULUSSDK_ROOT=${OCULUSSDK_ROOT}"
+        "SIXENSE_ROOT=${SIXENSE_ROOT}"
+        "GLEW_ROOT=${GLEW_ROOT}"
+        "SFML_ROOT=${SFML_ROOT}"
+        )
 ELSEIF( APPLE )
     ADD_DEFINITIONS( -D_MACOS )
 
