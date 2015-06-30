@@ -924,13 +924,14 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
+#ifdef _DEBUG
     // Debug callback initialization
     // Must be done *after* glew initialization.
     glDebugMessageCallback(myCallback, NULL);
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
     glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0,
         GL_DEBUG_SEVERITY_NOTIFICATION, -1 , "Start debugging");
-
+#endif
 
 #ifdef USE_ANTTWEAKBAR
     LOG_INFO("Using AntTweakbar.");
