@@ -702,6 +702,12 @@ void destroyAuxiliaryWindow(GLFWwindow* pAuxWindow)
     g_AuxWindow = NULL;
 }
 
+// OpenGL debug callback
+void CALLBACK myCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *msg, const void *data)
+{
+    LOG_INFO("[[GL Debug]] %s", msg);
+}
+
 int main(int argc, char** argv)
 {
 #if defined(_WIN32)
@@ -792,6 +798,16 @@ int main(int argc, char** argv)
     }
 
     bool swapBackBufferDims = false;
+
+    // Context setup - before window creation
+    glfwWindowHint(GLFW_DEPTH_BITS, 16);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, useOpenGLCoreContext ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_ANY_PROFILE);
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#ifdef _DEBUG
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#endif
 
 #ifdef USE_OCULUSSDK
     ovrSizei sz = g_app.getHmdResolution();
@@ -907,6 +923,13 @@ int main(int argc, char** argv)
         LOG_INFO("glewInit() error.");
         exit(EXIT_FAILURE);
     }
+
+    // Debug callback initialization
+    // Must be done *after* glew initialization.
+    glDebugMessageCallback(myCallback, NULL);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+    glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0,
+        GL_DEBUG_SEVERITY_NOTIFICATION, -1 , "Start debugging");
 
 
 #ifdef USE_ANTTWEAKBAR
