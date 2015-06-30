@@ -12,7 +12,7 @@ import os
 import sys
 import shutil
 
-libsHome = "C:/lib/"
+libsHome = os.path.join('C:', os.sep, 'lib')
 # These home directories may be overridden by cmd line args
 libraryRootDirs = {
 	'ANTTWEAKBAR_ROOT': os.path.join(libsHome, 'AntTweakBar_116', 'AntTweakBar'),
