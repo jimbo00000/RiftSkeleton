@@ -703,7 +703,13 @@ void destroyAuxiliaryWindow(GLFWwindow* pAuxWindow)
 }
 
 // OpenGL debug callback
-void CALLBACK myCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *msg, const void *data)
+void APIENTRY myCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+    const GLchar *msg,
+    
+#ifndef _LINUX
+    const
+#endif
+    void *data)
 {
     LOG_INFO("[[GL Debug]] %s", msg);
 }
