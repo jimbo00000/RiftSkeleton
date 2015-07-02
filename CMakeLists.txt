@@ -297,6 +297,7 @@ ELSEIF( UNIX )
         -lX11
         -lXinerama # GLFW 3.1
         -lXcursor # GLFW 3.1
+        -ldl
         ${HYDRA_LIBS}
         ${ANT_LIBS}
         )
