@@ -7,6 +7,7 @@
 #endif
 
 #include <sstream>
+#include <algorithm>
 
 #include <GL/glew.h>
 #include <SDL.h>
