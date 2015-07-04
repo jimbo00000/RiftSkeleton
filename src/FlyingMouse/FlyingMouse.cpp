@@ -223,7 +223,7 @@ float FlyingMouse::GetTriggerValue(Hand h) const
     for (int cont=0; cont<maxControllers; cont++)
     {
         const sixenseControllerData& da =  g_curAcd.controllers[cont];
-        if (h == da.which_hand)
+        if (h == da.which_hand % 2)
             return da.trigger;
     }
 #endif
