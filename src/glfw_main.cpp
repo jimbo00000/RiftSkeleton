@@ -703,9 +703,24 @@ void destroyAuxiliaryWindow(GLFWwindow* pAuxWindow)
 }
 
 // OpenGL debug callback
-void CALLBACK myCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *msg, const void *data)
+void GLAPIENTRY myCallback(
+    GLenum source, GLenum type, GLuint id, GLenum severity,
+    GLsizei length, const GLchar *msg,
+#ifndef _LINUX
+    const
+#endif
+    void *data)
 {
-    LOG_INFO("[[GL Debug]] %s", msg);
+    switch (severity)
+    {
+    case GL_DEBUG_SEVERITY_HIGH:
+    case GL_DEBUG_SEVERITY_MEDIUM:
+    case GL_DEBUG_SEVERITY_LOW:
+        LOG_INFO("[[GL Debug]] %x %x %x %x %s", source, type, id, severity, msg);
+        break;
+    case GL_DEBUG_SEVERITY_NOTIFICATION:
+        break;
+    }
 }
 
 int main(int argc, char** argv)
@@ -719,17 +734,11 @@ int main(int argc, char** argv)
 #endif
 
     bool useOpenGLCoreContext = false;
-
-    g_renderMode.outputType = RenderingMode::OVR_SDK;
-
 #ifdef USE_CORE_CONTEXT
     useOpenGLCoreContext = true;
 #endif
 
-#ifdef _LINUX
-    // Linux driver seems to be lagging a bit
-    useOpenGLCoreContext = false;
-#endif
+    g_renderMode.outputType = RenderingMode::OVR_SDK;
 
     LOG_INFO("Using GLFW3 backend.");
     LOG_INFO("Compiled against GLFW %i.%i.%i",
@@ -803,7 +812,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_DEPTH_BITS, 16);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, useOpenGLCoreContext ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_ANY_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, useOpenGLCoreContext ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #ifdef _DEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
