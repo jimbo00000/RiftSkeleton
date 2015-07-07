@@ -870,7 +870,7 @@ int main(int argc, char** argv)
     resize(l_Window, sz.w, sz.h); // inform AppSkeleton of window size
 #else
     l_Window = glfwCreateWindow(800, 600, "GLFW Oculus Rift Test", NULL, NULL);
-    std::string windowTitle = "RiftSkeleton";
+    std::string windowTitle = PROJECT_NAME;
 #endif //USE_OCULUSSDK
 
     if (!l_Window)
