@@ -5,12 +5,17 @@
 #include <time.h>
 #include <iostream>
 
+#ifndef PROJECT_NAME
+// This macro should be defined in CMakeLists.txt
+#define PROJECT_NAME "RiftSkeleton"
+#endif
+
 /// Default constructor: called the first time Instance() is called.
 /// Open the output file.
 Logger::Logger()
 {
-    m_stream.open("RiftSkeleton-log.txt");
-    Write("RiftSkeleton log");
+    m_stream.open(PROJECT_NAME "-log.txt");
+    Write(PROJECT_NAME "log");
 }
 
 /// Flush and close the output file.

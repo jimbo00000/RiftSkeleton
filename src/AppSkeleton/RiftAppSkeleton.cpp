@@ -21,6 +21,11 @@
 
 #define USE_OVR_PERF_LOGGING
 
+#ifndef PROJECT_NAME
+// This macro should be defined in CMakeLists.txt
+#define PROJECT_NAME "RiftSkeleton"
+#endif
+
 RiftAppSkeleton::RiftAppSkeleton()
 : m_Hmd(NULL)
 , m_hmdCaps(0)
@@ -31,7 +36,7 @@ RiftAppSkeleton::RiftAppSkeleton()
     m_eyePoseCached = OVR::Posef();
     memset(m_logUserData, 0, 256);
 #ifdef USE_OVR_PERF_LOGGING
-    sprintf(m_logUserData, "RiftSkeleton");
+    sprintf(m_logUserData, PROJECT_NAME);
     // Unfortunately, the OVR perf log does not appear to re-read data
     // at the given user pointer each log entry(~1Hz). Is this a bug?
 #endif
@@ -96,7 +101,7 @@ void RiftAppSkeleton::initHMD()
     }
 
 #ifdef USE_OVR_PERF_LOGGING
-    ovrHmd_StartPerfLog(m_Hmd, "RiftSkeletonxxx-PerfLog.csv", m_logUserData);
+    ovrHmd_StartPerfLog(m_Hmd, PROJECT_NAME "-PerfLog.csv", m_logUserData);
 #endif
 
     //const unsigned int caps = ovrHmd_GetEnabledCaps(m_Hmd);
