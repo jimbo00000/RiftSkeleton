@@ -30,6 +30,11 @@
 #include "FPSTimer.h"
 #include "Logger.h"
 
+#ifndef PROJECT_NAME
+// This macro should be defined in CMakeLists.txt
+#define PROJECT_NAME "RiftSkeleton"
+#endif
+
 RiftAppSkeleton g_app;
 RenderingMode g_renderMode;
 Timer g_timer;
@@ -682,7 +687,7 @@ int main(int argc, char** argv)
     {
         // Create a normal, decorated application window
         LOG_INFO("Using Debug HMD mode.");
-        windowTitle = "RiftSkeleton-SDL2-DebugHMD";
+        windowTitle = PROJECT_NAME "-SDL2-DebugHMD";
         g_renderMode.outputType = RenderingMode::Mono_Buffered;
 
         g_pHMDWindow = SDL_CreateWindow(
@@ -694,7 +699,7 @@ int main(int argc, char** argv)
     else if (g_app.UsingDirectMode())
     {
         LOG_INFO("Using Direct to Rift mode.");
-        windowTitle = "RiftSkeleton-SDL2-Direct";
+        windowTitle = PROJECT_NAME "-SDL2-Direct";
 
         LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
         g_pHMDWindow = SDL_CreateWindow(
@@ -726,7 +731,7 @@ int main(int argc, char** argv)
     else
     {
         LOG_INFO("Using Extended desktop mode.");
-        windowTitle = "RiftSkeleton-SDL2-Extended";
+        windowTitle = PROJECT_NAME "-SDL2-Extended";
 
         LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
         g_pHMDWindow = SDL_CreateWindow(
