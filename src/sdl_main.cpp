@@ -24,7 +24,12 @@
 #include <string.h>
 #include <sstream>
 
+#ifdef USE_OCULUSSDK
 #include "RiftAppSkeleton.h"
+#else
+#include "AppSkeleton.h"
+#endif
+
 #include "RenderingMode.h"
 #include "Timer.h"
 #include "FPSTimer.h"
@@ -35,7 +40,12 @@
 #define PROJECT_NAME "RiftSkeleton"
 #endif
 
+#ifdef USE_OCULUSSDK
 RiftAppSkeleton g_app;
+#else
+AppSkeleton g_app;
+#endif
+
 RenderingMode g_renderMode;
 Timer g_timer;
 double g_lastFrameTime = 0.0;
@@ -188,10 +198,12 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
             g_app.ResetChassisTransformations();
             break;
 
+#ifdef USE_OCULUSSDK
         case 'v': g_app.ToggleVignette(); break;
         case 't': g_app.ToggleTimeWarp(); break;
         case 'o': g_app.ToggleOverdrive(); break;
         case 'l': g_app.ToggleLowPersistence(); break;
+#endif
 
         case SDLK_ESCAPE:
             if (event.key.keysym.sym == SDLK_ESCAPE)
@@ -474,6 +486,7 @@ void display()
         SDL_GL_SwapWindow(g_pHMDWindow);
         break;
 
+#ifdef USE_OCULUSSDK
     case RenderingMode::SideBySide_Undistorted:
         g_app.display_stereo_undistorted();
         SDL_GL_SwapWindow(g_pHMDWindow);
@@ -488,6 +501,7 @@ void display()
         g_app.display_client();
         SDL_GL_SwapWindow(g_pHMDWindow);
         break;
+#endif
 
     default:
         LOG_ERROR("Unknown display type: %d", g_renderMode.outputType);
@@ -679,6 +693,11 @@ int main(int argc, char** argv)
 
 #ifdef USE_OCULUSSDK
     g_app.initHMD();
+#else
+    g_renderMode.outputType = RenderingMode::Mono_Buffered;
+#endif
+
+#ifdef USE_OCULUSSDK
     const ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
     std::string windowTitle = "";
@@ -745,8 +764,9 @@ int main(int argc, char** argv)
     g_pHMDWindow = SDL_CreateWindow(
         "GL Skeleton - SDL2",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        sz.w, sz.h,
+        800, 600,
         SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+    std::string windowTitle = PROJECT_NAME;
 #endif //USE_OCULUSSDK
 
 
