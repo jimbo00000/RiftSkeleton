@@ -596,6 +596,27 @@ void destroyAuxiliaryWindow(SDL_Window* pAuxWindow)
     g_AuxWindowID = -1;
 }
 
+// OpenGL debug callback
+void GLAPIENTRY myCallback(
+    GLenum source, GLenum type, GLuint id, GLenum severity,
+    GLsizei length, const GLchar *msg,
+#ifndef _LINUX
+    const
+#endif
+    void *data)
+{
+    switch (severity)
+    {
+    case GL_DEBUG_SEVERITY_HIGH:
+    case GL_DEBUG_SEVERITY_MEDIUM:
+    case GL_DEBUG_SEVERITY_LOW:
+        LOG_INFO("[[GL Debug]] %x %x %x %x %s", source, type, id, severity, msg);
+        break;
+    case GL_DEBUG_SEVERITY_NOTIFICATION:
+        break;
+    }
+}
+
 int main(int argc, char** argv)
 {
 #if defined(_WIN32)
@@ -684,9 +705,13 @@ int main(int argc, char** argv)
     {
         LOG_INFO("Using OpenGL compatibility context.");
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+        //SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        //SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     }
+#endif
+
+#ifdef _DEBUG
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 #endif
 
     bool swapBackBufferDims = false;
@@ -844,6 +869,16 @@ int main(int argc, char** argv)
         LOG_INFO("glewInit() error.");
         exit(EXIT_FAILURE);
     }
+
+#ifdef _DEBUG
+    // Debug callback initialization
+    // Must be done *after* glew initialization.
+    glDebugMessageCallback(myCallback, NULL);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+    glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0,
+        GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Start debugging");
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+#endif
 
 #ifdef USE_ANTTWEAKBAR
     LOG_INFO("Using AntTweakbar.");
