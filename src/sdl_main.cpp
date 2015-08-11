@@ -24,7 +24,9 @@
 #include <string.h>
 #include <sstream>
 
-#ifdef USE_OCULUSSDK
+#if defined(USE_OSVR)
+#include "OsvrAppSkeleton.h"
+#elif defined(USE_OCULUSSDK)
 #include "RiftAppSkeleton.h"
 #else
 #include "AppSkeleton.h"
@@ -40,7 +42,9 @@
 #define PROJECT_NAME "RiftSkeleton"
 #endif
 
-#ifdef USE_OCULUSSDK
+#if defined(USE_OSVR)=
+OsvrAppSkeleton g_app;
+#elif defined(USE_OCULUSSDK)
 RiftAppSkeleton g_app;
 #else
 AppSkeleton g_app;
@@ -486,7 +490,13 @@ void display()
         SDL_GL_SwapWindow(g_pHMDWindow);
         break;
 
-#ifdef USE_OCULUSSDK
+#if defined(USE_OSVR)
+    case RenderingMode::SideBySide_Undistorted:
+        g_app.display_stereo_undistorted();
+        SDL_GL_SwapWindow(g_pHMDWindow);
+        break;
+
+#elif defined(USE_OCULUSSDK)
     case RenderingMode::SideBySide_Undistorted:
         g_app.display_stereo_undistorted();
         SDL_GL_SwapWindow(g_pHMDWindow);
@@ -716,13 +726,19 @@ int main(int argc, char** argv)
 
     bool swapBackBufferDims = false;
 
-#ifdef USE_OCULUSSDK
+#if defined(USE_OCULUSSDK) || defined(USE_OSVR)
     g_app.initHMD();
 #else
     g_renderMode.outputType = RenderingMode::Mono_Buffered;
 #endif
 
-#ifdef USE_OCULUSSDK
+
+#if defined(USE_OSVR)
+    ///@todo OSVR path
+    std::string windowTitle = "";
+    windowTitle = PROJECT_NAME "-SDL2-Osvr";
+
+#elif defined(USE_OCULUSSDK)
     const ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
     std::string windowTitle = "";

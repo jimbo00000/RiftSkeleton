@@ -15,6 +15,7 @@ SET( GL_FRAMEWORK "GLFW" CACHE STRING "Which OpenGL windowing framework to use" 
 SET( USE_ANTTWEAKBAR TRUE CACHE BOOL "Use AntTweakBar" )
 SET( USE_SIXENSE TRUE CACHE BOOL "Use Sixense" )
 SET( USE_OCULUSSDK TRUE CACHE BOOL "Use Oculus SDK" )
+SET( USE_OSVR FALSE CACHE BOOL "Use OSVR SDK" )
 
 SET( USE_CORE_CONTEXT TRUE CACHE BOOL "Use Core Context" )
 IF( USE_CORE_CONTEXT )
@@ -102,6 +103,15 @@ IF( WIN32 )
         SET( OVR_LIBS LibOVR.lib )
         ADD_DEFINITIONS( -DUSE_OCULUSSDK )
     ENDIF( USE_OCULUSSDK )
+
+    IF( USE_OSVR )
+        SET( OSVR_ROOT "${LIBS_HOME}/OSVR-Core-Snapshot-v0.2-338-ga848a4c-build122-vs12-32bit" CACHE STRING "OSVR root" )
+        INCLUDE_DIRECTORIES( "${OSVR_ROOT}/include" )
+        LINK_DIRECTORIES   ( "${OSVR_ROOT}/lib" )
+        SET( OSVR_LIBS osvrClientKit.lib )
+        INCLUDE_DIRECTORIES( "${LIBS_HOME}/boost_1_58_0" )
+        ADD_DEFINITIONS( -DUSE_OSVR )
+    ENDIF( USE_OSVR )
 
     IF( USE_SIXENSE )
         MESSAGE("Using Sixense SDK.")
@@ -338,6 +348,12 @@ IF( NOT USE_OCULUSSDK )
 
     LIST(REMOVE_ITEM SCENE_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Scene/OVRScene.cpp )
+ENDIF()
+
+IF( NOT USE_OSVR )
+    MESSAGE( "Removing OSVR-dependent files..." )
+    LIST(REMOVE_ITEM APPSKELETON_SOURCE_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OsvrAppSkeleton.cpp )
 ENDIF()
 
 INCLUDE_DIRECTORIES("src/Util")
