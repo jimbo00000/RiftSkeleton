@@ -32,10 +32,13 @@ void OsvrAppSkeleton::initHMD()
 
 void OsvrAppSkeleton::initVR(bool swapBackBufferDims)
 {
+    ctx = osvrClientInit("com.osvr.jimbo00000.RiftSkeleton", 0);
+    osvrClientGetInterface(ctx, "/me/head", &head);
 }
 
 void OsvrAppSkeleton::exitVR()
 {
+    osvrClientShutdown(ctx);
 }
 
 void OsvrAppSkeleton::RecenterPose()
@@ -44,22 +47,12 @@ void OsvrAppSkeleton::RecenterPose()
 
 void OsvrAppSkeleton::display_stereo_undistorted() const
 {
-    osvr::clientkit::ClientContext context(
-        "com.osvr.exampleclients.TrackerState");
+    osvrClientUpdate(ctx);
 
-    // This is just one of the paths. You can also use:
-    // /me/hands/right
-    // /me/head
-    osvr::clientkit::Interface head =
-        context.getInterface("/me/head");
-
-
-    // Note that there is not currently a tidy C++ wrapper for
-    // state access, so we're using the C API call directly here.
     OSVR_PoseState state;
     OSVR_TimeValue timestamp;
     OSVR_ReturnCode ret =
-        osvrGetPoseState(head.get(), &timestamp, &state);
+        osvrGetPoseState(head, &timestamp, &state);
     if (OSVR_RETURN_SUCCESS != ret) {
         std::cout << "No pose state!" << std::endl;
     }
@@ -75,6 +68,7 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
             << std::endl;
     }
 
+    // Draw
     glClearColor(1, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT);
 }

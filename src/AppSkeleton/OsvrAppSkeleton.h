@@ -46,6 +46,10 @@ public:
     hmdRes getHmdResolution() const { return { 1920, 1080 }; }
     winPos getHmdWindowPos() const { return{ 1920, 0 }; }
 
+protected:
+    OSVR_ClientContext ctx;
+    OSVR_ClientInterface head;
+
 private: // Disallow copy ctor and assignment operator
     OsvrAppSkeleton(const OsvrAppSkeleton&);
     OsvrAppSkeleton& operator=(const OsvrAppSkeleton&);
