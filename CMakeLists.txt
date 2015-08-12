@@ -141,6 +141,7 @@ IF( WIN32 )
         ${FRAMEWORK_LIBS}
         opengl32.lib glu32.lib glew32s.lib
         ${OVR_LIBS}
+        ${OSVR_LIBS}
         Winmm.lib
         ws2_32.lib
         ${HYDRA_LIBS}

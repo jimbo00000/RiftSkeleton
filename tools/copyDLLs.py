@@ -18,6 +18,7 @@ libraryRootDirs = {
 	'ANTTWEAKBAR_ROOT': os.path.join(libsHome, 'AntTweakBar_116', 'AntTweakBar'),
 	'SIXENSE_ROOT': os.path.join(libsHome, 'SixenseSDK'),
 	'GLEW_ROOT': os.path.join(libsHome, 'glew-1.12.0'),
+	'OSVR_ROOT': os.path.join(libsHome, 'OSVR-Core-Snapshot-v0.2-338-ga848a4c-build122-vs12-32bit'),
 	'SDL2_ROOT': os.path.join(libsHome, 'SDL2-2.0.3'),
 	'SFML_ROOT': os.path.join(libsHome, 'SFML-2.2'),
 }
@@ -28,6 +29,10 @@ libraryRootDirs = {
 commonDllList = [
 	['ANTTWEAKBAR_ROOT', ['lib'], 'AntTweakBar.dll' ],
 	['GLEW_ROOT', ['bin', 'Release', 'Win32'], 'glew32.dll' ],
+	['OSVR_ROOT', ['bin'], 'osvrClient.dll' ],
+	['OSVR_ROOT', ['bin'], 'osvrClientKit.dll' ],
+	['OSVR_ROOT', ['bin'], 'osvrCommon.dll' ],
+	['OSVR_ROOT', ['bin'], 'osvrUtil.dll' ],
 	['SDL2_ROOT', ['lib','x86'], 'SDL2.dll' ],
 	['SIXENSE_ROOT', ['samples','win32','sixense_simple3d'], 'DeviceDLL.dll' ],
 ]
