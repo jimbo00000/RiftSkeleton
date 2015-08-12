@@ -738,6 +738,18 @@ int main(int argc, char** argv)
     std::string windowTitle = "";
     windowTitle = PROJECT_NAME "-SDL2-Osvr";
 
+    const hmdRes sz = g_app.getHmdResolution();
+    const winPos pos = g_app.getHmdWindowPos();
+    g_renderMode.outputType = RenderingMode::SideBySide_Undistorted;
+
+    LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
+    g_pHMDWindow = SDL_CreateWindow(
+        windowTitle.c_str(),
+        pos.x, pos.y,
+        sz.w, sz.h,
+        SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+    SDL_SetRelativeMouseMode(SDL_TRUE);
+
 #elif defined(USE_OCULUSSDK)
     const ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
