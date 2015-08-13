@@ -1,7 +1,7 @@
 Using OSVR
 ==========
 
-Using the OSVR libraries and server with the Oculus Rift requires some extra setup on top of installing the OVR SDK and runtime. Install the 0.5.0.1 Oculus runtime and SDK and make sure the service is running. Set the Rift display mode to Extended (This is only so we can create a window without access to Oculus's Direct Mode).
+Using the OSVR libraries and server with the Oculus Rift requires some extra setup on top of installing the OVR SDK and runtime. Install the 0.5.0.1 Oculus runtime and SDK and make sure the service is running. Set the Rift display mode to Extended (This is only so we can create a window without access to Oculus's Direct Mode). Set the Rift's screen orientation to Landscape(Flipped). Note that this is sub-optimal for performance and done for convenience, and is hopefully a temporary workaround.
 
 ## Setup
 
