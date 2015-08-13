@@ -121,7 +121,7 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
     for (int e = 0; e < 2; ++e) // eye loop
     {
         // Assume side-by-side configuration
-        glViewport(e*hr.w, 0, hr.w / 2, hr.h);
+        glViewport(e*hr.w/2, 0, hr.w / 2, hr.h);
         const glm::mat4 viewLocal = makeMatrixFromPoseComponents(poset, poser);
         const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
         _resetGLState();
