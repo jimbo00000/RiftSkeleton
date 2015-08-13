@@ -18,3 +18,5 @@ glm::mat4 makeChassisMatrix_glm(
 glm::mat4 makeMatrixFromPose(const ovrPosef& eyePose);
 OVR::Matrix4f makeOVRMatrixFromGlmMatrix(const glm::mat4& gm);
 #endif
+
+glm::mat4 makeMatrixFromPoseComponents(const glm::vec3& t, const glm::quat& r);

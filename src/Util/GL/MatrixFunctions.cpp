@@ -45,3 +45,9 @@ OVR::Matrix4f makeOVRMatrixFromGlmMatrix(const glm::mat4& glm_m)
     return ovr_m; // copied on return
 }
 #endif
+
+glm::mat4 makeMatrixFromPoseComponents(const glm::vec3& t, const glm::quat& r)
+{
+    return glm::translate(glm::mat4(1.f), t)
+        * glm::mat4_cast(r);
+}
