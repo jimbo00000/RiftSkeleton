@@ -101,6 +101,22 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Ripped from OVR's function output at runtime
+    const float pL[] = {
+        0.929788947, 0.000000000, -0.0156717598, 0.000000000,
+        0.000000000, 0.750974476, 0.000000000, 0.000000000,
+        0.000000000, 0.000000000, -1.00000095, -0.0100000100,
+        0.000000000, 0.000000000, -1.00000000, 0.000000000,
+    };
+    const float pR[] = {
+        0.929788947, 0.000000000, 0.0156717598, 0.000000000,
+        0.000000000, 0.750974476, 0.000000000, 0.000000000,
+        0.000000000, 0.000000000, -1.00000095, -0.0100000100,
+        0.000000000, 0.000000000, -1.00000000, 0.000000000,
+    };
+    const glm::mat4 projL = glm::transpose(glm::make_mat4(pL));
+    const glm::mat4 projR = glm::transpose(glm::make_mat4(pR));
+
     const hmdRes hr = getHmdResolution();
     for (int e = 0; e < 2; ++e) // eye loop
     {
@@ -108,11 +124,10 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
         glViewport(e*hr.w, 0, hr.w / 2, hr.h);
         const glm::mat4 viewLocal = makeMatrixFromPoseComponents(poset, poser);
         const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
-        const glm::mat4 proj(1.f); ///@todo off-axis Projection matrix
         _resetGLState();
         _DrawScenes(
             glm::value_ptr(glm::inverse(viewWorld)),
-            glm::value_ptr(proj),
+            e == 0 ? glm::value_ptr(projL) : glm::value_ptr(projR),
             glm::value_ptr(glm::inverse(viewLocal)));
     }
     unbindFBO();
