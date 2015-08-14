@@ -118,11 +118,16 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
     const glm::mat4 projR = glm::transpose(glm::make_mat4(pR));
 
     const hmdRes hr = getHmdResolution();
+    const float ipd = .064; ///@todo User configuration
+    const float halfIpd = ipd * .5f;
     for (int e = 0; e < 2; ++e) // eye loop
     {
         // Assume side-by-side configuration
         glViewport(e*hr.w/2, 0, hr.w / 2, hr.h);
-        const glm::mat4 viewLocal = makeMatrixFromPoseComponents(poset, poser);
+        const float eyeTx = e == 0 ? -halfIpd : halfIpd;
+        const glm::mat4 viewLocal = glm::translate(
+            makeMatrixFromPoseComponents(poset, poser),
+            glm::vec3(eyeTx, 0.f, 0.f));
         const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
         _resetGLState();
         _DrawScenes(
