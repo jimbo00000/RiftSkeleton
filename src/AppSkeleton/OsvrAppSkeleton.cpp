@@ -73,6 +73,61 @@ void destroyDistortionMesh(ovrDistortionMesh& mesh)
     delete mesh.pIndexData;
 }
 
+void OsvrAppSkeleton::_initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx)
+{
+    // Init left and right VAOs separately
+    shader.bindVAO();
+
+    ovrDistortionMesh& mesh = m_DistMeshes[eyeIdx];
+    GLuint vertVbo = 0;
+    glGenBuffers(1, &vertVbo);
+    shader.AddVbo("vPosition", vertVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vertVbo);
+    glBufferData(GL_ARRAY_BUFFER, mesh.VertexCount * sizeof(ovrDistortionVertex), &mesh.pVertexData[0].ScreenPosNDC.x, GL_STATIC_DRAW);
+
+    const int a_pos = shader.GetAttrLoc("vPosition");
+    glVertexAttribPointer(a_pos, 4, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex), NULL);
+    glEnableVertexAttribArray(a_pos);
+
+    const int a_texR = shader.GetAttrLoc("vTexR");
+    if (a_texR > -1)
+    {
+        glVertexAttribPointer(a_texR, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex),
+            reinterpret_cast<void*>(offsetof(ovrDistortionVertex, TanEyeAnglesR)));
+        glEnableVertexAttribArray(a_texR);
+    }
+
+    const int a_texG = shader.GetAttrLoc("vTexG");
+    if (a_texG > -1)
+    {
+        glVertexAttribPointer(a_texG, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex),
+            reinterpret_cast<void*>(offsetof(ovrDistortionVertex, TanEyeAnglesG)));
+        glEnableVertexAttribArray(a_texG);
+    }
+
+    const int a_texB = shader.GetAttrLoc("vTexB");
+    if (a_texB > -1)
+    {
+        glVertexAttribPointer(a_texB, 2, GL_FLOAT, GL_FALSE, sizeof(ovrDistortionVertex),
+            reinterpret_cast<void*>(offsetof(ovrDistortionVertex, TanEyeAnglesB)));
+        glEnableVertexAttribArray(a_texB);
+    }
+
+
+    GLuint elementVbo = 0;
+    glGenBuffers(1, &elementVbo);
+    shader.AddVbo("elements", elementVbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementVbo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.IndexCount * sizeof(GLushort), &mesh.pIndexData[0], GL_STATIC_DRAW);
+
+    // We have copies of the mesh in GL, but keep a count of indices around for the GL draw call.
+    const unsigned int tmp = mesh.IndexCount;
+    destroyDistortionMesh(mesh);
+    mesh.IndexCount = tmp;
+
+    glBindVertexArray(0);
+}
+
 int OsvrAppSkeleton::ConfigureRendering()
 {
     const hmdRes hr = getHmdResolution();
@@ -81,10 +136,8 @@ int OsvrAppSkeleton::ConfigureRendering()
 
     loadDistortionMeshFromFile(m_DistMeshes[0], "meshL.dat");
     loadDistortionMeshFromFile(m_DistMeshes[1], "meshR.dat");
-
-    ///@todo Initialize vertex and index buffers
-    destroyDistortionMesh(m_DistMeshes[0]);
-    destroyDistortionMesh(m_DistMeshes[1]);
+    _initPresentDistMesh(m_presentDistMeshL, 0);
+    _initPresentDistMesh(m_presentDistMeshR, 1);
 
     return 0;
 }

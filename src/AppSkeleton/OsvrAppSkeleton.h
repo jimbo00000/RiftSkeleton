@@ -68,6 +68,8 @@ public:
     winPos getHmdWindowPos() const { return{ 1920, 0 }; }
 
 protected:
+    void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);
+
     OSVR_ClientContext ctx;
     OSVR_ClientInterface head;
     ovrDistortionMesh m_DistMeshes[2];
