@@ -235,6 +235,7 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
 
     glViewport(0, 0, hr.w, hr.h);
 
+#if 0
     // Present FBO to screen
     const GLuint prog = m_presentFbo.prog();
     glUseProgram(prog);
@@ -248,4 +249,56 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
     }
     glBindVertexArray(0);
     glUseProgram(0);
+#else
+    // Apply distortion from mesh loaded from OVR SDK.
+    glClearColor(0.f, 0.f, 0.f, 0.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
+    // Now draw the distortion mesh...
+    for (int eyeNum = 0; eyeNum < 2; eyeNum++)
+    {
+        const ShaderWithVariables& eyeShader =
+            eyeNum == 0 ?
+                m_presentDistMeshL :
+                m_presentDistMeshR;
+        const GLuint prog = eyeShader.prog();
+        glUseProgram(prog);
+        eyeShader.bindVAO();
+        {
+            const ovrDistortionMesh& mesh = m_DistMeshes[eyeNum];
+            ///@note Once again, these values are shamelessly ripped from the running
+            /// RiftAppSkeleton in Debug mode.
+            const glm::vec2 uvscale = glm::vec2(0.232447237, 0.375487238);
+            const glm::vec2 uvoff = eyeNum == 0 ?
+                glm::vec2(0.246082067, 0.500000000) :
+                glm::vec2(0.753917933, 0.500000000);
+
+            glUniform2f(eyeShader.GetUniLoc("EyeToSourceUVOffset"), uvoff.x, uvoff.y);
+            glUniform2f(eyeShader.GetUniLoc("EyeToSourceUVScale"), uvscale.x, uvscale.y);
+
+            ///@todo Timewarp
+            {
+                glm::mat4 id(1.f);
+                glUniformMatrix4fv(eyeShader.GetUniLoc("EyeRotationStart"), 1, false, glm::value_ptr(id));
+                glUniformMatrix4fv(eyeShader.GetUniLoc("EyeRotationEnd"), 1, false, glm::value_ptr(id));
+            }
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_renderBuffer.tex);
+            glUniform1i(eyeShader.GetUniLoc("fboTex"), 0);
+
+            glUniform1f(eyeShader.GetUniLoc("fboScale"), m_fboScale);
+
+            glDrawElements(
+                GL_TRIANGLES,
+                mesh.IndexCount,
+                GL_UNSIGNED_SHORT,
+                0);
+        }
+        glBindVertexArray(0);
+        glUseProgram(0);
+    }
+#endif
 }
