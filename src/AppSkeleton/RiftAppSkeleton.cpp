@@ -11,6 +11,7 @@
 #include <math.h>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 
 #include <OVR.h>
 
@@ -286,6 +287,25 @@ int RiftAppSkeleton::ConfigureSDKRendering()
     return 0;
 }
 
+///@brief This is for re-using the distortion mesh in the OVRAppSkeleton.
+/// I hope we are not violating OVR SDK's license too badly here.
+void saveDistortionMeshToFile(const ovrDistortionMesh& mesh, const std::string filename)
+{
+    if (filename.empty())
+        return;
+    std::ofstream file;
+    file.open(filename.c_str(), std::ios::out | std::ios::binary);
+    if (!file.is_open())
+    {
+        std::cerr << "saveDistortionMeshToFile: could not open file " << filename << std::endl;
+    }
+    file.write(reinterpret_cast <const char*>(&mesh.VertexCount), sizeof(mesh.VertexCount));
+    file.write(reinterpret_cast <const char*>(&mesh.IndexCount), sizeof(mesh.IndexCount));
+    file.write(reinterpret_cast <const char*>(mesh.pVertexData), mesh.VertexCount*sizeof(ovrDistortionVertex));
+    file.write(reinterpret_cast <const char*>(mesh.pIndexData), mesh.IndexCount*sizeof(unsigned short));
+    file.close();
+}
+
 ///@brief Writes to m_EyeRenderDesc, m_EyeRenderDesc and m_DistMeshes
 int RiftAppSkeleton::ConfigureClientRendering()
 {
@@ -305,6 +325,8 @@ int RiftAppSkeleton::ConfigureClientRendering()
             m_EyeRenderDesc[eye].Fov,
             m_distortionCaps,
             &m_DistMeshes[eye]);
+
+        saveDistortionMeshToFile(m_DistMeshes[eye], eye == ovrEye_Left ? "meshL.dat" : "meshR.dat");
     }
     return 0;
 }

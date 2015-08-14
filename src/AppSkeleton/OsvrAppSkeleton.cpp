@@ -15,6 +15,7 @@
 #include <math.h>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 
 #include "OsvrAppSkeleton.h"
 #include "MatrixFunctions.h"
@@ -44,11 +45,46 @@ void OsvrAppSkeleton::exitVR()
     osvrClientShutdown(ctx);
 }
 
+///@brief Load the mesh that was saved by saveDistortionMeshToFile in RiftAppSkeleton.cpp.
+/// This means you have to run that skeleton once to get the meshL.dat and meshR.dat files saved
+/// with the proper parameters for your HMD.
+void loadDistortionMeshFromFile(ovrDistortionMesh& mesh, const std::string filename)
+{
+    if (filename.empty())
+        return;
+    std::ifstream file;
+    file.open(filename.c_str(), std::ios::in | std::ios::binary);
+    if (!file.is_open())
+    {
+        std::cerr << "loadDistortionMeshFromFile: could not open file " << filename << std::endl;
+    }
+    file.read(reinterpret_cast <char*>(&mesh.VertexCount), sizeof(mesh.VertexCount));
+    file.read(reinterpret_cast <char*>(&mesh.IndexCount), sizeof(mesh.IndexCount));
+    mesh.pVertexData = new ovrDistortionVertex[mesh.VertexCount];
+    mesh.pIndexData = new unsigned short[mesh.IndexCount];
+    file.read(reinterpret_cast <char*>(mesh.pVertexData), mesh.VertexCount*sizeof(ovrDistortionVertex));
+    file.read(reinterpret_cast <char*>(mesh.pIndexData), mesh.IndexCount*sizeof(unsigned short));
+    file.close();
+}
+
+void destroyDistortionMesh(ovrDistortionMesh& mesh)
+{
+    delete mesh.pVertexData;
+    delete mesh.pIndexData;
+}
+
 int OsvrAppSkeleton::ConfigureRendering()
 {
     const hmdRes hr = getHmdResolution();
     deallocateFBO(m_renderBuffer);
     allocateFBO(m_renderBuffer, hr.w, hr.h);
+
+    loadDistortionMeshFromFile(m_DistMeshes[0], "meshL.dat");
+    loadDistortionMeshFromFile(m_DistMeshes[1], "meshR.dat");
+
+    ///@todo Initialize vertex and index buffers
+    destroyDistortionMesh(m_DistMeshes[0]);
+    destroyDistortionMesh(m_DistMeshes[1]);
 
     return 0;
 }
