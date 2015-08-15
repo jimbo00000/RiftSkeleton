@@ -744,7 +744,10 @@ int main(int argc, char** argv)
     std::string windowTitle = "";
     windowTitle = PROJECT_NAME "-SDL2-Osvr";
 
-    const hmdRes sz = g_app.getHmdResolution();
+    const hmdRes sz = {
+        g_app.getHmdResolution().h,
+        g_app.getHmdResolution().w
+    };
     const winPos pos = g_app.getHmdWindowPos();
     g_renderMode.outputType = RenderingMode::SideBySide_Undistorted;
 

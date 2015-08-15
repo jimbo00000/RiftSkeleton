@@ -214,8 +214,8 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
 {
     _DrawToRenderBuffer();
     const hmdRes hr = getHmdResolution();
-    glViewport(0, 0, hr.w, hr.h);
-    _PresentFboDistorted();
+    glViewport(0, 0, hr.h, hr.w);
+    _PresentFboUndistorted();
 }
 
 void OsvrAppSkeleton::display_stereo_distorted() const
@@ -223,7 +223,7 @@ void OsvrAppSkeleton::display_stereo_distorted() const
     _DrawToRenderBuffer();
     const hmdRes hr = getHmdResolution();
     glViewport(0, 0, hr.w, hr.h);
-    _PresentFboUndistorted();
+    _PresentFboDistorted();
 }
 
 void OsvrAppSkeleton::_PresentFboUndistorted() const

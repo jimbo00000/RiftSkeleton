@@ -125,12 +125,28 @@ void AppSkeleton::_initPresentFbo()
         1, 1,
         -1, 1
     };
+
+#if 0
+    // These tex coords output 1920x1080 aligned to screen pixel coordinates
+    // with no transformation. However, since the display scans out along its
+    // longer axis, setting the screen to landscape mode in Windows's control
+    // panel can introduce extra judder.
     const float texs[] = {
         0, 0,
         1, 0,
         1, 1,
         0, 1,
     };
+#else
+    // These tex coords effectively perform a rotation to output a 1920x1080
+    // FBO to portrait mode screen at 1080x1920.
+    const float texs[] = {
+        0, 1,
+        0, 0,
+        1, 0,
+        1, 1,
+    };
+#endif
 
     GLuint vertVbo = 0;
     glGenBuffers(1, &vertVbo);
