@@ -65,6 +65,15 @@ void loadDistortionMeshFromFile(ovrDistortionMesh& mesh, const std::string filen
     file.read(reinterpret_cast <char*>(mesh.pVertexData), mesh.VertexCount*sizeof(ovrDistortionVertex));
     file.read(reinterpret_cast <char*>(mesh.pIndexData), mesh.IndexCount*sizeof(unsigned short));
     file.close();
+
+    // Swap device coordinates to work with portrait screen orientation (default)
+    for (int i = 0l; i < mesh.VertexCount; ++i)
+    {
+        ovrDistortionVertex& v = mesh.pVertexData[i];
+        std::swap(v.ScreenPosNDC.x, v.ScreenPosNDC.y);
+        v.ScreenPosNDC.x *= -1.f;
+    }
+
 }
 
 void destroyDistortionMesh(ovrDistortionMesh& mesh)
@@ -222,7 +231,7 @@ void OsvrAppSkeleton::display_stereo_distorted() const
 {
     _DrawToRenderBuffer();
     const hmdRes hr = getHmdResolution();
-    glViewport(0, 0, hr.w, hr.h);
+    glViewport(0, 0, hr.h, hr.w);
     _PresentFboDistorted();
 }
 
