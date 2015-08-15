@@ -61,6 +61,7 @@ public:
     int ConfigureRendering();
 
     void display_stereo_undistorted() const;
+    void display_stereo_distorted() const;
 
     // Hardcoded dimensions to match default Rift settings in Extended Mode.
     // Set screen orientation to Landscape (flipped).

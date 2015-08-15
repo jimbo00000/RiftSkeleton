@@ -208,27 +208,31 @@ void OsvrAppSkeleton::_DrawToRenderBuffer() const
             glm::value_ptr(glm::inverse(viewLocal)));
     }
     unbindFBO();
-
 }
 
 void OsvrAppSkeleton::display_stereo_undistorted() const
 {
     _DrawToRenderBuffer();
+    const hmdRes hr = getHmdResolution();
+    glViewport(0, 0, hr.w, hr.h);
+    _PresentFboDistorted();
+}
 
-    // Set up for present to HMD screen
+void OsvrAppSkeleton::display_stereo_distorted() const
+{
+    _DrawToRenderBuffer();
+    const hmdRes hr = getHmdResolution();
+    glViewport(0, 0, hr.w, hr.h);
+    _PresentFboUndistorted();
+}
+
+void OsvrAppSkeleton::_PresentFboUndistorted() const
+{
     glClearColor(0.f, 0.f, 1.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 
-    const hmdRes hr = getHmdResolution();
-    glViewport(0, 0, hr.w, hr.h);
-
-    _PresentFboDistorted();
-}
-
-void OsvrAppSkeleton::_PresentFboUndistorted() const
-{
     // Present FBO to screen
     const GLuint prog = m_presentFbo.prog();
     glUseProgram(prog);

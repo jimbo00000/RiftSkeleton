@@ -496,6 +496,12 @@ void display()
         SDL_GL_SwapWindow(g_pHMDWindow);
         break;
 
+    case RenderingMode::OVR_SDK: ///@todo misnomer
+    case RenderingMode::OVR_Client:
+        g_app.display_stereo_distorted();
+        SDL_GL_SwapWindow(g_pHMDWindow);
+        break;
+
 #elif defined(USE_OCULUSSDK)
     case RenderingMode::SideBySide_Undistorted:
         g_app.display_stereo_undistorted();
