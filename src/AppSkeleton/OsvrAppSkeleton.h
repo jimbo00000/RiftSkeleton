@@ -69,6 +69,7 @@ public:
 
 protected:
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);
+    void _DrawToRenderBuffer() const;
     void _PresentFboUndistorted() const;
     void _PresentFboDistorted() const;
 

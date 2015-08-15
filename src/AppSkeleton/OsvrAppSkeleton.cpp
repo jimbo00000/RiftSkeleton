@@ -146,7 +146,7 @@ void OsvrAppSkeleton::RecenterPose()
 {
 }
 
-void OsvrAppSkeleton::display_stereo_undistorted() const
+void OsvrAppSkeleton::_DrawToRenderBuffer() const
 {
     osvrClientUpdate(ctx);
 
@@ -209,6 +209,11 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
     }
     unbindFBO();
 
+}
+
+void OsvrAppSkeleton::display_stereo_undistorted() const
+{
+    _DrawToRenderBuffer();
 
     // Set up for present to HMD screen
     glClearColor(0.f, 0.f, 1.f, 0.f);
@@ -216,6 +221,7 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 
+    const hmdRes hr = getHmdResolution();
     glViewport(0, 0, hr.w, hr.h);
 
     _PresentFboDistorted();
