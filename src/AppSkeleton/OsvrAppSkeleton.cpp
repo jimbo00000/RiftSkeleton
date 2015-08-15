@@ -235,7 +235,11 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
 
     glViewport(0, 0, hr.w, hr.h);
 
-#if 0
+    _PresentFboDistorted();
+}
+
+void OsvrAppSkeleton::_PresentFboUndistorted() const
+{
     // Present FBO to screen
     const GLuint prog = m_presentFbo.prog();
     glUseProgram(prog);
@@ -249,7 +253,10 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
     }
     glBindVertexArray(0);
     glUseProgram(0);
-#else
+}
+
+void OsvrAppSkeleton::_PresentFboDistorted() const
+{
     // Apply distortion from mesh loaded from OVR SDK.
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -260,9 +267,7 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
     for (int eyeNum = 0; eyeNum < 2; eyeNum++)
     {
         const ShaderWithVariables& eyeShader =
-            eyeNum == 0 ?
-                m_presentDistMeshL :
-                m_presentDistMeshR;
+            eyeNum == 0 ? m_presentDistMeshL : m_presentDistMeshR;
         const GLuint prog = eyeShader.prog();
         glUseProgram(prog);
         eyeShader.bindVAO();
@@ -300,5 +305,4 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
         glBindVertexArray(0);
         glUseProgram(0);
     }
-#endif
 }

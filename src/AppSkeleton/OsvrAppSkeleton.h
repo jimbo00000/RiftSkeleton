@@ -69,6 +69,8 @@ public:
 
 protected:
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);
+    void _PresentFboUndistorted() const;
+    void _PresentFboDistorted() const;
 
     OSVR_ClientContext ctx;
     OSVR_ClientInterface head;
