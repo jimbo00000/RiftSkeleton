@@ -166,23 +166,6 @@ void OsvrAppSkeleton::display_stereo_undistorted() const
         osvrQuatGetY(&(state.rotation)),
         osvrQuatGetZ(&(state.rotation)));
 
-#if 0
-    if (OSVR_RETURN_SUCCESS != ret) {
-        std::cout << "No pose state!" << std::endl;
-    }
-    else {
-        std::cout << "Got POSE state: Position = ("
-            //<< state.translation.data[0] << ", "
-            //<< state.translation.data[1] << ", "
-            //<< state.translation.data[2] << "), orientation = ("
-            << osvrQuatGetW(&(state.rotation)) << ", ("
-            << osvrQuatGetX(&(state.rotation)) << ", "
-            << osvrQuatGetY(&(state.rotation)) << ", "
-            << osvrQuatGetZ(&(state.rotation)) << ")"
-            << std::endl;
-    }
-#endif
-
     // Draw
     const float m_fboScale = 1.f; ///@todo buffer scaling
     bindFBO(m_renderBuffer, m_fboScale);
