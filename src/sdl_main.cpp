@@ -42,7 +42,7 @@
 #define PROJECT_NAME "RiftSkeleton"
 #endif
 
-#if defined(USE_OSVR)=
+#if defined(USE_OSVR)
 OsvrAppSkeleton g_app;
 #elif defined(USE_OCULUSSDK)
 RiftAppSkeleton g_app;
@@ -740,7 +740,6 @@ int main(int argc, char** argv)
 
 
 #if defined(USE_OSVR)
-    ///@todo OSVR path
     std::string windowTitle = "";
     windowTitle = PROJECT_NAME "-SDL2-Osvr";
 
