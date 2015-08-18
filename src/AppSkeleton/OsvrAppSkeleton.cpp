@@ -153,8 +153,8 @@ int OsvrAppSkeleton::ConfigureRendering()
     deallocateFBO(m_renderBuffer);
     allocateFBO(m_renderBuffer, hr.w, hr.h);
 
-    loadDistortionMeshFromFile(m_DistMeshes[0], "meshL.dat");
-    loadDistortionMeshFromFile(m_DistMeshes[1], "meshR.dat");
+    loadDistortionMeshFromFile(m_DistMeshes[0], "../data/Rift-distortionmeshL.dat");
+    loadDistortionMeshFromFile(m_DistMeshes[1], "../data/Rift-distortionmeshR.dat");
     _initPresentDistMesh(m_presentDistMeshL, 0);
     _initPresentDistMesh(m_presentDistMeshR, 1);
 
