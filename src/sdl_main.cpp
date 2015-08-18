@@ -657,12 +657,12 @@ int main(int argc, char** argv)
     SDL_VERSION(&compiled);
     SDL_GetVersion(&linked);
     LOG_INFO("Compiled against SDL version %d.%d.%d.",
-           compiled.major, compiled.minor, compiled.patch);
+        compiled.major, compiled.minor, compiled.patch);
     LOG_INFO("Linking against SDL version %d.%d.%d.",
-           linked.major, linked.minor, linked.patch);
+        linked.major, linked.minor, linked.patch);
 
     // Command line options
-    for (int i=0; i<argc; ++i)
+    for (int i = 0; i < argc; ++i)
     {
         const std::string a = argv[i];
         LOG_INFO("argv[%d]: %s", i, a.c_str());
@@ -689,16 +689,16 @@ int main(int argc, char** argv)
         LOG_INFO("SDL_Init(SDL_INIT_EVERYTHING) failed.");
         return false;
     }
-    
+
 
     // Log system monitor information
     // Get current display mode of all displays.
-    for (int i=0; i<SDL_GetNumVideoDisplays(); ++i)
+    for (int i = 0; i < SDL_GetNumVideoDisplays(); ++i)
     {
         SDL_DisplayMode current;
         const int should_be_zero = SDL_GetCurrentDisplayMode(i, &current);
 
-        if(should_be_zero != 0)
+        if (should_be_zero != 0)
         {
             LOG_ERROR("Could not get display mode for video display #%d: %s", i, SDL_GetError());
         }
@@ -743,20 +743,37 @@ int main(int argc, char** argv)
     std::string windowTitle = "";
     windowTitle = PROJECT_NAME "-SDL2-Osvr";
 
-    const hmdRes sz = {
-        g_app.getHmdResolution().h,
-        g_app.getHmdResolution().w
-    };
-    const winPos pos = g_app.getHmdWindowPos();
-    g_renderMode.outputType = RenderingMode::SideBySide_Undistorted;
+    if (g_app.UsingDebugHmd())
+    {
+        const hmdRes sz = { 800, 600 };
+        // Create a normal, decorated application window
+        LOG_INFO("Using Debug HMD mode.");
+        windowTitle = PROJECT_NAME "-SDL2-DebugHMD";
+        g_renderMode.outputType = RenderingMode::Mono_Buffered;
 
-    LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
-    g_pHMDWindow = SDL_CreateWindow(
-        windowTitle.c_str(),
-        pos.x, pos.y,
-        sz.w, sz.h,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-    SDL_SetRelativeMouseMode(SDL_TRUE);
+        g_pHMDWindow = SDL_CreateWindow(
+            windowTitle.c_str(),
+            SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+            sz.w, sz.h,
+            SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+    }
+    else
+    {
+        const hmdRes sz = {
+            g_app.getHmdResolution().h,
+            g_app.getHmdResolution().w
+        };
+        const winPos pos = g_app.getHmdWindowPos();
+        g_renderMode.outputType = RenderingMode::SideBySide_Undistorted;
+
+        LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
+        g_pHMDWindow = SDL_CreateWindow(
+            windowTitle.c_str(),
+            pos.x, pos.y,
+            sz.w, sz.h,
+            SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+        SDL_SetRelativeMouseMode(SDL_TRUE);
+    }
 
 #elif defined(USE_OCULUSSDK)
     const ovrSizei sz = g_app.getHmdResolution();
