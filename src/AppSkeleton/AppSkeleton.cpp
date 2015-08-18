@@ -102,7 +102,7 @@ void AppSkeleton::initGL()
     }
 
     m_presentFbo.initProgram("presentfbo");
-    _initPresentFbo();
+    _initPresentFbo(m_presentFbo);
     m_presentDistMeshL.initProgram("presentmesh");
     m_presentDistMeshR.initProgram("presentmesh");
     // Init the present mesh VAO *after* initVR, which creates the mesh
@@ -115,9 +115,9 @@ void AppSkeleton::initGL()
 }
 
 
-void AppSkeleton::_initPresentFbo(bool rotateForPortrait)
+void AppSkeleton::_initPresentFbo(ShaderWithVariables& pres, bool rotateForPortrait)
 {
-    m_presentFbo.bindVAO();
+    pres.bindVAO();
 
     const float verts[] = {
         -1, -1,
@@ -149,26 +149,26 @@ void AppSkeleton::_initPresentFbo(bool rotateForPortrait)
 
     GLuint vertVbo = 0;
     glGenBuffers(1, &vertVbo);
-    m_presentFbo.AddVbo("vPosition", vertVbo);
+    pres.AddVbo("vPosition", vertVbo);
     glBindBuffer(GL_ARRAY_BUFFER, vertVbo);
     glBufferData(GL_ARRAY_BUFFER, 4*2*sizeof(GLfloat), verts, GL_STATIC_DRAW);
-    glVertexAttribPointer(m_presentFbo.GetAttrLoc("vPosition"), 2, GL_FLOAT, GL_FALSE, 0, NULL);
+    glVertexAttribPointer(pres.GetAttrLoc("vPosition"), 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
     GLuint texVbo = 0;
     glGenBuffers(1, &texVbo);
-    m_presentFbo.AddVbo("vTex", texVbo);
+    pres.AddVbo("vTex", texVbo);
     glBindBuffer(GL_ARRAY_BUFFER, texVbo);
     glBufferData(GL_ARRAY_BUFFER, 4*2*sizeof(GLfloat), texs, GL_STATIC_DRAW);
-    glVertexAttribPointer(m_presentFbo.GetAttrLoc("vTex"), 2, GL_FLOAT, GL_FALSE, 0, NULL);
+    glVertexAttribPointer(pres.GetAttrLoc("vTex"), 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
-    glEnableVertexAttribArray(m_presentFbo.GetAttrLoc("vPosition"));
-    glEnableVertexAttribArray(m_presentFbo.GetAttrLoc("vTex"));
+    glEnableVertexAttribArray(pres.GetAttrLoc("vPosition"));
+    glEnableVertexAttribArray(pres.GetAttrLoc("vTex"));
 
-    glUseProgram(m_presentFbo.prog());
+    glUseProgram(pres.prog());
     {
         glm::mat4 id(1.0f);
-        glUniformMatrix4fv(m_presentFbo.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(id));
-        glUniformMatrix4fv(m_presentFbo.GetUniLoc("prmtx"), 1, false, glm::value_ptr(id));
+        glUniformMatrix4fv(pres.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(id));
+        glUniformMatrix4fv(pres.GetUniLoc("prmtx"), 1, false, glm::value_ptr(id));
     }
     glUseProgram(0);
 

@@ -71,7 +71,7 @@ public:
 #endif
 
 protected:
-    void _initPresentFbo(bool rotateForPortrait=false);
+    void _initPresentFbo(ShaderWithVariables& pres, bool rotateForPortrait = false);
     void _resetGLState() const;
     void _drawSceneMono() const;
     void _checkSceneIntersections(glm::vec3 origin, glm::vec3 dir);
