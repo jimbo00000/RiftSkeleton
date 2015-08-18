@@ -28,6 +28,16 @@ OsvrAppSkeleton::~OsvrAppSkeleton()
 {
 }
 
+void OsvrAppSkeleton::initGL()
+{
+    AppSkeleton::initGL();
+
+    // Re-use the side-by-side stereo present shader and flip it for portrait orientation.
+    m_presentFbo.destroy();
+    m_presentFbo.initProgram("presentfbo");
+    _initPresentFbo(m_presentFbo, true);
+}
+
 void OsvrAppSkeleton::initHMD()
 {
 }

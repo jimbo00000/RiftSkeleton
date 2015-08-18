@@ -63,6 +63,8 @@ public:
     void display_stereo_undistorted() const;
     void display_stereo_distorted() const;
 
+    virtual void initGL();
+
     // Hardcoded dimensions to match default Rift settings in Extended Mode.
     // Set screen orientation to Landscape (flipped).
     hmdRes getHmdResolution() const { return { 1920, 1080 }; }
