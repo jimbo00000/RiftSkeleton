@@ -67,6 +67,7 @@ public:
     // Set screen orientation to Landscape (flipped).
     hmdRes getHmdResolution() const { return { 1920, 1080 }; }
     winPos getHmdWindowPos() const { return{ 1920, 0 }; }
+    bool UsingDebugHmd() const { return false; } ///@todo Determine if HMD is connected
 
 protected:
     void _initPresentDistMesh(ShaderWithVariables& shader, int eyeIdx);

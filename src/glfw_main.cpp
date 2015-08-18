@@ -843,22 +843,35 @@ int main(int argc, char** argv)
     std::string windowTitle = "";
     windowTitle = PROJECT_NAME "-GLFW-Osvr";
 
-    const hmdRes sz = {
-        g_app.getHmdResolution().h,
-        g_app.getHmdResolution().w
-    };
-    const winPos pos = g_app.getHmdWindowPos();
-    g_renderMode.outputType = RenderingMode::SideBySide_Undistorted;
+    if (g_app.UsingDebugHmd())
+    {
+        const hmdRes sz = { 800, 600 };
+        // Create a normal, decorated application window
+        LOG_INFO("Using Debug HMD mode.");
+        windowTitle = PROJECT_NAME "-GLFW-DebugHMD";
+        g_renderMode.outputType = RenderingMode::Mono_Buffered;
 
-    LOG_INFO("Using Extended desktop mode.");
-    windowTitle = PROJECT_NAME "-GLFW-Extended";
+        l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
+    }
+    else
+    {
+        const hmdRes sz = {
+            g_app.getHmdResolution().h,
+            g_app.getHmdResolution().w
+        };
+        const winPos pos = g_app.getHmdWindowPos();
+        g_renderMode.outputType = RenderingMode::SideBySide_Undistorted;
 
-    LOG_INFO("Creating GLFW_DECORATED window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
-    glfwWindowHint(GLFW_DECORATED, 0);
-    l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
-    glfwWindowHint(GLFW_DECORATED, 1);
-    glfwSetInputMode(l_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetWindowPos(l_Window, pos.x, pos.y);
+        LOG_INFO("Using Extended desktop mode.");
+        windowTitle = PROJECT_NAME "-GLFW-Extended";
+
+        LOG_INFO("Creating GLFW_DECORATED window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
+        glfwWindowHint(GLFW_DECORATED, 0);
+        l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
+        glfwWindowHint(GLFW_DECORATED, 1);
+        glfwSetInputMode(l_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetWindowPos(l_Window, pos.x, pos.y);
+    }
 
 #elif defined(USE_OCULUSSDK)
     ovrSizei sz = g_app.getHmdResolution();
