@@ -31,13 +31,13 @@ public:
     virtual ~AppSkeleton();
 
     void ResetChassisTransformations();
-    void initGL();
     void _DrawScenes(const float* pMvWorld, const float* pPersp, const float* pMvLocal=NULL) const;
     void display_raw() const;
     void display_buffered(bool setViewport=true) const;
     virtual void timestep(double absTime, double dt);
     void resize(int w, int h);
 
+    virtual void initGL();
     virtual void OnMouseButton(int,int);
     virtual void OnMouseMove(int,int);
     virtual void OnMouseWheel(double,double);
