@@ -345,7 +345,7 @@ IF( NOT USE_OCULUSSDK )
     MESSAGE( "Removing OVR-dependent files..." )
 
     LIST(REMOVE_ITEM APPSKELETON_SOURCE_FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/RiftAppSkeleton.cpp )
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK05AppSkeleton.cpp )
 
     LIST(REMOVE_ITEM SCENE_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Scene/OVRScene.cpp )

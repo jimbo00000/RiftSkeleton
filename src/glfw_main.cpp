@@ -34,7 +34,7 @@
 #if defined(USE_OSVR)
 #include "OsvrAppSkeleton.h"
 #elif defined(USE_OCULUSSDK)
-#include "RiftAppSkeleton.h"
+#include "OVRSDK05AppSkeleton.h"
 #else
 #include "AppSkeleton.h"
 #endif
@@ -47,7 +47,7 @@
 #if defined(USE_OSVR)
 OsvrAppSkeleton g_app;
 #elif defined(USE_OCULUSSDK)
-RiftAppSkeleton g_app;
+OVRSDK05AppSkeleton g_app;
 #else
 AppSkeleton g_app;
 #endif
