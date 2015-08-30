@@ -83,8 +83,12 @@ IF( WIN32 )
         # TODO: the logic here needs work, OVR SDK dir is kept in cache until manually changed
         IF( OVRSDK_VERSION STREQUAL "05" )
             SET( OCULUSSDK_ROOT "${LIBS_HOME}/OculusSDK-0.5.0.1" CACHE STRING "OculusSDK root" )
-        ELSE()
+            ADD_DEFINITIONS( -DOVRSDK05 )
+        ELSEIF( OVRSDK_VERSION STREQUAL "06" )
             SET( OCULUSSDK_ROOT "${LIBS_HOME}/OculusSDK" CACHE STRING "OculusSDK root" )
+            ADD_DEFINITIONS( -DOVRSDK06 )
+        ELSE()
+            MESSAGE("Unknown OVR SDK version.")
         ENDIF()
 
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Include" )
