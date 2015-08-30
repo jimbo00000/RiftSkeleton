@@ -26,7 +26,9 @@ public:
     OVRSDK06AppSkeleton();
     virtual ~OVRSDK06AppSkeleton();
 
-    void initHMD() {}
+    void initHMD();
+    void RecenterPose();
+    void exitVR();
 
     void ToggleVignette() {}
     void ToggleTimeWarp() {}
@@ -48,6 +50,9 @@ public:
     void display_stereo_undistorted() const {}
     void display_sdk() const {}
     void display_client() const {}
+
+protected:
+    ovrHmd m_Hmd;
 
 private: // Disallow copy ctor and assignment operator
     OVRSDK06AppSkeleton(const OVRSDK06AppSkeleton&);
