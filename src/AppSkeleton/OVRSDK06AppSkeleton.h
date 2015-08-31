@@ -48,16 +48,19 @@ public:
     bool UsingDebugHmd() const { return false; }
     bool UsingDirectMode() const { return true; }
 
-    void display_stereo_undistorted() const {}
-    void display_sdk() const {}
-    void display_client() const {}
+    void display_stereo_undistorted() { display_sdk(); }
+    void display_sdk() const;
+    void display_client() const { display_sdk(); }
 
 protected:
     ovrHmd m_Hmd;
     ovrSwapTextureSet* m_pTexSet;
     ovrTexture* m_pMirrorTex;
-    ovrLayerEyeFov m_layerEyeFov;
     ovrEyeRenderDesc m_eyeRenderDescs[ovrEye_Count];
+    ovrVector3f m_eyeOffsets[ovrEye_Count];
+    mutable ovrLayerEyeFov m_layerEyeFov;
+    mutable ovrPosef m_eyePoses[ovrEye_Count];
+    mutable int m_frameIndex;
 
 private: // Disallow copy ctor and assignment operator
     OVRSDK06AppSkeleton(const OVRSDK06AppSkeleton&);

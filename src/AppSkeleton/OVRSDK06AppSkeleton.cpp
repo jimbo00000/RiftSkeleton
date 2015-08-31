@@ -34,6 +34,7 @@ OVRSDK06AppSkeleton::OVRSDK06AppSkeleton()
 : m_Hmd(NULL)
 , m_pTexSet(NULL)
 , m_pMirrorTex(NULL)
+, m_frameIndex(0)
 {
 }
 
@@ -66,8 +67,10 @@ void OVRSDK06AppSkeleton::initHMD()
 
     if (ovrSuccess != ovrHmd_Create(0, &m_Hmd))
     {
-        if (ovrSuccess != ovrHmd_CreateDebug(ovrHmd_DK2, &m_Hmd)) {
-            LOG_INFO("Could not create HMD");
+        LOG_INFO("Could not create HMD");
+        if (ovrSuccess != ovrHmd_CreateDebug(ovrHmd_DK2, &m_Hmd))
+        {
+            LOG_ERROR("Could not create Debug HMD");
         }
     }
 
@@ -93,7 +96,7 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     }
 
     // Set up eye fields of view
-    ovrLayerEyeFov layer = m_layerEyeFov;
+    ovrLayerEyeFov& layer = m_layerEyeFov;
     layer.Header.Type = ovrLayerType_EyeFov;
     layer.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;
 
@@ -128,17 +131,15 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     const ovrGLTextureData* pGLData = reinterpret_cast<ovrGLTextureData*>(m_pMirrorTex);
     LOG_INFO("Mirror texture created: %d.", pGLData->TexId);
 
-#if 0
-    for (int i = 0; i < color->TextureCount; ++i)
+    for (int i = 0; i < m_pTexSet->TextureCount; ++i)
     {
-        ovrGLTexture& ovrTex = (ovrGLTexture&)color->Textures[i];
+        const ovrGLTexture& ovrTex = (ovrGLTexture&)m_pTexSet->Textures[i];
         glBindTexture(GL_TEXTURE_2D, ovrTex.OGL.TexId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
-#endif
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -156,7 +157,7 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         ovrMatrix4f ovrPerspectiveProjection =
             ovrMatrix4f_Projection(erd.Fov, .1f, 10000.f, ovrProjection_RightHanded);
         //projections[eye] = ovr::toGlm(ovrPerspectiveProjection);
-        //eyeOffsets[eye] = erd.HmdToEyeViewOffset;
+        m_eyeOffsets[eye] = erd.HmdToEyeViewOffset;
 
         // Allocate the frameBuffer that will hold the scene, and then be
         // re-rendered to the screen with distortion
@@ -173,4 +174,33 @@ ovrSizei OVRSDK06AppSkeleton::getHmdResolution() const
         return { 800, 600 };
     }
     return m_Hmd->Resolution;
+}
+
+void OVRSDK06AppSkeleton::display_sdk() const
+{
+    ovrHmd hmd = m_Hmd;
+    if (hmd == NULL)
+        return;
+
+    ovrTrackingState outHmdTrackingState;
+    ovrHmd_GetEyePoses(m_Hmd, m_frameIndex, m_eyeOffsets,
+        m_eyePoses, &outHmdTrackingState);
+
+    for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
+        eye < ovrEyeType::ovrEye_Count;
+        eye = static_cast<ovrEyeType>(eye + 1))
+    {
+        // viewport
+        // render
+
+    }
+
+
+    ovrLayerEyeFov& layer = m_layerEyeFov;
+    ovrLayerHeader* layers = &layer.Header;
+    ovrResult result = ovrHmd_SubmitFrame(hmd, m_frameIndex, NULL, &layers, 1);
+
+    ///@todo mirror
+
+    ++m_frameIndex;
 }
