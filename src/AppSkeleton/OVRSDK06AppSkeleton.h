@@ -27,6 +27,7 @@ public:
     virtual ~OVRSDK06AppSkeleton();
 
     void initHMD();
+    void initVR(bool swapBackBufferDims = false);
     void RecenterPose();
     void exitVR();
 
@@ -42,7 +43,7 @@ public:
 #if defined(OVR_OS_WIN32)
     void setWindow(HWND w) {}
 #endif
-    ovrSizei getHmdResolution() const { return{ 1920, 1080 }; }
+    ovrSizei getHmdResolution() const;
     ovrVector2i getHmdWindowPos() const { return{ 1920, 0 }; }
     bool UsingDebugHmd() const { return false; }
     bool UsingDirectMode() const { return true; }
@@ -53,6 +54,10 @@ public:
 
 protected:
     ovrHmd m_Hmd;
+    ovrSwapTextureSet* m_pTexSet;
+    ovrTexture* m_pMirrorTex;
+    ovrLayerEyeFov m_layerEyeFov;
+    ovrEyeRenderDesc m_eyeRenderDescs[ovrEye_Count];
 
 private: // Disallow copy ctor and assignment operator
     OVRSDK06AppSkeleton(const OVRSDK06AppSkeleton&);
