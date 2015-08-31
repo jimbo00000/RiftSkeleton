@@ -149,8 +149,9 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     {
         const ovrFovPort& fov = layer.Fov[eye] = m_Hmd->MaxEyeFov[eye];
         const ovrSizei& size = layer.Viewport[eye].Size = ovrHmd_GetFovTextureSize(m_Hmd, eye, fov, 1.f);
-        layer.Viewport[eye].Pos = { 0, 0 };
-        LOG_INFO("Eye %d tex size: %dx%d", eye, size.w, size.h);
+        layer.Viewport[eye].Pos = { (int)eye*size.w, 0 };
+        LOG_INFO("Eye %d tex : %dx%d @ (%d,%d)", eye, size.w, size.h,
+            layer.Viewport[eye].Pos.x, layer.Viewport[eye].Pos.y);
 
         ovrEyeRenderDesc & erd = m_eyeRenderDescs[eye];
         erd = ovrHmd_GetRenderDesc(m_Hmd, eye, m_Hmd->MaxEyeFov[eye]);
@@ -183,7 +184,7 @@ void OVRSDK06AppSkeleton::display_sdk() const
     if (hmd == NULL)
         return;
 
-    ovrTrackingState outHmdTrackingState;
+    ovrTrackingState outHmdTrackingState = { 0 };
     ovrHmd_GetEyePoses(m_Hmd, m_frameIndex, m_eyeOffsets,
         m_eyePoses, &outHmdTrackingState);
 
@@ -192,16 +193,36 @@ void OVRSDK06AppSkeleton::display_sdk() const
         eye = static_cast<ovrEyeType>(eye + 1))
     {
         // viewport
+        const ovrRecti& vp = m_layerEyeFov.Viewport[eye];
+        glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
+
         // render
-
+        const ovrPosef& eyePose = m_eyePoses[eye];
+        const glm::mat4 viewLocal = makeMatrixFromPose(eyePose);
+        const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
+        const glm::mat4& proj = m_eyeProjections[eye];
+        _resetGLState();
+        _DrawScenes(
+            glm::value_ptr(glm::inverse(viewWorld)),
+            glm::value_ptr(proj),
+            glm::value_ptr(glm::inverse(viewLocal)));
     }
-
 
     ovrLayerEyeFov& layer = m_layerEyeFov;
     ovrLayerHeader* layers = &layer.Header;
     ovrResult result = ovrHmd_SubmitFrame(hmd, m_frameIndex, NULL, &layers, 1);
 
-    ///@todo mirror
+    // Blit output to mirror
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    {
+        //glBlitFramebuffer(
+        //    0, mirror->size.y, mirror->size.x, 0,
+        //    0, 0, mirror->size.x, mirror->size.y,
+        //    GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glClearColor(0, 1, 0, 0);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
     ++m_frameIndex;
 }
