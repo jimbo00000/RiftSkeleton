@@ -156,8 +156,9 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         erd = ovrHmd_GetRenderDesc(m_Hmd, eye, m_Hmd->MaxEyeFov[eye]);
         ovrMatrix4f ovrPerspectiveProjection =
             ovrMatrix4f_Projection(erd.Fov, .1f, 10000.f, ovrProjection_RightHanded);
-        //projections[eye] = ovr::toGlm(ovrPerspectiveProjection);
+        m_eyeProjections[eye] = glm::transpose(glm::make_mat4(&ovrPerspectiveProjection.M[0][0]));
         m_eyeOffsets[eye] = erd.HmdToEyeViewOffset;
+        LOG_INFO("  eye offset: %f %f %f", m_eyeOffsets[eye].x, m_eyeOffsets[eye].y, m_eyeOffsets[eye].z);
 
         // Allocate the frameBuffer that will hold the scene, and then be
         // re-rendered to the screen with distortion
