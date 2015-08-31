@@ -62,6 +62,8 @@ protected:
     mutable ovrLayerEyeFov m_layerEyeFov;
     mutable ovrPosef m_eyePoses[ovrEye_Count];
     mutable int m_frameIndex;
+    FBO m_swapFBO;
+    FBO m_mirrorFBO;
 
 private: // Disallow copy ctor and assignment operator
     OVRSDK06AppSkeleton(const OVRSDK06AppSkeleton&);
