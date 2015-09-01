@@ -106,6 +106,9 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     const ovrSizei& size = layer.Viewport[eye].Size = ovrHmd_GetFovTextureSize(m_Hmd, eye, fov, 1.f);
     LOG_INFO("FOV Texture requested size: %d x %d", size.w, size.h);
 
+
+    glUseProgram(0);
+
     if (!OVR_SUCCESS(ovrHmd_CreateSwapTextureSetGL(m_Hmd, GL_RGBA, size.w, size.h, &m_pTexSet)))
     {
         LOG_ERROR("Unable to create swap textures");
@@ -118,30 +121,6 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         LOG_INFO("Swap tex[%d] = %d", i, pGLData->TexId);
     }
 
-    if (m_pMirrorTex)
-    {
-        ovrHmd_DestroyMirrorTexture(m_Hmd, m_pMirrorTex);
-    }
-    ovrResult result = ovrHmd_CreateMirrorTextureGL(m_Hmd, GL_RGBA, size.w, size.h, &m_pMirrorTex);
-    if (!OVR_SUCCESS(result))
-    {
-        LOG_ERROR("Unable to create mirror texture");
-        return;
-    }
-    const ovrGLTextureData* pMirrorGLData = reinterpret_cast<ovrGLTextureData*>(m_pMirrorTex);
-    LOG_INFO("Mirror texture created: %d", pMirrorGLData->TexId);
-
-    for (int i = 0; i < m_pTexSet->TextureCount; ++i)
-    {
-        const ovrGLTexture& ovrTex = (ovrGLTexture&)m_pTexSet->Textures[i];
-        glBindTexture(GL_TEXTURE_2D, ovrTex.OGL.TexId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    }
-
-    glBindTexture(GL_TEXTURE_2D, 0);
 
     for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
         eye < ovrEyeType::ovrEye_Count;
@@ -169,6 +148,34 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         layer.ColorTexture[0] = m_pTexSet;
         layer.ColorTexture[1] = m_pTexSet;
     }
+
+    glUseProgram(0);
+
+
+    if (m_pMirrorTex)
+    {
+        ovrHmd_DestroyMirrorTexture(m_Hmd, m_pMirrorTex);
+    }
+    ovrResult result = ovrHmd_CreateMirrorTextureGL(m_Hmd, GL_RGBA, size.w, size.h, &m_pMirrorTex);
+    if (!OVR_SUCCESS(result))
+    {
+        LOG_ERROR("Unable to create mirror texture");
+        return;
+    }
+    const ovrGLTextureData* pMirrorGLData = reinterpret_cast<ovrGLTextureData*>(m_pMirrorTex);
+    LOG_INFO("Mirror texture created: %d", pMirrorGLData->TexId);
+
+    for (int i = 0; i < m_pTexSet->TextureCount; ++i)
+    {
+        const ovrGLTexture& ovrTex = (ovrGLTexture&)m_pTexSet->Textures[i];
+        glBindTexture(GL_TEXTURE_2D, ovrTex.OGL.TexId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 
 
     // Manually assemble swap FBO
@@ -261,6 +268,7 @@ void OVRSDK06AppSkeleton::display_sdk() const
                 glm::value_ptr(glm::inverse(viewWorld)),
                 glm::value_ptr(proj),
                 glm::value_ptr(glm::inverse(viewLocal)));
+            m_layerEyeFov.RenderPose[eye] = eyePose;
         }
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
         //unbindFBO();
@@ -282,19 +290,24 @@ void OVRSDK06AppSkeleton::display_sdk() const
 #if 1
     // Blit output to mirror
     _resetGLState();
-    //glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_mirrorFBO.id);
+
+    GLint drawFboId = 0, readFboId = 0;
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
+
     {
+        static float g = 1.f;
+        g -= .01f;
+        if (g < 0.f)
+            g = 1.f;
         glViewport(0, 0, m_mirrorFBO.w, m_mirrorFBO.h);
         //glBlitFramebuffer(
         //    0, mirror->size.y, mirror->size.x, 0,
         //    0, 0, mirror->size.x, mirror->size.y,
         //    GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        glClearColor(0, 1, 0, 0);
+        glClearColor(0, g, 0, 0);
         glClear(GL_COLOR_BUFFER_BIT);
     }
-    //glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
 
     ++m_frameIndex;

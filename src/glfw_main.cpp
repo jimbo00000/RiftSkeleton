@@ -672,7 +672,10 @@ void displayToHMD()
 
     case RenderingMode::OVR_SDK:
         g_app.display_sdk();
-        // OVR will do its own swap
+#ifdef OVRSDK06
+        glfwSwapBuffers(g_pHMDWindow);
+#endif
+        // OVR SDK 05 will do its own swap
         break;
 
     case RenderingMode::OVR_Client:
