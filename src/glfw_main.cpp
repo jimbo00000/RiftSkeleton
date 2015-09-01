@@ -883,7 +883,7 @@ int main(int argc, char** argv)
         glfwSetWindowPos(l_Window, pos.x, pos.y);
     }
 
-#elif defined(USE_OCULUSSDK)
+#elif defined(OVRSDK05)
     ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
     std::string windowTitle = "";
@@ -933,10 +933,29 @@ int main(int argc, char** argv)
     }
 
     resize(l_Window, sz.w, sz.h); // inform AppSkeleton of window size
+#elif defined(OVRSDK06)
+    std::string windowTitle = "";
+
+    LOG_INFO("Using SDK 0.6.0.0's direct mode.");
+    windowTitle = PROJECT_NAME "-GLFW-06-Direct";
+
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    ovrSizei sz;
+    ovrVector2i pos;
+    sz.w = mode->width/2;
+    sz.h = mode->height/2;
+    pos.x = 100;
+    pos.y = 100;
+    // Create just a regular window for presenting OVR SDK 0.6's mirror texture
+    ///@todo Is it any faster with no mirror at all?
+    LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
+    l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
+
 #else
     l_Window = glfwCreateWindow(800, 600, "GLFW Oculus Rift Test", NULL, NULL);
     std::string windowTitle = PROJECT_NAME;
-#endif //USE_OCULUSSDK
+#endif //USE_OSVR|OVRSDK05|OVRSDK06
 
     if (!l_Window)
     {
@@ -946,7 +965,7 @@ int main(int argc, char** argv)
     }
 
     // Required for SDK rendering (to do the buffer swap on its own)
-#ifdef USE_OCULUSSDK
+#ifdef OVRSDK05
   #if defined(_WIN32)
     g_app.setWindow(glfwGetWin32Window(l_Window));
   #elif defined(__linux__)
