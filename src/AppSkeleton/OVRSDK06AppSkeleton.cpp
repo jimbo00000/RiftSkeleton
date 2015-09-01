@@ -59,7 +59,7 @@ void OVRSDK06AppSkeleton::exitVR()
 
 void OVRSDK06AppSkeleton::initHMD()
 {
-    ovrInitParams initParams; memset(&initParams, 0, sizeof(ovrInitParams));
+    ovrInitParams initParams = { 0 };
     if (ovrSuccess != ovr_Initialize(NULL))
     {
         LOG_INFO("Failed to initialize the Oculus SDK");
@@ -139,7 +139,6 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     }
 
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -180,7 +179,7 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     const int idx = 0;
     const ovrGLTextureData* pGLData = reinterpret_cast<ovrGLTextureData*>(&m_pTexSet->Textures[idx]);
     m_swapFBO.tex = pGLData->TexId;
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pGLData->TexId, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_swapFBO.tex, 0);
 
     m_swapFBO.depth = 0;
     glGenRenderbuffers(1, &m_swapFBO.depth);
@@ -189,6 +188,14 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_swapFBO.depth);
 
+    // Check status
+    {
+        const GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+        if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+        {
+            LOG_ERROR("Framebuffer status incomplete: %d %x", status, status);
+        }
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
@@ -198,7 +205,16 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     glGenFramebuffers(1, &m_mirrorFBO.id);
     glBindFramebuffer(GL_FRAMEBUFFER, m_mirrorFBO.id);
     m_mirrorFBO.tex = pMirrorGLData->TexId;
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pMirrorGLData->TexId, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_mirrorFBO.tex, 0);
+
+    // Check status
+    {
+        const GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+        if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+        {
+            LOG_ERROR("Framebuffer status incomplete: %d %x", status, status);
+        }
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -225,10 +241,11 @@ void OVRSDK06AppSkeleton::display_sdk() const
         eye < ovrEyeType::ovrEye_Count;
         eye = static_cast<ovrEyeType>(eye + 1))
     {
-        bindFBO(m_swapFBO);
+        //bindFBO(m_swapFBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
         {
-            //ovrGLTexture& tex = (ovrGLTexture&)(m_pTexSet->Textures[m_pTexSet->CurrentIndex]);
-            //glFramebufferTexture2D(target, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
+            ovrGLTexture& tex = (ovrGLTexture&)(m_pTexSet->Textures[m_pTexSet->CurrentIndex]);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
 
             // viewport
             const ovrRecti& vp = m_layerEyeFov.Viewport[eye];
@@ -245,13 +262,24 @@ void OVRSDK06AppSkeleton::display_sdk() const
                 glm::value_ptr(proj),
                 glm::value_ptr(glm::inverse(viewLocal)));
         }
-        unbindFBO();
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+        //unbindFBO();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     ovrLayerEyeFov& layer = m_layerEyeFov;
     ovrLayerHeader* layers = &layer.Header;
     ovrResult result = ovrHmd_SubmitFrame(hmd, m_frameIndex, NULL, &layers, 1);
 
+    // Increment counters in swap texture set
+    //for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
+    //    eye < ovrEyeType::ovrEye_Count;
+    //    eye = static_cast<ovrEyeType>(eye + 1))
+    {
+        ++m_pTexSet->CurrentIndex %= m_pTexSet->TextureCount;
+    }
+
+#if 1
     // Blit output to mirror
     _resetGLState();
     //glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
@@ -267,6 +295,7 @@ void OVRSDK06AppSkeleton::display_sdk() const
     }
     //glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
 
     ++m_frameIndex;
 }
