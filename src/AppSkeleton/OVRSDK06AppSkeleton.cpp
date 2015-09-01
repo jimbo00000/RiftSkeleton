@@ -109,7 +109,7 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
 
     glUseProgram(0);
 
-    if (!OVR_SUCCESS(ovrHmd_CreateSwapTextureSetGL(m_Hmd, GL_RGBA, size.w, size.h, &m_pTexSet)))
+    if (!OVR_SUCCESS(ovrHmd_CreateSwapTextureSetGL(m_Hmd, GL_RGBA, 2 * size.w, size.h, &m_pTexSet)))
     {
         LOG_ERROR("Unable to create swap textures");
         return;
@@ -258,16 +258,37 @@ void OVRSDK06AppSkeleton::display_sdk() const
             const ovrRecti& vp = m_layerEyeFov.Viewport[eye];
             glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
 
-            // render
             const ovrPosef& eyePose = m_eyePoses[eye];
+
+#if 1
+
+            static float g = 1.f;
+            g -= .01f;
+            if (g < 0.f)
+                g = 1.f;
+            //glBlitFramebuffer(
+            //    0, mirror->size.y, mirror->size.x, 0,
+            //    0, 0, mirror->size.x, mirror->size.y,
+            //    GL_COLOR_BUFFER_BIT, GL_NEAREST);
+            glClearColor(g, 0, 0, 0);
+            glClear(GL_COLOR_BUFFER_BIT);
+#else
+            // render
             const glm::mat4 viewLocal = makeMatrixFromPose(eyePose);
             const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
             const glm::mat4& proj = m_eyeProjections[eye];
             _resetGLState();
+
+
+            GLint drawFboId = 0, readFboId = 0;
+            glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
+            glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
+
             _DrawScenes(
                 glm::value_ptr(glm::inverse(viewWorld)),
                 glm::value_ptr(proj),
                 glm::value_ptr(glm::inverse(viewLocal)));
+#endif
             m_layerEyeFov.RenderPose[eye] = eyePose;
         }
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
