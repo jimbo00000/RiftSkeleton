@@ -144,13 +144,8 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         // re-rendered to the screen with distortion
         //eyeFbos[eye] = SwapTexFboPtr(new SwapTextureFramebufferWrapper(hmd));
         //eyeFbos[eye]->Init(ovr::toGlm(size));
-        //layer.ColorTexture[eye] = eyeFbos[eye]->color;
-        layer.ColorTexture[0] = m_pTexSet;
-        layer.ColorTexture[1] = m_pTexSet;
+        layer.ColorTexture[eye] = m_pTexSet;
     }
-
-    glUseProgram(0);
-
 
     if (m_pMirrorTex)
     {
@@ -179,7 +174,7 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
 
 
     // Manually assemble swap FBO
-    m_swapFBO.w = size.w;
+    m_swapFBO.w = 2 * size.w;
     m_swapFBO.h = size.h;
     glGenFramebuffers(1, &m_swapFBO.id);
     glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
@@ -244,16 +239,22 @@ void OVRSDK06AppSkeleton::display_sdk() const
     ovrHmd_GetEyePoses(m_Hmd, m_frameIndex, m_eyeOffsets,
         m_eyePoses, &outHmdTrackingState);
 
+
+    _resetGLState();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
+    ovrGLTexture& tex = (ovrGLTexture&)(m_pTexSet->Textures[m_pTexSet->CurrentIndex]);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
+
+    GLint drawFboId = 0, readFboId = 0;
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
+
     for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
         eye < ovrEyeType::ovrEye_Count;
         eye = static_cast<ovrEyeType>(eye + 1))
     {
-        //bindFBO(m_swapFBO);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
         {
-            ovrGLTexture& tex = (ovrGLTexture&)(m_pTexSet->Textures[m_pTexSet->CurrentIndex]);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
-
             // viewport
             const ovrRecti& vp = m_layerEyeFov.Viewport[eye];
             glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
@@ -261,6 +262,9 @@ void OVRSDK06AppSkeleton::display_sdk() const
             const ovrPosef& eyePose = m_eyePoses[eye];
 
 #if 1
+            static GLint s_vp[4];
+            glGetIntegerv(GL_VIEWPORT, &s_vp[0]);
+
 
             static float g = 1.f;
             g -= .01f;
@@ -270,7 +274,11 @@ void OVRSDK06AppSkeleton::display_sdk() const
             //    0, mirror->size.y, mirror->size.x, 0,
             //    0, 0, mirror->size.x, mirror->size.y,
             //    GL_COLOR_BUFFER_BIT, GL_NEAREST);
-            glClearColor(g, 0, 0, 0);
+            ///@todo Cant seem to render to right eye VP...
+            if (eye == 0)
+                glClearColor(g, 0, 0, 0);
+            else
+                glClearColor(0, 0, g, 0);
             glClear(GL_COLOR_BUFFER_BIT);
 #else
             // render
@@ -280,10 +288,6 @@ void OVRSDK06AppSkeleton::display_sdk() const
             _resetGLState();
 
 
-            GLint drawFboId = 0, readFboId = 0;
-            glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
-            glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
-
             _DrawScenes(
                 glm::value_ptr(glm::inverse(viewWorld)),
                 glm::value_ptr(proj),
@@ -291,10 +295,10 @@ void OVRSDK06AppSkeleton::display_sdk() const
 #endif
             m_layerEyeFov.RenderPose[eye] = eyePose;
         }
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-        //unbindFBO();
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+    //unbindFBO();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     ovrLayerEyeFov& layer = m_layerEyeFov;
     ovrLayerHeader* layers = &layer.Header;
@@ -312,7 +316,6 @@ void OVRSDK06AppSkeleton::display_sdk() const
     // Blit output to mirror
     _resetGLState();
 
-    GLint drawFboId = 0, readFboId = 0;
     glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
     glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
 
