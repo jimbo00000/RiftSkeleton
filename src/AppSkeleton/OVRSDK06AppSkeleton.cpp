@@ -32,10 +32,11 @@
 
 OVRSDK06AppSkeleton::OVRSDK06AppSkeleton()
 : m_Hmd(NULL)
-, m_pTexSet(NULL)
 , m_pMirrorTex(NULL)
 , m_frameIndex(0)
 {
+    m_pTexSet[0] = NULL;
+    m_pTexSet[1] = NULL;
 }
 
 OVRSDK06AppSkeleton::~OVRSDK06AppSkeleton()
@@ -52,7 +53,10 @@ void OVRSDK06AppSkeleton::RecenterPose()
 void OVRSDK06AppSkeleton::exitVR()
 {
     //deallocateFBO(m_renderBuffer);
-    ovrHmd_DestroySwapTextureSet(m_Hmd, m_pTexSet);
+    for (int i = 0; i < 2; ++i)
+    {
+        ovrHmd_DestroySwapTextureSet(m_Hmd, m_pTexSet[i]);
+    }
     ovrHmd_Destroy(m_Hmd);
     ovr_Shutdown();
 }
@@ -89,10 +93,13 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     if (m_Hmd == NULL)
         return;
 
-    if (m_pTexSet)
+    for (int i = 0; i < 2; ++i)
     {
-        ovrHmd_DestroySwapTextureSet(m_Hmd, m_pTexSet);
-        m_pTexSet = nullptr;
+        if (m_pTexSet[i])
+        {
+            ovrHmd_DestroySwapTextureSet(m_Hmd, m_pTexSet[i]);
+            m_pTexSet[i] = nullptr;
+        }
     }
 
     // Set up eye fields of view
@@ -105,21 +112,6 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     const ovrFovPort& fov = layer.Fov[eye] = m_Hmd->MaxEyeFov[eye];
     const ovrSizei& size = layer.Viewport[eye].Size = ovrHmd_GetFovTextureSize(m_Hmd, eye, fov, 1.f);
     LOG_INFO("FOV Texture requested size: %d x %d", size.w, size.h);
-
-
-    glUseProgram(0);
-
-    if (!OVR_SUCCESS(ovrHmd_CreateSwapTextureSetGL(m_Hmd, GL_RGBA, 2 * size.w, size.h, &m_pTexSet)))
-    {
-        LOG_ERROR("Unable to create swap textures");
-        return;
-    }
-    LOG_INFO("Swap textures created: %d textures", m_pTexSet->TextureCount);
-    for (int i = 0; i < m_pTexSet->TextureCount; ++i)
-    {
-        const ovrGLTextureData* pGLData = reinterpret_cast<ovrGLTextureData*>(&m_pTexSet->Textures[i]);
-        LOG_INFO("Swap tex[%d] = %d", i, pGLData->TexId);
-    }
 
 
     for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
@@ -143,8 +135,62 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         // Allocate the frameBuffer that will hold the scene, and then be
         // re-rendered to the screen with distortion
         //eyeFbos[eye] = SwapTexFboPtr(new SwapTextureFramebufferWrapper(hmd));
+
+        if (!OVR_SUCCESS(ovrHmd_CreateSwapTextureSetGL(m_Hmd, GL_RGBA, size.w, size.h, &m_pTexSet[eye])))
+        {
+            LOG_ERROR("Unable to create swap textures");
+            return;
+        }
+        ovrSwapTextureSet& swapSet = *m_pTexSet[eye];
+
+        LOG_INFO("Swap textures created: %d textures", swapSet.TextureCount);
+        for (int i = 0; i < swapSet.TextureCount; ++i)
+        {
+            //ovrGLTextureData* pGLData = reinterpret_cast<ovrGLTextureData*>(swapSet.Textures[i]);
+            //LOG_INFO("Swap tex[%d] = %d", i, pGLData->TexId);
+        }
+
+        for (int i = 0; i < swapSet.TextureCount; ++i)
+        {
+            const ovrGLTexture& ovrTex = (ovrGLTexture&)swapSet.Textures[i];
+            glBindTexture(GL_TEXTURE_2D, ovrTex.OGL.TexId);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        }
+
+
+        // Manually assemble swap FBO
+        m_swapFBO.w = size.w;
+        m_swapFBO.h = size.h;
+        glGenFramebuffers(1, &m_swapFBO.id);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
+        const int idx = 0;
+        const ovrGLTextureData* pGLData = reinterpret_cast<ovrGLTextureData*>(&swapSet.Textures[idx]);
+        m_swapFBO.tex = pGLData->TexId;
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_swapFBO.tex, 0);
+
+        m_swapFBO.depth = 0;
+        glGenRenderbuffers(1, &m_swapFBO.depth);
+        glBindRenderbuffer(GL_RENDERBUFFER, m_swapFBO.depth);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, size.w, size.h);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_swapFBO.depth);
+
+        // Check status
+        {
+            const GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+            if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+            {
+                LOG_ERROR("Framebuffer status incomplete: %d %x", status, status);
+            }
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
         //eyeFbos[eye]->Init(ovr::toGlm(size));
-        layer.ColorTexture[eye] = m_pTexSet;
+        layer.ColorTexture[eye] = m_pTexSet[eye];
     }
 
     if (m_pMirrorTex)
@@ -160,45 +206,9 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     const ovrGLTextureData* pMirrorGLData = reinterpret_cast<ovrGLTextureData*>(m_pMirrorTex);
     LOG_INFO("Mirror texture created: %d", pMirrorGLData->TexId);
 
-    for (int i = 0; i < m_pTexSet->TextureCount; ++i)
-    {
-        const ovrGLTexture& ovrTex = (ovrGLTexture&)m_pTexSet->Textures[i];
-        glBindTexture(GL_TEXTURE_2D, ovrTex.OGL.TexId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    }
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-
-    // Manually assemble swap FBO
-    m_swapFBO.w = 2 * size.w;
-    m_swapFBO.h = size.h;
-    glGenFramebuffers(1, &m_swapFBO.id);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
-    const int idx = 0;
-    const ovrGLTextureData* pGLData = reinterpret_cast<ovrGLTextureData*>(&m_pTexSet->Textures[idx]);
-    m_swapFBO.tex = pGLData->TexId;
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_swapFBO.tex, 0);
-
-    m_swapFBO.depth = 0;
-    glGenRenderbuffers(1, &m_swapFBO.depth);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_swapFBO.depth);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, size.w, size.h);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_swapFBO.depth);
-
-    // Check status
-    {
-        const GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-        if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
-        {
-            LOG_ERROR("Framebuffer status incomplete: %d %x", status, status);
-        }
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
     // Manually assemble mirror FBO
@@ -242,18 +252,20 @@ void OVRSDK06AppSkeleton::display_sdk() const
 
     _resetGLState();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
-    ovrGLTexture& tex = (ovrGLTexture&)(m_pTexSet->Textures[m_pTexSet->CurrentIndex]);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
-
-    GLint drawFboId = 0, readFboId = 0;
-    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
-    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
-
     for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
         eye < ovrEyeType::ovrEye_Count;
         eye = static_cast<ovrEyeType>(eye + 1))
     {
+        const ovrSwapTextureSet& swapSet = *m_pTexSet[eye];
+        glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
+        ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
+
+        GLint drawFboId = 0, readFboId = 0;
+        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
+        glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
+
+
         {
             // viewport
             const ovrRecti& vp = m_layerEyeFov.Viewport[eye];
@@ -295,29 +307,28 @@ void OVRSDK06AppSkeleton::display_sdk() const
 #endif
             m_layerEyeFov.RenderPose[eye] = eyePose;
         }
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+        //unbindFBO();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-    //unbindFBO();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     ovrLayerEyeFov& layer = m_layerEyeFov;
     ovrLayerHeader* layers = &layer.Header;
     ovrResult result = ovrHmd_SubmitFrame(hmd, m_frameIndex, NULL, &layers, 1);
 
     // Increment counters in swap texture set
-    //for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
-    //    eye < ovrEyeType::ovrEye_Count;
-    //    eye = static_cast<ovrEyeType>(eye + 1))
+    for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
+        eye < ovrEyeType::ovrEye_Count;
+        eye = static_cast<ovrEyeType>(eye + 1))
     {
-        ++m_pTexSet->CurrentIndex %= m_pTexSet->TextureCount;
+        ovrSwapTextureSet& swapSet = *m_pTexSet[eye];
+        ++swapSet.CurrentIndex %= swapSet.TextureCount;
     }
 
 #if 1
     // Blit output to mirror
     _resetGLState();
-
-    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
-    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
 
     {
         static float g = 1.f;

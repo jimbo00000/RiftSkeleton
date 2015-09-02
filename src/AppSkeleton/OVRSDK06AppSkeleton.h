@@ -54,8 +54,8 @@ public:
 
 protected:
     ovrHmd m_Hmd;
-    ovrSwapTextureSet* m_pTexSet;
     ovrTexture* m_pMirrorTex;
+    ovrSwapTextureSet* m_pTexSet[ovrEye_Count];
     ovrEyeRenderDesc m_eyeRenderDescs[ovrEye_Count];
     ovrVector3f m_eyeOffsets[ovrEye_Count];
     glm::mat4 m_eyeProjections[ovrEye_Count];
