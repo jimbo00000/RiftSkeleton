@@ -218,6 +218,8 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         }
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 ovrSizei OVRSDK06AppSkeleton::getHmdResolution() const
