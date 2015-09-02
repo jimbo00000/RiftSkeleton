@@ -955,7 +955,6 @@ int main(int argc, char** argv)
     LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
     l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
     g_app.SetAppWindowSize(sz);
-
 #else
     l_Window = glfwCreateWindow(800, 600, "GLFW Oculus Rift Test", NULL, NULL);
     std::string windowTitle = PROJECT_NAME;
@@ -1043,7 +1042,9 @@ int main(int argc, char** argv)
     g_app.initVR(swapBackBufferDims);
     LOG_INFO("initVR(%d) complete.", swapBackBufferDims);
 
-    //SetVsync(1);
+#if defined(OVRSDK06)
+    SetVsync(0);
+#endif
 
     while (!glfwWindowShouldClose(l_Window))
     {
