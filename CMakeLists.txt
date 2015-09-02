@@ -280,6 +280,7 @@ ELSEIF( UNIX )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVRKernel/Src" )
         LINK_DIRECTORIES   ( "${OCULUSSDK_ROOT}/LibOVR/Lib/Linux/x86_64/Release/" )
         SET( OVR_LIBS -lOVR -ldl -ludev -lXinerama )
+        ADD_DEFINITIONS( -DOVRSDK05 ) # The only option for now
         ADD_DEFINITIONS( -DUSE_OCULUSSDK )
     ENDIF( USE_OCULUSSDK )
 
