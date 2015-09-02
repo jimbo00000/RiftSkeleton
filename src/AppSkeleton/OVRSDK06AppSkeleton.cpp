@@ -252,14 +252,24 @@ void OVRSDK06AppSkeleton::display_sdk() const
         ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
         {
-            const ovrRecti& vp = m_layerEyeFov.Viewport[eye];
+            // Handle render target resolution scaling
+            m_layerEyeFov.Viewport[eye].Size = ovrHmd_GetFovTextureSize(m_Hmd, eye, m_layerEyeFov.Fov[eye], m_fboScale);
+            ovrRecti& vp = m_layerEyeFov.Viewport[eye];
+            if (m_layerEyeFov.Header.Flags & ovrLayerFlag_TextureOriginAtBottomLeft)
+            {
+                ///@note It seems that the render viewport should be vertically centered within the swapSet texture.
+                /// See also OculusWorldDemo.cpp:1443 - "The usual OpenGL viewports-don't-match-UVs oddness."
+                const int texh = swapSet.Textures[swapSet.CurrentIndex].Header.TextureSize.h;
+                vp.Pos.y = (texh - vp.Size.h) / 2;
+            }
+
             glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-            const ovrPosef& eyePose = m_eyePoses[eye];
 
             glClearColor(0.f, 0.f, 0.f, 0.f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // render
+            // Render the scene for the current eye
+            const ovrPosef& eyePose = m_eyePoses[eye];
             const glm::mat4 viewLocal = makeMatrixFromPose(eyePose);
             const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
             const glm::mat4& proj = m_eyeProjections[eye];
