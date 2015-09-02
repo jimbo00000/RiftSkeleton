@@ -35,6 +35,7 @@ I set up my local build environment with libraries installed under a single dire
 
 ## Similar Projects 
  - [OculusRiftInAction](https://github.com/jherico/OculusRiftInAction) - Brad Davis  
+ - [Example_SelfContained.cpp](https://github.com/jherico/OculusRiftInAction/blob/ea0231ad045187c8a5819a801ce4a2fae63301aa/examples/cpp/Example_SelfContained.cpp) - Brad Davis  
  - [mutantstargoat - oculus2](http://nuclear.mutantstargoat.com/hg/oculus2/file/tip) - John Tsiombikas  
  - [osgoculusviewer](https://github.com/bjornblissing/osgoculusviewer) - Bjorn Blissing  
  - [Oculus Rift SDL2 OpenGL Demo (Updated for Oculus SDK 0.4.0)](https://forums.oculus.com/viewtopic.php?f=30&t=8948) - anarkavre  
