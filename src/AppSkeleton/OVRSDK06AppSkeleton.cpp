@@ -52,7 +52,6 @@ void OVRSDK06AppSkeleton::RecenterPose()
 
 void OVRSDK06AppSkeleton::exitVR()
 {
-    //deallocateFBO(m_renderBuffer);
     for (int i = 0; i < 2; ++i)
     {
         ovrHmd_DestroySwapTextureSet(m_Hmd, m_pTexSet[i]);
@@ -113,14 +112,13 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     const ovrSizei& size = layer.Viewport[eye].Size = ovrHmd_GetFovTextureSize(m_Hmd, eye, fov, 1.f);
     LOG_INFO("FOV Texture requested size: %d x %d", size.w, size.h);
 
-
     for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
         eye < ovrEyeType::ovrEye_Count;
         eye = static_cast<ovrEyeType>(eye + 1))
     {
         const ovrFovPort& fov = layer.Fov[eye] = m_Hmd->MaxEyeFov[eye];
         const ovrSizei& size = layer.Viewport[eye].Size = ovrHmd_GetFovTextureSize(m_Hmd, eye, fov, 1.f);
-        layer.Viewport[eye].Pos = { (int)eye*size.w, 0 };
+        layer.Viewport[eye].Pos = { 0, 0 };
         LOG_INFO("Eye %d tex : %dx%d @ (%d,%d)", eye, size.w, size.h,
             layer.Viewport[eye].Pos.x, layer.Viewport[eye].Pos.y);
 
@@ -134,8 +132,6 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
 
         // Allocate the frameBuffer that will hold the scene, and then be
         // re-rendered to the screen with distortion
-        //eyeFbos[eye] = SwapTexFboPtr(new SwapTextureFramebufferWrapper(hmd));
-
         if (!OVR_SUCCESS(ovrHmd_CreateSwapTextureSetGL(m_Hmd, GL_RGBA, size.w, size.h, &m_pTexSet[eye])))
         {
             LOG_ERROR("Unable to create swap textures");
@@ -159,7 +155,6 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         }
-
 
         // Manually assemble swap FBO
         m_swapFBO.w = size.w;
@@ -188,8 +183,6 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-        //eyeFbos[eye]->Init(ovr::toGlm(size));
         layer.ColorTexture[eye] = m_pTexSet[eye];
     }
 
@@ -206,10 +199,7 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     const ovrGLTextureData* pMirrorGLData = reinterpret_cast<ovrGLTextureData*>(m_pMirrorTex);
     LOG_INFO("Mirror texture created: %d", pMirrorGLData->TexId);
 
-
     glBindTexture(GL_TEXTURE_2D, 0);
-
-
 
     // Manually assemble mirror FBO
     m_mirrorFBO.w = size.w;
@@ -249,9 +239,6 @@ void OVRSDK06AppSkeleton::display_sdk() const
     ovrHmd_GetEyePoses(m_Hmd, m_frameIndex, m_eyeOffsets,
         m_eyePoses, &outHmdTrackingState);
 
-
-    _resetGLState();
-
     for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
         eye < ovrEyeType::ovrEye_Count;
         eye = static_cast<ovrEyeType>(eye + 1))
@@ -260,56 +247,26 @@ void OVRSDK06AppSkeleton::display_sdk() const
         glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
         ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
-
-        GLint drawFboId = 0, readFboId = 0;
-        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFboId);
-        glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFboId);
-
-
         {
-            // viewport
             const ovrRecti& vp = m_layerEyeFov.Viewport[eye];
             glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
-
             const ovrPosef& eyePose = m_eyePoses[eye];
 
-#if 1
-            static GLint s_vp[4];
-            glGetIntegerv(GL_VIEWPORT, &s_vp[0]);
+            glClearColor(0.f, 0.f, 0.f, 0.f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-            static float g = 1.f;
-            g -= .01f;
-            if (g < 0.f)
-                g = 1.f;
-            //glBlitFramebuffer(
-            //    0, mirror->size.y, mirror->size.x, 0,
-            //    0, 0, mirror->size.x, mirror->size.y,
-            //    GL_COLOR_BUFFER_BIT, GL_NEAREST);
-            ///@todo Cant seem to render to right eye VP...
-            if (eye == 0)
-                glClearColor(g, 0, 0, 0);
-            else
-                glClearColor(0, 0, g, 0);
-            glClear(GL_COLOR_BUFFER_BIT);
-#else
             // render
             const glm::mat4 viewLocal = makeMatrixFromPose(eyePose);
             const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
             const glm::mat4& proj = m_eyeProjections[eye];
-            _resetGLState();
-
-
             _DrawScenes(
                 glm::value_ptr(glm::inverse(viewWorld)),
                 glm::value_ptr(proj),
                 glm::value_ptr(glm::inverse(viewLocal)));
-#endif
+
             m_layerEyeFov.RenderPose[eye] = eyePose;
         }
-
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-        //unbindFBO();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
