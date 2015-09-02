@@ -954,6 +954,7 @@ int main(int argc, char** argv)
     ///@todo Is it any faster with no mirror at all?
     LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
     l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
+    g_app.SetAppWindowSize(sz);
 
 #else
     l_Window = glfwCreateWindow(800, 600, "GLFW Oculus Rift Test", NULL, NULL);

@@ -38,6 +38,7 @@ public:
     void ToggleMirrorToWindow() {}
     void ToggleDynamicPrediction() {}
 
+    void SetAppWindowSize(ovrSizei sz) { m_appWindowSize = sz; }
     // Direct mode and SDK rendering hooks
     void AttachToWindow(void* pWindow) {}
 #if defined(OVR_OS_WIN32)
@@ -64,6 +65,7 @@ protected:
     mutable int m_frameIndex;
     FBO m_swapFBO;
     FBO m_mirrorFBO;
+    ovrSizei m_appWindowSize;
 
 private: // Disallow copy ctor and assignment operator
     OVRSDK06AppSkeleton(const OVRSDK06AppSkeleton&);

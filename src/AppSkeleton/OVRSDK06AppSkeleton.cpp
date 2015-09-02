@@ -326,24 +326,20 @@ void OVRSDK06AppSkeleton::display_sdk() const
         ++swapSet.CurrentIndex %= swapSet.TextureCount;
     }
 
-#if 1
-    // Blit output to mirror
-    _resetGLState();
-
+    // Blit output to main app window to show something on screen in addition
+    // to what's in the Rift. This could optionally be the distorted texture
+    // from the OVR SDK's mirror texture, or perhaps a single eye's undistorted
+    // view, or even a third-person render(at a performance cost).
+    if (true)
     {
-        static float g = 1.f;
-        g -= .01f;
-        if (g < 0.f)
-            g = 1.f;
-        glViewport(0, 0, m_mirrorFBO.w, m_mirrorFBO.h);
+        glViewport(0, 0, m_appWindowSize.w, m_appWindowSize.h);
+        glClearColor(0, 1, 0, 0);
+        glClear(GL_COLOR_BUFFER_BIT);
         //glBlitFramebuffer(
         //    0, mirror->size.y, mirror->size.x, 0,
         //    0, 0, mirror->size.x, mirror->size.y,
         //    GL_COLOR_BUFFER_BIT, GL_NEAREST);
-        glClearColor(0, g, 0, 0);
-        glClear(GL_COLOR_BUFFER_BIT);
     }
-#endif
 
     ++m_frameIndex;
 }
