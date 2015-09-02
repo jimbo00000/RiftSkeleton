@@ -292,12 +292,12 @@ void OVRSDK06AppSkeleton::display_sdk() const
     if (true)
     {
         glViewport(0, 0, m_appWindowSize.w, m_appWindowSize.h);
-        glClearColor(0, 1, 0, 0);
-        glClear(GL_COLOR_BUFFER_BIT);
-        //glBlitFramebuffer(
-        //    0, mirror->size.y, mirror->size.x, 0,
-        //    0, 0, mirror->size.x, mirror->size.y,
-        //    GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, m_mirrorFBO.id);
+        glBlitFramebuffer(
+            0, m_mirrorFBO.h, m_mirrorFBO.w, 0,
+            0, 0, m_appWindowSize.w, m_appWindowSize.h,
+            GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     }
 
     ++m_frameIndex;
