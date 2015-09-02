@@ -23,3 +23,12 @@ Copy the json file `osvr_server_config.oculusrift.sample.json` to the directory 
 Launch `osvr_server.exe` with the json file as the first parameter by dragging the json file onto the exe in Windows explorer. This drag-and-drop operation is the equivalent of running `osvr_server.exe osvr_server_config.oculusrift.sample.json` from the command line.
 
 
+## Building on Ubuntu 15
+
+sudo apt-get install libboost-all-dev libusb-dev
+
+git clone:
+libfunctionality
+https://github.com/open-source-parsers/jsoncpp.git
+ - Make sure to set JSONCPP_WITH_CMAKE_PACKAGE to on
+
