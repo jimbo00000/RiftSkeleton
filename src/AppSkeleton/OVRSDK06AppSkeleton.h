@@ -60,9 +60,11 @@ protected:
     ovrEyeRenderDesc m_eyeRenderDescs[ovrEye_Count];
     ovrVector3f m_eyeOffsets[ovrEye_Count];
     glm::mat4 m_eyeProjections[ovrEye_Count];
-    mutable ovrLayerEyeFov m_layerEyeFov;
+
     mutable ovrPosef m_eyePoses[ovrEye_Count];
+    mutable ovrLayerEyeFov m_layerEyeFov;
     mutable int m_frameIndex;
+
     FBO m_swapFBO;
     FBO m_mirrorFBO;
     ovrSizei m_appWindowSize;
