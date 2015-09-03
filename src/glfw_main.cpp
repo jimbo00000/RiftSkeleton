@@ -191,10 +191,11 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
         case GLFW_KEY_DELETE: g_dynamicallyScaleFBO = !g_dynamicallyScaleFBO; break;
 
         case '`':
-#ifdef USE_OCULUSSDK
+#if defined(OVRSDK05)
             ///@todo Is there a way to create an auxiliary window in Direct to rift mode?
             /// The call to glfwCreateWindow crashes the app in Win7.
-            if ((g_app.UsingDirectMode() == false) ||
+            if (
+                (g_app.UsingDirectMode() == false) ||
                 (g_app.UsingDebugHmd() == true))
 #endif
             {
