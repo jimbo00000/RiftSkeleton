@@ -66,7 +66,6 @@ int which_button = -1;
 int modifier_mode = 0;
 
 GLFWwindow* g_pHMDWindow = NULL;
-GLFWwindow* g_AuxWindow = NULL;
 int g_auxWindow_w = 1920 / 2;
 int g_auxWindow_h = 587;
 
@@ -93,13 +92,6 @@ void destroyAuxiliaryWindow(GLFWwindow* pAuxWindow);
 static void SetVsync(int state)
 {
     LOG_INFO("SetVsync(%d)", state);
-
-    // Since AuxWindow holds the tweakbar, this should never be NULL
-    if (g_AuxWindow != NULL)
-    {
-        glfwMakeContextCurrent(g_AuxWindow);
-        glfwSwapInterval(state);
-    }
     glfwMakeContextCurrent(g_pHMDWindow);
     glfwSwapInterval(state);
 }
@@ -215,7 +207,6 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
 #endif
 
         case GLFW_KEY_ESCAPE:
-            if (g_AuxWindow == NULL)
             {
                 // Clear the frame before calling all the destructors - even a few
                 // frames worth of frozen video is enough to cause discomfort!
@@ -230,11 +221,6 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
                 glfwDestroyWindow(g_pHMDWindow);
                 glfwTerminate();
                 exit(0);
-            }
-            else
-            {
-                destroyAuxiliaryWindow(g_AuxWindow);
-                glfwMakeContextCurrent(g_pHMDWindow);
             }
             break;
         }
@@ -603,47 +589,6 @@ void displayToHMD()
     }
 }
 
-///@return An auxiliary "control view" window to display a monoscopic view of the world
-/// that the Rift user is inhabiting(on the primary VR window). Yes, this takes resources
-/// away from the VR user's rendering and will lower the rendering throughput(MPx/sec)
-/// available to the HMD. It should not negatively impact latency until frame rate drops
-/// below the display's refresh rate(which will happen sooner with this extra load, but
-/// can be tuned). Pixel fill can be tuned by adjusting the FBO render target size with
-/// the mouse wheel, but vertex rate cannot and another render pass adds 50%.
-///@todo A more palatable solution is to share the FBO render target between this and
-/// the Rift window and just present the left half of it.
-GLFWwindow* initializeAuxiliaryWindow(GLFWwindow* pRiftWindow)
-{
-    ///@todo Set size to half FBO target width
-    GLFWwindow* pAuxWindow = glfwCreateWindow(g_auxWindow_w, g_auxWindow_h, "Control Window", NULL, pRiftWindow);
-    if (pAuxWindow == NULL)
-    {
-        return NULL;
-    }
-
-    glfwMakeContextCurrent(pAuxWindow);
-
-    glfwSetMouseButtonCallback(pAuxWindow, mouseDown_Aux);
-    glfwSetCursorPosCallback(pAuxWindow, mouseMove_Aux);
-    glfwSetScrollCallback(pAuxWindow, mouseWheel_Aux);
-    glfwSetKeyCallback(pAuxWindow, keyboard_Aux);
-    glfwSetWindowSizeCallback(pAuxWindow, resize_Aux);
-
-    // The window will be shown whether we do this or not (on Windows)...
-    glfwShowWindow(pAuxWindow);
-
-    glfwMakeContextCurrent(pRiftWindow);
-
-    return pAuxWindow;
-}
-
-void destroyAuxiliaryWindow(GLFWwindow* pAuxWindow)
-{
-    glfwMakeContextCurrent(pAuxWindow);
-    glfwDestroyWindow(pAuxWindow);
-    g_AuxWindow = NULL;
-}
-
 // OpenGL debug callback
 void GLAPIENTRY myCallback(
     GLenum source, GLenum type, GLuint id, GLenum severity,
@@ -921,8 +866,6 @@ int main(int argc, char** argv)
                 << static_cast<int>(g_fps.GetFPS())
                 << " fps";
             glfwSetWindowTitle(l_Window, oss.str().c_str());
-            if (g_AuxWindow != NULL)
-                glfwSetWindowTitle(g_AuxWindow, oss.str().c_str());
         }
 #endif
         const float dumpInterval = 1.f;
@@ -930,29 +873,6 @@ int main(int argc, char** argv)
         {
             LOG_INFO("Frame rate: %d fps", static_cast<int>(g_fps.GetFPS()));
             g_logDumpTimer.reset();
-        }
-
-        // Optionally display to auxiliary mono view
-        if (g_AuxWindow != NULL)
-        {
-            glfwMakeContextCurrent(g_AuxWindow);
-            glClearColor(0.f, 0.f, 0.f, 0.f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-#ifdef USE_ANTTWEAKBAR
-            TwDraw(); ///@todo Should this go first? Will it write to a depth buffer?
-#endif
-
-            glfwSwapBuffers(g_AuxWindow);
-
-            if (glfwWindowShouldClose(g_AuxWindow))
-            {
-                destroyAuxiliaryWindow(g_AuxWindow);
-            }
-
-            // Set context to Rift window when done
-            glfwMakeContextCurrent(l_Window);
         }
     }
 
