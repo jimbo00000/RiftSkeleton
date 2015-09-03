@@ -39,15 +39,9 @@ public:
     void ToggleDynamicPrediction() {}
 
     void SetAppWindowSize(ovrSizei sz) { m_appWindowSize = sz; }
-    // Direct mode and SDK rendering hooks
-    void AttachToWindow(void* pWindow) {}
-#if defined(OVR_OS_WIN32)
-    void setWindow(HWND w) {}
-#endif
+
     ovrSizei getHmdResolution() const;
-    ovrVector2i getHmdWindowPos() const { return{ 1920, 0 }; }
     bool UsingDebugHmd() const { return m_usingDebugHmd; }
-    bool UsingDirectMode() const { return true; }
 
     void display_stereo_undistorted() { display_sdk(); }
     void display_sdk() const;
