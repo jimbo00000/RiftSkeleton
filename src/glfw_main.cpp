@@ -530,6 +530,11 @@ void resize_Aux(GLFWwindow* pWindow, int w, int h)
     ///@note This will break PaneScene's tweakbar positioning
     TwWindowSize(w, h);
 #endif
+
+#if defined(OVRSDK06)
+    ovrSizei sz = { w, h };
+    g_app.SetAppWindowSize(sz);
+#endif
 }
 
 void timestep()
