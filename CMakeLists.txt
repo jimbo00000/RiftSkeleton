@@ -395,8 +395,18 @@ ADD_LIBRARY( AppSkeleton ${APPSKELETON_SOURCE_FILES} )
 ADD_LIBRARY( Scene       ${SCENE_SOURCE_FILES} )
 ADD_LIBRARY( FlyingMouse ${FLYINGMOUSE_SOURCE_FILES} )
 
+#
+# Some convoluted logic here to choose one of several main source files:
+# Since the OVR 06 SDK changes the way main handles the AppSkeleton, there is a main
+# file for each windowing system(GLFW,SDL) and SDK version(05,06).
+#
 IF( GL_FRAMEWORK STREQUAL "GLFW" )
-    ADD_EXECUTABLE( ${PROJECT_NAME} src/glfw_main.cpp )
+    IF( OVRSDK_VERSION STREQUAL "05" )
+        ADD_EXECUTABLE( ${PROJECT_NAME} src/glfw_main.cpp )
+    ELSEIF( OVRSDK_VERSION STREQUAL "06" )
+        ADD_EXECUTABLE( ${PROJECT_NAME} src/glfw_sdk06_main.cpp )
+    ENDIF()
+# TODO: OVR SDK 06 and SDL
 ELSEIF( GL_FRAMEWORK STREQUAL "SDL" )
     ADD_EXECUTABLE( ${PROJECT_NAME} src/sdl_main.cpp )
 ELSEIF( GL_FRAMEWORK STREQUAL "SFML" )
