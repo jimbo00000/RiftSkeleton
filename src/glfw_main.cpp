@@ -197,7 +197,6 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
             if (
                 (g_app.UsingDirectMode() == false) ||
                 (g_app.UsingDebugHmd() == true))
-#endif
             {
                 if (g_AuxWindow == NULL)
                 {
@@ -211,6 +210,7 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
                     glfwMakeContextCurrent(g_pHMDWindow);
                 }
             }
+#endif
             break;
 
         case GLFW_KEY_SPACE:
@@ -674,6 +674,9 @@ void displayToHMD()
     case RenderingMode::OVR_SDK:
         g_app.display_sdk();
 #ifdef OVRSDK06
+#  ifdef USE_ANTTWEAKBAR
+        TwDraw(); ///@todo Should this go first? Will it write to a depth buffer?
+#  endif
         glfwSwapBuffers(g_pHMDWindow);
 #endif
         // OVR SDK 05 will do its own swap
@@ -978,11 +981,19 @@ int main(int argc, char** argv)
 #endif //USE_OCULUSSDK
 
     glfwMakeContextCurrent(l_Window);
+#ifdef OVRSDK06
+    glfwSetWindowSizeCallback(l_Window, resize_Aux);
+    glfwSetMouseButtonCallback(l_Window, mouseDown_Aux);
+    glfwSetCursorPosCallback(l_Window, mouseMove_Aux);
+    glfwSetScrollCallback(l_Window, mouseWheel_Aux);
+    glfwSetKeyCallback(l_Window, keyboard_Aux);
+#else
     glfwSetWindowSizeCallback(l_Window, resize);
     glfwSetMouseButtonCallback(l_Window, mouseDown);
     glfwSetCursorPosCallback(l_Window, mouseMove);
     glfwSetScrollCallback(l_Window, mouseWheel);
     glfwSetKeyCallback(l_Window, keyboard);
+#endif
 
     memset(m_keyStates, 0, GLFW_KEY_LAST*sizeof(int));
 
