@@ -564,21 +564,12 @@ void displayToHMD()
 
 #elif defined(USE_OCULUSSDK)
     case RenderingMode::SideBySide_Undistorted:
-        g_app.display_stereo_undistorted();
-        glfwSwapBuffers(g_pHMDWindow);
-        break;
-
     case RenderingMode::OVR_SDK:
+    case RenderingMode::OVR_Client:
         g_app.display_sdk();
 #ifdef USE_ANTTWEAKBAR
         TwDraw(); ///@todo Should this go first? Will it write to a depth buffer?
 #endif
-        glfwSwapBuffers(g_pHMDWindow);
-        // OVR SDK 05 will do its own swap
-        break;
-
-    case RenderingMode::OVR_Client:
-        g_app.display_client();
         glfwSwapBuffers(g_pHMDWindow);
         break;
 #endif //USE_OCULUSSDK
