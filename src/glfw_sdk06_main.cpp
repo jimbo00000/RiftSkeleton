@@ -65,7 +65,6 @@ int oldx, oldy, newx, newy;
 int which_button = -1;
 int modifier_mode = 0;
 
-ShaderWithVariables g_auxPresent;
 GLFWwindow* g_pHMDWindow = NULL;
 GLFWwindow* g_AuxWindow = NULL;
 int g_auxWindow_w = 1920 / 2;
@@ -551,82 +550,6 @@ void printGLContextInfo(GLFWwindow* pW)
     LOG_INFO("Renderer: %s", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
 }
 
-void initAuxPresentFboShader()
-{
-    g_auxPresent.initProgram("presentfbo");
-    g_auxPresent.bindVAO();
-
-    const float verts[] = {
-        -1, -1,
-        1, -1,
-        1, 1,
-        -1, 1
-    };
-    // The aspect ratio of one eye's view is half side-by-side(portrait), so we can chop
-    // the top and bottom parts off to present something closer to landscape.
-    const float texs[] = {
-        0.0f, 0.25f,
-        0.5f, 0.25f,
-        0.5f, 0.75f,
-        0.0f, 0.75f,
-    };
-
-    GLuint vertVbo = 0;
-    glGenBuffers(1, &vertVbo);
-    g_auxPresent.AddVbo("vPosition", vertVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vertVbo);
-    glBufferData(GL_ARRAY_BUFFER, 4*2*sizeof(GLfloat), verts, GL_STATIC_DRAW);
-    glVertexAttribPointer(g_auxPresent.GetAttrLoc("vPosition"), 2, GL_FLOAT, GL_FALSE, 0, NULL);
-
-    GLuint texVbo = 0;
-    glGenBuffers(1, &texVbo);
-    g_auxPresent.AddVbo("vTex", texVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, texVbo);
-    glBufferData(GL_ARRAY_BUFFER, 4*2*sizeof(GLfloat), texs, GL_STATIC_DRAW);
-    glVertexAttribPointer(g_auxPresent.GetAttrLoc("vTex"), 2, GL_FLOAT, GL_FALSE, 0, NULL);
-
-    glEnableVertexAttribArray(g_auxPresent.GetAttrLoc("vPosition"));
-    glEnableVertexAttribArray(g_auxPresent.GetAttrLoc("vTex"));
-
-    glUseProgram(g_auxPresent.prog());
-    {
-        const glm::mat4 id(1.0f);
-        glUniformMatrix4fv(g_auxPresent.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(id));
-        glUniformMatrix4fv(g_auxPresent.GetUniLoc("prmtx"), 1, false, glm::value_ptr(id));
-    }
-    glUseProgram(0);
-
-    glBindVertexArray(0);
-}
-
-void presentSharedFboTexture()
-{
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-
-    glViewport(0, 0, g_auxWindow_w, g_auxWindow_h);
-
-    // Present FBO to screen
-    const GLuint prog = g_auxPresent.prog();
-    glUseProgram(prog);
-    g_auxPresent.bindVAO();
-    {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, g_app.getRenderBufferTex());
-        glUniform1i(g_auxPresent.GetUniLoc("fboTex"), 0);
-
-        // This is the only uniform that changes per-frame
-        const float fboScale = g_renderMode.outputType == RenderingMode::OVR_SDK ?
-            1.0f :
-            g_app.GetFboScale();
-        glUniform1f(g_auxPresent.GetUniLoc("fboScale"), fboScale);
-
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-    }
-    glBindVertexArray(0);
-    glUseProgram(0);
-}
-
 void displayToHMD()
 {
     switch(g_renderMode.outputType)
@@ -699,10 +622,6 @@ GLFWwindow* initializeAuxiliaryWindow(GLFWwindow* pRiftWindow)
     }
 
     glfwMakeContextCurrent(pAuxWindow);
-    {
-        // Create context-specific data here
-        initAuxPresentFboShader();
-    }
 
     glfwSetMouseButtonCallback(pAuxWindow, mouseDown_Aux);
     glfwSetCursorPosCallback(pAuxWindow, mouseMove_Aux);
@@ -721,7 +640,6 @@ GLFWwindow* initializeAuxiliaryWindow(GLFWwindow* pRiftWindow)
 void destroyAuxiliaryWindow(GLFWwindow* pAuxWindow)
 {
     glfwMakeContextCurrent(pAuxWindow);
-    g_auxPresent.destroy();
     glfwDestroyWindow(pAuxWindow);
     g_AuxWindow = NULL;
 }
@@ -1021,17 +939,6 @@ int main(int argc, char** argv)
             glClearColor(0.f, 0.f, 0.f, 0.f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            ///@note VAOs *cannot* be shared between contexts.
-            ///@note GLFW windows are inextricably tied to their own unique context.
-            /// For these two reasons, calling draw a third time for the auxiliary window
-            /// is not possible. Furthermore, it is not strictly desirable for the extra
-            /// rendering cost.
-            /// Instead, we share the render target texture from the stereo render and present
-            /// just the left eye to the aux window.
-            if (g_drawToAuxWindow)
-            {
-                presentSharedFboTexture();
-            }
 
 #ifdef USE_ANTTWEAKBAR
             TwDraw(); ///@todo Should this go first? Will it write to a depth buffer?
