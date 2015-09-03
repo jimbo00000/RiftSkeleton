@@ -34,6 +34,7 @@ OVRSDK06AppSkeleton::OVRSDK06AppSkeleton()
 : m_Hmd(NULL)
 , m_pMirrorTex(NULL)
 , m_frameIndex(0)
+, m_usingDebugHmd(false)
 {
     m_pTexSet[0] = NULL;
     m_pTexSet[1] = NULL;
@@ -75,6 +76,7 @@ void OVRSDK06AppSkeleton::initHMD()
         {
             LOG_ERROR("Could not create Debug HMD");
         }
+        m_usingDebugHmd = true;
     }
 
     const ovrBool ret = ovrHmd_ConfigureTracking(m_Hmd,

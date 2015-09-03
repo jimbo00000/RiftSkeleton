@@ -46,7 +46,7 @@ public:
 #endif
     ovrSizei getHmdResolution() const;
     ovrVector2i getHmdWindowPos() const { return{ 1920, 0 }; }
-    bool UsingDebugHmd() const { return false; }
+    bool UsingDebugHmd() const { return m_usingDebugHmd; }
     bool UsingDirectMode() const { return true; }
 
     void display_stereo_undistorted() { display_sdk(); }
@@ -66,6 +66,7 @@ protected:
     FBO m_swapFBO;
     FBO m_mirrorFBO;
     ovrSizei m_appWindowSize;
+    bool m_usingDebugHmd;
 
 private: // Disallow copy ctor and assignment operator
     OVRSDK06AppSkeleton(const OVRSDK06AppSkeleton&);
