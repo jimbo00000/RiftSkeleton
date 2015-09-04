@@ -61,6 +61,7 @@ protected:
 
     FBO m_swapFBO;
     FBO m_mirrorFBO;
+    FBO m_undistortedFBO;
     ovrSizei m_appWindowSize;
     bool m_usingDebugHmd;
 
