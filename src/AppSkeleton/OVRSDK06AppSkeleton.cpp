@@ -35,6 +35,7 @@ OVRSDK06AppSkeleton::OVRSDK06AppSkeleton()
 , m_pMirrorTex(NULL)
 , m_frameIndex(0)
 , m_usingDebugHmd(false)
+, m_mirror(MirrorDistorted)
 {
     m_pTexSet[0] = NULL;
     m_pTexSet[1] = NULL;
@@ -49,6 +50,13 @@ void OVRSDK06AppSkeleton::RecenterPose()
     if (m_Hmd == NULL)
         return;
     ovrHmd_RecenterPose(m_Hmd);
+}
+
+void OVRSDK06AppSkeleton::ToggleMirroringType()
+{
+    int m = static_cast<int>(m_mirror);
+    ++m %= NumMirrorTypes;
+    m_mirror = static_cast<MirrorType>(m);
 }
 
 void OVRSDK06AppSkeleton::exitVR()
@@ -300,20 +308,23 @@ void OVRSDK06AppSkeleton::display_sdk() const
         // to the desktop window instead of the barrel distorted mirror texture.
         // This blit, while cheap, could cost some framerate to the HMD.
         // An over-the-shoulder view is another option, at a greater performance cost.
-        if (eye == ovrEyeType::ovrEye_Left)
+        if (m_mirror == MirrorUndistorted)
         {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, m_swapFBO.id);
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_undistortedFBO.id);
-            glViewport(0, 0, m_undistortedFBO.w, m_undistortedFBO.h);
-            glBlitFramebuffer(
-                0, static_cast<int>(static_cast<float>(m_swapFBO.h)*m_fboScale),
-                static_cast<int>(static_cast<float>(m_swapFBO.w)*m_fboScale), 0, ///@todo Fix for FBO scaling
-                0, 0, m_undistortedFBO.w, m_undistortedFBO.h,
-                GL_COLOR_BUFFER_BIT, GL_NEAREST);
-            glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-            glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
+            if (eye == ovrEyeType::ovrEye_Left)
+            {
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, m_swapFBO.id);
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_undistortedFBO.id);
+                glViewport(0, 0, m_undistortedFBO.w, m_undistortedFBO.h);
+                glBlitFramebuffer(
+                    0, static_cast<int>(static_cast<float>(m_swapFBO.h)*m_fboScale),
+                    static_cast<int>(static_cast<float>(m_swapFBO.w)*m_fboScale), 0, ///@todo Fix for FBO scaling
+                    0, 0, m_undistortedFBO.w, m_undistortedFBO.h,
+                    GL_COLOR_BUFFER_BIT, GL_NEAREST);
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+                glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
+            }
         }
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
@@ -337,10 +348,10 @@ void OVRSDK06AppSkeleton::display_sdk() const
     // to what's in the Rift. This could optionally be the distorted texture
     // from the OVR SDK's mirror texture, or perhaps a single eye's undistorted
     // view, or even a third-person render(at a performance cost).
-    if (true)
+    if (m_mirror != MirrorNone)
     {
         glViewport(0, 0, m_appWindowSize.w, m_appWindowSize.h);
-        const FBO& srcFBO = m_undistortedFBO;
+        const FBO& srcFBO = m_mirror == MirrorDistorted ? m_mirrorFBO : m_undistortedFBO;
         glBindFramebuffer(GL_READ_FRAMEBUFFER, srcFBO.id);
         glBlitFramebuffer(
             0, srcFBO.h, srcFBO.w, 0,

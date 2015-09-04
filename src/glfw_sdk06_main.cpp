@@ -202,7 +202,7 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
         case 'T': g_app.ToggleTimeWarp(); break;
         case 'O': g_app.ToggleOverdrive(); break;
         case 'L': g_app.ToggleLowPersistence(); break;
-        case 'M': g_app.ToggleMirrorToWindow(); break;
+        case 'M': g_app.ToggleMirroringType(); break;
         case 'P': g_app.ToggleDynamicPrediction(); break;
 #endif
 
