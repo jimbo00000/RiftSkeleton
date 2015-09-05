@@ -34,12 +34,7 @@
 #if defined(USE_OSVR)
 #include "OsvrAppSkeleton.h"
 #elif defined(USE_OCULUSSDK)
-#  if defined(OVRSDK05)
-#  include "OVRSDK05AppSkeleton.h"
-#  elif defined(OVRSDK06)
-#  include "OVRSDK06AppSkeleton.h"
-#  else
-#  endif
+#include "OVRSDK05AppSkeleton.h"
 #else
 #include "AppSkeleton.h"
 #endif
@@ -52,12 +47,7 @@
 #if defined(USE_OSVR)
 OsvrAppSkeleton g_app;
 #elif defined(USE_OCULUSSDK)
-#  if defined(OVRSDK05)
 OVRSDK05AppSkeleton g_app;
-#  elif defined(OVRSDK06)
-OVRSDK06AppSkeleton g_app;
-#  else
-#  endif
 #else
 AppSkeleton g_app;
 #endif
@@ -191,7 +181,6 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
         case GLFW_KEY_DELETE: g_dynamicallyScaleFBO = !g_dynamicallyScaleFBO; break;
 
         case '`':
-#if defined(OVRSDK05)
             ///@todo Is there a way to create an auxiliary window in Direct to rift mode?
             /// The call to glfwCreateWindow crashes the app in Win7.
             if (
@@ -210,7 +199,6 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
                     glfwMakeContextCurrent(g_pHMDWindow);
                 }
             }
-#endif
             break;
 
         case GLFW_KEY_SPACE:
@@ -530,11 +518,6 @@ void resize_Aux(GLFWwindow* pWindow, int w, int h)
     ///@note This will break PaneScene's tweakbar positioning
     TwWindowSize(w, h);
 #endif
-
-#if defined(OVRSDK06)
-    ovrSizei sz = { w, h };
-    g_app.SetAppWindowSize(sz);
-#endif
 }
 
 void timestep()
@@ -678,12 +661,6 @@ void displayToHMD()
 
     case RenderingMode::OVR_SDK:
         g_app.display_sdk();
-#ifdef OVRSDK06
-#  ifdef USE_ANTTWEAKBAR
-        TwDraw(); ///@todo Should this go first? Will it write to a depth buffer?
-#  endif
-        glfwSwapBuffers(g_pHMDWindow);
-#endif
         // OVR SDK 05 will do its own swap
         break;
 
@@ -895,7 +872,7 @@ int main(int argc, char** argv)
         glfwSetWindowPos(l_Window, pos.x, pos.y);
     }
 
-#elif defined(OVRSDK05)
+#elif defined(USE_OCULUSSDK)
     ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
     std::string windowTitle = "";
@@ -945,29 +922,7 @@ int main(int argc, char** argv)
     }
 
     resize(l_Window, sz.w, sz.h); // inform AppSkeleton of window size
-#elif defined(OVRSDK06)
-    std::string windowTitle = "";
-
-    LOG_INFO("Using SDK 0.6.0.0's direct mode.");
-    windowTitle = PROJECT_NAME "-GLFW-06-Direct";
-
-    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-    ovrSizei sz;
-    ovrVector2i pos;
-    sz.w = mode->width/2;
-    sz.h = mode->height/2;
-    pos.x = 100;
-    pos.y = 100;
-    // Create just a regular window for presenting OVR SDK 0.6's mirror texture
-    ///@todo Is it any faster with no mirror at all?
-    LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
-    l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
-    g_app.SetAppWindowSize(sz);
-#else
-    l_Window = glfwCreateWindow(800, 600, "GLFW Oculus Rift Test", NULL, NULL);
-    std::string windowTitle = PROJECT_NAME;
-#endif //USE_OSVR|OVRSDK05|OVRSDK06
+#endif //USE_OSVR|USE_OCULUSSDK
 
     if (!l_Window)
     {
@@ -986,19 +941,11 @@ int main(int argc, char** argv)
 #endif //USE_OCULUSSDK
 
     glfwMakeContextCurrent(l_Window);
-#ifdef OVRSDK06
-    glfwSetWindowSizeCallback(l_Window, resize_Aux);
-    glfwSetMouseButtonCallback(l_Window, mouseDown_Aux);
-    glfwSetCursorPosCallback(l_Window, mouseMove_Aux);
-    glfwSetScrollCallback(l_Window, mouseWheel_Aux);
-    glfwSetKeyCallback(l_Window, keyboard_Aux);
-#else
     glfwSetWindowSizeCallback(l_Window, resize);
     glfwSetMouseButtonCallback(l_Window, mouseDown);
     glfwSetCursorPosCallback(l_Window, mouseMove);
     glfwSetScrollCallback(l_Window, mouseWheel);
     glfwSetKeyCallback(l_Window, keyboard);
-#endif
 
     memset(m_keyStates, 0, GLFW_KEY_LAST*sizeof(int));
 
@@ -1058,10 +1005,6 @@ int main(int argc, char** argv)
     LOG_INFO("Calling initVR...");
     g_app.initVR(swapBackBufferDims);
     LOG_INFO("initVR(%d) complete.", swapBackBufferDims);
-
-#if defined(OVRSDK06)
-    SetVsync(0);
-#endif
 
     while (!glfwWindowShouldClose(l_Window))
     {
