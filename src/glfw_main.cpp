@@ -922,6 +922,14 @@ int main(int argc, char** argv)
     }
 
     resize(l_Window, sz.w, sz.h); // inform AppSkeleton of window size
+#else
+    const glm::vec2 sz(800, 600);
+    // Create a normal, decorated application window
+    LOG_INFO("Using No VR SDK.");
+    const std::string windowTitle = PROJECT_NAME "-GLFW-NoVRSDK";
+    g_renderMode.outputType = RenderingMode::Mono_Buffered;
+
+    l_Window = glfwCreateWindow(sz.x, sz.y, windowTitle.c_str(), NULL, NULL);
 #endif //USE_OSVR|USE_OCULUSSDK
 
     if (!l_Window)

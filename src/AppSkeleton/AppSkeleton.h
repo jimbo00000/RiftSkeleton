@@ -52,6 +52,7 @@ public:
     void exitVR() {}
     void RecenterPose() {}
     bool UsingDebugHmd() const { return true; }
+    bool UsingDirectMode() const { return true; }
     void DismissHealthAndSafetyWarning() const {}
     void CheckForTapToDismissHealthAndSafetyWarning() const {}
 
