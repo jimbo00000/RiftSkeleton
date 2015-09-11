@@ -1,15 +1,17 @@
 RiftSkeleton
 ============
 
-A basic framework for getting started with OpenGL programming for the Oculus Rift.
+A basic framework for getting started with OpenGL VR programming.
 
 ## Description 
-The skeleton app targets the OVR SDK v0.5.0.1 and provides a simple framework for developing OpenGL VR programs. Take a look at the Scene class under src/ for a basic "hello world" implementation(some simple color cubes in space).
+The skeleton app targets the Oculus SDK or OSVR, providing a simple framework for developing OpenGL VR programs. Take a look at the Scene class under src/ for a basic "hello world" implementation(some simple color cubes in space). Replace the Scene class with your own.  
 
 ## Portability 
 
- - Linux, MacOS, Windows  
- - NVIDIA, AMD
+ - Windows, Linux(OVR SDK 0.5.x), MacOS(OVR SDK 0.5.x)  
+ - NVIDIA, AMD  
+ - Oculus SDK, OSVR  
+ - GLFW, SDL2  
 
 ## Dependencies 
  - [CMake](http://www.cmake.org/) (for building)
@@ -23,7 +25,6 @@ The skeleton app targets the OVR SDK v0.5.0.1 and provides a simple framework fo
 I set up my local build environment with libraries installed under a single directory(**C:/lib** on Windows, **~/lib** on Linux, **~/Development** on MacOS). This location can be changed in cmake-gui by modifying the **LIBS_HOME** variable or by editing it in CMakeLists.txt directly.
 
 ## Features 
- - OVR SDK and Client rendering paths  
  - Adaptive render buffer resolution scaling to ensure fastest possible frame rate  
  - Camera frustum highlighting when headset approaches limits of tracking area  
  - Auxiliary window with AntTweakbar controls(toggle with backtick(`) press)  
