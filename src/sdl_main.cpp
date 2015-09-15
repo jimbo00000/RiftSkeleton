@@ -706,7 +706,6 @@ int main(int argc, char** argv)
         }
     }
 
-#ifndef _LINUX
     if (useOpenGLCoreContext)
     {
         LOG_INFO("Using OpenGL core context.");
@@ -721,7 +720,6 @@ int main(int argc, char** argv)
         //SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         //SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     }
-#endif
 
 #ifdef _DEBUG
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
