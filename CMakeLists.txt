@@ -284,6 +284,14 @@ ELSEIF( UNIX )
         ADD_DEFINITIONS( -DUSE_OCULUSSDK )
     ENDIF( USE_OCULUSSDK )
 
+    IF( USE_OSVR )
+        SET( OSVR_ROOT "${LIBS_HOME}" CACHE STRING "OSVR root" )
+        INCLUDE_DIRECTORIES( "${OSVR_ROOT}/include" )
+        LINK_DIRECTORIES   ( "${OSVR_ROOT}/lib" )
+        SET( OSVR_LIBS -losvrClientKit )
+        ADD_DEFINITIONS( -DUSE_OSVR )
+    ENDIF( USE_OSVR )
+
     IF( USE_SIXENSE )
         MESSAGE("Using Sixense SDK.")
         SET( SIXENSE_ROOT "${LIBS_HOME}/sixenseSDK_linux_OSX" CACHE STRING "SixenseSDK root" )
@@ -312,6 +320,7 @@ ELSEIF( UNIX )
 
     SET( PLATFORM_LIBS
         ${OVR_LIBS}
+        ${OSVR_LIBS}
         -lGLEW
         -lGL
         -lGLU
