@@ -737,6 +737,7 @@ int main(int argc, char** argv)
 
 
 #if defined(USE_OSVR)
+    LOG_INFO("USE_OSVR=1");
     std::string windowTitle = "";
     windowTitle = PROJECT_NAME "-SDL2-Osvr";
 
@@ -773,6 +774,7 @@ int main(int argc, char** argv)
     }
 
 #elif defined(USE_OCULUSSDK)
+    LOG_INFO("USE_OCULUSSDK=1");
     const ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
     std::string windowTitle = "";
