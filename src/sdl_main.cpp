@@ -410,7 +410,7 @@ void mouseMove(int x, int y)
 
     if (which_button == SDL_BUTTON_LEFT)
     {
-        const float spinMagnitude = 0.05f;
+        const float spinMagnitude = 2.5f;
         g_app.m_mouseDeltaYaw += static_cast<float>(mmx) * spinMagnitude;
     }
     else if (which_button == SDL_BUTTON_RIGHT)
@@ -730,6 +730,7 @@ int main(int argc, char** argv)
     bool swapBackBufferDims = false;
 
 #if defined(USE_OCULUSSDK) || defined(USE_OSVR)
+    LOG_INFO("Initializing HMD...");
     g_app.initHMD();
 #else
     g_renderMode.outputType = RenderingMode::Mono_Buffered;
