@@ -10,10 +10,40 @@ Running RiftSkeleton on Linux
  - Under the Configuration drop menu, choose "New X Screen (requires X Restart)"
  - Click the "Apply what is Possible" button (althought it probably does nothing)
  - Click the "Save to X Configuration File" button
- - Restart X or just reboot (I can'd find a clear way to restart X on Fedora 21)
+ - Restart X or just reboot (I can't find a clear way to restart X on Fedora 21)
 
 ## Run ovrd
 Assuming the 0.5.0.1 SDK is built and installed, run `sudo /usr/local/bin/ovrd`
 
 ## Run the app
 Run cmake as usual, cd build && make, then `DISPLAY=:0.1 sudo ./RiftSkeleton`
+
+
+Building OSVR on Ubuntu 15.04
+============
+
+## Dependencies
+
+libfunctionality: builds, installs out-of-source with default CMake settings
+jsoncpp: JSONCPP_WITH_CMAKE_PACKAGE=1 JSONCPP_LIB_BUILD_SHARED=1
+
+`sudo apt-get install libusb-1.0-0-dev libboost-all-dev`
+
+opencv-2.4.11: builds, installs out-of-source with default CMake settings (takes a while)
+
+`git clone https://github.com/OSVR/OSVR-Oculus-Rift.git`
+`make`
+`sudo make install`
+
+run `sudo ldconfig` after each `make install`
+
+
+Download vrpn-feature-oculus-rift
+VRPN_USE_OVR=1
+
+*** Can't seem to get CMake to find the OVR SDK here ***
+
+git clone https://github.com/OSVR/OSVR-Oculus-Rift.git
+
+
+
