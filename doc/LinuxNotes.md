@@ -24,26 +24,23 @@ Building OSVR on Ubuntu 15.04
 
 ## Dependencies
 
-libfunctionality: builds, installs out-of-source with default CMake settings
-jsoncpp: JSONCPP_WITH_CMAKE_PACKAGE=1 JSONCPP_LIB_BUILD_SHARED=1
+libfunctionality: builds, installs out-of-source with default CMake settings  
+jsoncpp: JSONCPP_WITH_CMAKE_PACKAGE=1 JSONCPP_LIB_BUILD_SHARED=1  
 
-`sudo apt-get install libusb-1.0-0-dev libboost-all-dev`
+`sudo apt-get install libusb-1.0-0-dev libboost-all-dev`  
 
-opencv-2.4.11: builds, installs out-of-source with default CMake settings (takes a while)
+opencv-2.4.11: builds, installs out-of-source with default CMake settings (takes a while)  
 
-`git clone https://github.com/OSVR/OSVR-Oculus-Rift.git`
-`make`
-`sudo make install`
+`git clone https://github.com/OSVR/OSVR-Oculus-Rift.git`  
+`make`  
+`sudo make install`  
 
-run `sudo ldconfig` after each `make install`
+run `sudo ldconfig` after each `make install`  
 
+Download vrpn-feature-oculus-rift  
+Build with VRPN_USE_OVR=1  
 
-Download vrpn-feature-oculus-rift
-VRPN_USE_OVR=1
-
-*** Can't seem to get CMake to find the OVR SDK here ***
-
-git clone https://github.com/OSVR/OSVR-Oculus-Rift.git
+git clone https://github.com/OSVR/OSVR-Oculus-Rift.git  
 
 
 

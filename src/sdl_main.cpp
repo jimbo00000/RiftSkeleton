@@ -762,8 +762,19 @@ int main(int argc, char** argv)
             g_app.getHmdResolution().h,
             g_app.getHmdResolution().w
         };
-        const winPos pos = g_app.getHmdWindowPos();
-        g_renderMode.outputType = RenderingMode::SideBySide_Undistorted;
+        g_renderMode.outputType = RenderingMode::OVR_SDK;
+        winPos pos = g_app.getHmdWindowPos();
+
+#if defined(_LINUX)
+        LOG_INFO("Linux build.");
+        if (!strcmp(getenv("DISPLAY"), ":0.1"))
+        {
+            // When running on a dedicated X Screen for the Rift, i.e. DISPLAY=:0.1 ./RiftSkeleton,
+            // there is no position offset.
+            pos.x = 0;
+            pos.y = 0;
+        }
+#endif
 
         LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
         g_pHMDWindow = SDL_CreateWindow(
@@ -947,6 +958,11 @@ int main(int argc, char** argv)
 
     memset(m_keyStates, 0, 4096*sizeof(int));
 
+
+#if defined(_LINUX)
+    // On one system, leaving VSync on introduces tracking latency.
+    SetVsync(0);
+#endif
 
     int quit = 0;
     while (quit == 0)
