@@ -40,7 +40,11 @@ run `sudo ldconfig` after each `make install`
 Download vrpn-feature-oculus-rift  
 Build with VRPN_USE_OVR=1  
 
-git clone https://github.com/OSVR/OSVR-Oculus-Rift.git  
+`git clone https://github.com/OSVR/OSVR-Oculus-Rift.git`  
+`make && sudo make install`  
 
+## Running the app
+`/usr/local/bin/ovrd`  
+`sudo osvr_server /usr/local/./osvr_server_config.oculusrift.sample.json`  
 
-
+DISPLAY=:0.1 ./RiftSkeleton 
