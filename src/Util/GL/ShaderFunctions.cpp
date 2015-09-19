@@ -77,9 +77,9 @@ const std::string GetShaderSourceFromFile(const char* filename)
 {
     std::cout << "<<file>> ";
 
-    std::string shaderName = filename;
-    std::string shaderPath = "../shaders/"; ///@todo Check parent paths
-    std::string fullShaderName = shaderPath + shaderName;
+    const std::string shaderName = filename;
+    const std::string shaderPath = "../shaders/"; ///@todo Check parent paths
+    const std::string fullShaderName = shaderPath + shaderName;
 
     std::ifstream file;
     file.open(fullShaderName.c_str(), std::ios::in);
@@ -89,7 +89,7 @@ const std::string GetShaderSourceFromFile(const char* filename)
         return "";
     }
 
-    std::string fileContents = slurp(file);
+    const std::string fileContents = slurp(file);
     file.close();
 
     return fileContents;
@@ -151,13 +151,13 @@ GLuint loadShaderFile(const char* filename, const unsigned long Type)
     if (filename == NULL)
         return 0;
     const std::string shaderSource = GetShaderSource(filename);
-    std::string sourceString(shaderSource);
+    const std::string sourceString(shaderSource);
 
     if (sourceString.empty())
         return 0;
-    GLint length = static_cast<GLint>(sourceString.length());
+    const GLint length = static_cast<GLint>(sourceString.length());
 
-    GLuint shaderId = glCreateShader(Type);
+    const GLuint shaderId = glCreateShader(Type);
     const GLchar* pSrcStr = sourceString.c_str();
     glShaderSource(shaderId, 1, &pSrcStr, &length);
     glCompileShader(shaderId);
@@ -171,11 +171,11 @@ GLuint makeShaderFromSource(
     const char* geom)
 {
     std::cout << "  vs-";
-    GLuint vertSrc = loadShaderFile(vert, GL_VERTEX_SHADER);
+    const GLuint vertSrc = loadShaderFile(vert, GL_VERTEX_SHADER);
     printShaderInfoLog(vertSrc);
 
     std::cout << "  fs-";
-    GLuint fragSrc = loadShaderFile(frag, GL_FRAGMENT_SHADER);
+    const GLuint fragSrc = loadShaderFile(frag, GL_FRAGMENT_SHADER);
     printShaderInfoLog(fragSrc);
 
     // Vertex and fragment shaders are required
@@ -186,9 +186,9 @@ GLuint makeShaderFromSource(
     }
 
     //std::cout << "  gs: ";
-    GLuint geomSrc = loadShaderFile(geom, GL_GEOMETRY_SHADER_EXT);
+    const GLuint geomSrc = loadShaderFile(geom, GL_GEOMETRY_SHADER_EXT);
 
-    GLuint program = glCreateProgram();
+    const GLuint program = glCreateProgram();
 
     glCompileShader(vertSrc);
     glCompileShader(fragSrc);
