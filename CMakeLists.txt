@@ -246,12 +246,20 @@ ELSEIF( APPLE )
         # TODO: SDL2 or glfw
 
 ELSEIF( UNIX )
-    ADD_DEFINITIONS( -D_LINUX )
+    MESSAGE( CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} )
+    ADD_DEFINITIONS( -D_UNIX )
+    IF( CMAKE_SYSTEM_NAME STREQUAL "Linux" )
+        ADD_DEFINITIONS( -D_LINUX )
+    ENDIF()
+
     SET( LIBS_HOME "~/lib" )
     
     ADD_DEFINITIONS( -D_DEBUG )
     SET(CMAKE_CXX_FLAGS "-ggdb")
     SET(CMAKE_CXX_FLAGS_DEBUG "-ggdb")
+
+    INCLUDE_DIRECTORIES( /usr/local/include )
+    LINK_DIRECTORIES( /usr/local/lib )
 
     SET( GLM_ROOT "${LIBS_HOME}/glm-0.9.5.4/glm" CACHE STRING "glm root" )
     INCLUDE_DIRECTORIES( "${GLM_ROOT}" )
@@ -260,7 +268,7 @@ ELSEIF( UNIX )
     IF( GL_FRAMEWORK STREQUAL "GLFW" )
         MESSAGE("Using GLFW Framework.")
         INCLUDE_DIRECTORIES( "/usr/local/include/GLFW" )
-        SET( FRAMEWORK_LIBS -lglfw )
+        SET( FRAMEWORK_LIBS -lglfw3 )
     ELSEIF( GL_FRAMEWORK STREQUAL "SDL" )
         MESSAGE("Using SDL2 Framework.")
         INCLUDE_DIRECTORIES( "/usr/local/include/SDL2" "/usr/include/SDL2/" )
@@ -333,7 +341,7 @@ ELSEIF( UNIX )
         -lX11
         -lXinerama # GLFW 3.1
         -lXcursor # GLFW 3.1
-        -ldl
+	#-ldl
         ${HYDRA_LIBS}
         ${ANT_LIBS}
         )
