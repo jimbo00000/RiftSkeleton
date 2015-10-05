@@ -1,4 +1,4 @@
-Running RiftSkeleton on Linux
+Running RiftSkeleton on Linux with Oculus Rift DK2
 ============
 
 ## Set up the Rift Display
@@ -21,7 +21,7 @@ Assuming the 0.5.0.1 SDK is built and installed, run `sudo /usr/local/bin/ovrd`
 `DISPLAY=:0.1 sudo ./RiftSkeleton`  
 
 
-Building OSVR on Ubuntu 15.04
+Building OSVR on Ubuntu 15.04 for use with Oculus Rift
 ============
 
 ## Dependencies
@@ -61,4 +61,5 @@ Build with `VRPN_USE_OVR=1`
 `/usr/local/bin/ovrd`  
 `sudo osvr_server /usr/local/./osvr_server_config.oculusrift.sample.json`  
 
+`sudo nvidia-settings` and under **X Server Display Configuration** for the Rift Screen set **Orientation** to **Rotate Left**  
 `DISPLAY=:0.1 ./RiftSkeleton`  
