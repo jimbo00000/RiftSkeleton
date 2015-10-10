@@ -16,8 +16,8 @@
 
 #include <GLFW/glfw3.h>
 
-#if !defined(__APPLE__)
-//#  include <GLFW/glfw3native.h>
+#if defined(_WIN32) || defined(_LINUX)
+#  include <GLFW/glfw3native.h>
 #endif
 
 #include <glm/gtc/type_ptr.hpp>

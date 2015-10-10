@@ -27,6 +27,8 @@ ENDIF()
 
 ADD_DEFINITIONS( -DPROJECT_NAME="${PROJECT_NAME}" )
 
+MESSAGE( "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}" )
+
 #
 # Platform-dependent section
 #
@@ -246,20 +248,20 @@ ELSEIF( APPLE )
         # TODO: SDL2 or glfw
 
 ELSEIF( UNIX )
-    MESSAGE( CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} )
     ADD_DEFINITIONS( -D_UNIX )
     IF( CMAKE_SYSTEM_NAME STREQUAL "Linux" )
         ADD_DEFINITIONS( -D_LINUX )
+    ELSEIF( CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" )
+        ADD_DEFINITIONS( -D_FREEBSD )
+        INCLUDE_DIRECTORIES( /usr/local/include )
+        LINK_DIRECTORIES( /usr/local/lib )
     ENDIF()
 
     SET( LIBS_HOME "~/lib" )
-    
+
     ADD_DEFINITIONS( -D_DEBUG )
     SET(CMAKE_CXX_FLAGS "-ggdb")
     SET(CMAKE_CXX_FLAGS_DEBUG "-ggdb")
-
-    INCLUDE_DIRECTORIES( /usr/local/include )
-    LINK_DIRECTORIES( /usr/local/lib )
 
     SET( GLM_ROOT "${LIBS_HOME}/glm-0.9.5.4/glm" CACHE STRING "glm root" )
     INCLUDE_DIRECTORIES( "${GLM_ROOT}" )
