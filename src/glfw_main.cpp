@@ -263,10 +263,10 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
     if (m_keyStates[GLFW_KEY_RIGHT] != GLFW_RELEASE) { keyboardMove += right; }
 
     float mag = 1.0f;
-    if (m_keyStates[GLFW_KEY_LEFT_SHIFT] != GLFW_RELEASE)
-        mag *= 0.1f;
-    if (m_keyStates[GLFW_KEY_LEFT_CONTROL] != GLFW_RELEASE)
-        mag *= 10.0f;
+    if (m_keyStates[GLFW_KEY_LEFT_SHIFT] != GLFW_RELEASE) mag *= 0.1f;
+    if (m_keyStates[GLFW_KEY_LEFT_CONTROL] != GLFW_RELEASE) mag *= 10.0f;
+    if (m_keyStates[GLFW_KEY_RIGHT_SHIFT] != GLFW_RELEASE) mag *= 0.1f;
+    if (m_keyStates[GLFW_KEY_RIGHT_CONTROL] != GLFW_RELEASE) mag *= 10.0f;
 
     // Yaw keys
     g_app.m_keyboardYaw = 0.0f;
@@ -274,7 +274,8 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
     if (m_keyStates['1'] != GLFW_RELEASE) { g_app.m_keyboardYaw = -dyaw; }
     if (m_keyStates['3'] != GLFW_RELEASE) { g_app.m_keyboardYaw = dyaw; }
 
-    // Pitch and roll controls - if yaw is VR poison, this is torture and death!
+    // Pitch and roll controls - if yaw is VR poison,
+    // this is torture and death!
     g_app.m_keyboardDeltaPitch = 0.0f;
     g_app.m_keyboardDeltaRoll = 0.0f;
     if (g_allowPitch)
