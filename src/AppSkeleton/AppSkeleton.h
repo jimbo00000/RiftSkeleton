@@ -44,7 +44,6 @@ public:
 
     void SetChassisPosition(glm::vec3 p) { m_chassisPos = p; }
     GLuint getRenderBufferTex() const { return m_renderBuffer.tex; }
-    float GetFboScale() const { return m_fboScale; }
 
     // These vestigial functions match the entry points in OVRSDK05AppSkeleton.
     // Having them here is ugly, but doesn't seem as bad as a ton of #ifdefs in main.
