@@ -359,6 +359,13 @@ void OVRSDK06AppSkeleton::display_sdk() const
             GL_COLOR_BUFFER_BIT, GL_NEAREST);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     }
+    else
+    {
+        // Just a clear of the mirror window shouldn't be so expensive
+        // as to hurt frame rate.
+        glClearColor(0.f, 0.f, 0.f, 0.f);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
     ++m_frameIndex;
 }
