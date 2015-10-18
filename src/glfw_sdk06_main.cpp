@@ -185,15 +185,6 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
 
         case GLFW_KEY_ESCAPE:
             {
-                // Clear the frame before calling all the destructors - even a few
-                // frames worth of frozen video is enough to cause discomfort!
-                ///@note This does not seem to work in Direct mode.
-                glClearColor(58.f/255.f, 110.f/255.f, 165.f/255.f, 1.f); // Win7 default desktop color
-                glClear(GL_COLOR_BUFFER_BIT);
-                glfwSwapBuffers(g_pHMDWindow);
-                glClear(GL_COLOR_BUFFER_BIT);
-                glfwSwapBuffers(g_pHMDWindow);
-
                 g_app.exitVR();
                 glfwDestroyWindow(g_pHMDWindow);
                 glfwTerminate();
