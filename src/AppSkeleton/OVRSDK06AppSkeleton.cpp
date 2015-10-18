@@ -127,9 +127,9 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         LOG_INFO("Eye %d tex : %dx%d @ (%d,%d)", eye, size.w, size.h,
             layer.Viewport[eye].Pos.x, layer.Viewport[eye].Pos.y);
 
-        ovrEyeRenderDesc & erd = m_eyeRenderDescs[eye];
+        ovrEyeRenderDesc& erd = m_eyeRenderDescs[eye];
         erd = ovrHmd_GetRenderDesc(m_Hmd, eye, m_Hmd->MaxEyeFov[eye]);
-        ovrMatrix4f ovrPerspectiveProjection =
+        const ovrMatrix4f ovrPerspectiveProjection =
             ovrMatrix4f_Projection(erd.Fov, .1f, 10000.f, ovrProjection_RightHanded);
         m_eyeProjections[eye] = glm::transpose(glm::make_mat4(&ovrPerspectiveProjection.M[0][0]));
         m_eyeOffsets[eye] = erd.HmdToEyeViewOffset;
@@ -141,7 +141,7 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
             LOG_ERROR("Unable to create swap textures");
             return;
         }
-        ovrSwapTextureSet& swapSet = *m_pTexSet[eye];
+        const ovrSwapTextureSet& swapSet = *m_pTexSet[eye];
         for (int i = 0; i < swapSet.TextureCount; ++i)
         {
             const ovrGLTexture& ovrTex = (ovrGLTexture&)swapSet.Textures[i];
@@ -191,7 +191,7 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     const ovrEyeType eye = ovrEyeType::ovrEye_Left;
     const ovrFovPort& fov = layer.Fov[eye] = m_Hmd->MaxEyeFov[eye];
     const ovrSizei& size = layer.Viewport[eye].Size = ovrHmd_GetFovTextureSize(m_Hmd, eye, fov, 1.f);
-    ovrResult result = ovrHmd_CreateMirrorTextureGL(m_Hmd, GL_RGBA, size.w, size.h, &m_pMirrorTex);
+    const ovrResult result = ovrHmd_CreateMirrorTextureGL(m_Hmd, GL_RGBA, size.w, size.h, &m_pMirrorTex);
     if (!OVR_SUCCESS(result))
     {
         LOG_ERROR("Unable to create mirror texture");
@@ -258,12 +258,12 @@ ovrSizei OVRSDK06AppSkeleton::getHmdResolution() const
 
 void OVRSDK06AppSkeleton::display_sdk() const
 {
-    ovrHmd hmd = m_Hmd;
+    const ovrHmd hmd = m_Hmd;
     if (hmd == NULL)
         return;
 
     ovrTrackingState outHmdTrackingState = { 0 };
-    ovrHmd_GetEyePoses(m_Hmd, m_frameIndex, m_eyeOffsets,
+    ovrHmd_GetEyePoses(hmd, m_frameIndex, m_eyeOffsets,
         m_eyePoses, &outHmdTrackingState);
 
     for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
@@ -272,7 +272,7 @@ void OVRSDK06AppSkeleton::display_sdk() const
     {
         const ovrSwapTextureSet& swapSet = *m_pTexSet[eye];
         glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
-        ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
+        const ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
         {
             // Handle render target resolution scaling
@@ -331,9 +331,9 @@ void OVRSDK06AppSkeleton::display_sdk() const
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    ovrLayerEyeFov& layer = m_layerEyeFov;
-    ovrLayerHeader* layers = &layer.Header;
-    ovrResult result = ovrHmd_SubmitFrame(hmd, m_frameIndex, NULL, &layers, 1);
+    const ovrLayerEyeFov& layer = m_layerEyeFov;
+    const ovrLayerHeader* layers = &layer.Header;
+    const ovrResult result = ovrHmd_SubmitFrame(hmd, m_frameIndex, NULL, &layers, 1);
 
     // Increment counters in swap texture set
     for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
