@@ -61,7 +61,7 @@ int oldx, oldy, newx, newy;
 int which_button = -1;
 int modifier_mode = 0;
 
-GLFWwindow* g_pHMDWindow = NULL;
+GLFWwindow* g_pMirrorWindow = NULL;
 int g_auxWindow_w = 1920 / 2;
 int g_auxWindow_h = 587;
 
@@ -88,7 +88,7 @@ void destroyAuxiliaryWindow(GLFWwindow* pAuxWindow);
 static void SetVsync(int state)
 {
     LOG_INFO("SetVsync(%d)", state);
-    glfwMakeContextCurrent(g_pHMDWindow);
+    glfwMakeContextCurrent(g_pMirrorWindow);
     glfwSwapInterval(state);
 }
 
@@ -182,7 +182,7 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
         case GLFW_KEY_ESCAPE:
             {
                 g_app.exitVR();
-                glfwDestroyWindow(g_pHMDWindow);
+                glfwDestroyWindow(g_pMirrorWindow);
                 glfwTerminate();
                 exit(0);
             }
@@ -506,12 +506,12 @@ void displayToHMD()
     {
     case RenderingMode::Mono_Raw:
         g_app.display_raw();
-        glfwSwapBuffers(g_pHMDWindow);
+        glfwSwapBuffers(g_pMirrorWindow);
         break;
 
     case RenderingMode::Mono_Buffered:
         g_app.display_buffered();
-        glfwSwapBuffers(g_pHMDWindow);
+        glfwSwapBuffers(g_pMirrorWindow);
         break;
 
 #if defined(USE_OCULUSSDK)
@@ -522,7 +522,7 @@ void displayToHMD()
 #ifdef USE_ANTTWEAKBAR
         TwDraw(); ///@todo Should this go first? Will it write to a depth buffer?
 #endif
-        glfwSwapBuffers(g_pHMDWindow);
+        glfwSwapBuffers(g_pMirrorWindow);
         break;
 #endif //USE_OCULUSSDK
 
@@ -710,7 +710,7 @@ int main(int argc, char** argv)
 
     printGLContextInfo(l_Window);
     glfwMakeContextCurrent(l_Window);
-    g_pHMDWindow = l_Window;
+    g_pMirrorWindow = l_Window;
 
 
     // Don't forget to initialize Glew, turn glewExperimental on to
