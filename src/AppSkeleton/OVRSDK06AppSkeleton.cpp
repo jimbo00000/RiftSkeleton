@@ -340,11 +340,12 @@ void OVRSDK06AppSkeleton::display_sdk() const
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    const ovrLayerEyeFov& layer = m_layerEyeFov;
-    const ovrLayerHeader* layers = &layer.Header;
-    const ovrResult result = ovrHmd_SubmitFrame(hmd, m_frameIndex, NULL, &layers, 1);
+    // Submit layers to HMD for display
+    const ovrLayerHeader* layers[1] = { &m_layerEyeFov.Header };
+    const ovrResult result = ovrHmd_SubmitFrame(hmd, m_frameIndex, NULL, layers, 1);
+    ++m_frameIndex;
 
-    // Increment counters in swap texture set
+    // Increment counters in each swap texture set
     for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
         eye < ovrEyeType::ovrEye_Count;
         eye = static_cast<ovrEyeType>(eye + 1))
@@ -375,6 +376,4 @@ void OVRSDK06AppSkeleton::display_sdk() const
         glClearColor(0.f, 0.f, 0.f, 0.f);
         glClear(GL_COLOR_BUFFER_BIT);
     }
-
-    ++m_frameIndex;
 }
