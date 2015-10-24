@@ -102,6 +102,21 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
     if (m_Hmd == NULL)
         return;
 
+    // Set up eye view parameters
+    for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
+        eye < ovrEyeType::ovrEye_Count;
+        eye = static_cast<ovrEyeType>(eye + 1))
+    {
+        ovrEyeRenderDesc& erd = m_eyeRenderDescs[eye];
+        erd = ovrHmd_GetRenderDesc(m_Hmd, eye, m_Hmd->MaxEyeFov[eye]);
+
+        m_eyeOffsets[eye] = erd.HmdToEyeViewOffset;
+        const ovrMatrix4f ovrPerspectiveProjection = ovrMatrix4f_Projection(
+            erd.Fov, .1f, 10000.f, ovrProjection_RightHanded);
+        m_eyeProjections[eye] = glm::transpose(glm::make_mat4(&ovrPerspectiveProjection.M[0][0]));
+    }
+
+    // Create eye render target textures and FBOs
     for (int i = 0; i < 2; ++i)
     {
         if (m_pTexSet[i])
@@ -111,12 +126,10 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         }
     }
 
-    // Set up eye fields of view
     ovrLayerEyeFov& layer = m_layerEyeFov;
     layer.Header.Type = ovrLayerType_EyeFov;
     layer.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;
 
-    // Create eye render target textures and FBOs
     for (ovrEyeType eye = ovrEyeType::ovrEye_Left;
         eye < ovrEyeType::ovrEye_Count;
         eye = static_cast<ovrEyeType>(eye + 1))
@@ -126,13 +139,6 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         layer.Viewport[eye].Pos = { 0, 0 };
         LOG_INFO("Eye %d tex : %dx%d @ (%d,%d)", eye, size.w, size.h,
             layer.Viewport[eye].Pos.x, layer.Viewport[eye].Pos.y);
-
-        ovrEyeRenderDesc& erd = m_eyeRenderDescs[eye];
-        erd = ovrHmd_GetRenderDesc(m_Hmd, eye, m_Hmd->MaxEyeFov[eye]);
-        const ovrMatrix4f ovrPerspectiveProjection =
-            ovrMatrix4f_Projection(erd.Fov, .1f, 10000.f, ovrProjection_RightHanded);
-        m_eyeProjections[eye] = glm::transpose(glm::make_mat4(&ovrPerspectiveProjection.M[0][0]));
-        m_eyeOffsets[eye] = erd.HmdToEyeViewOffset;
 
         // Allocate the frameBuffer that will hold the scene, and then be
         // re-rendered to the screen with distortion
@@ -170,12 +176,10 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_swapFBO.depth);
 
         // Check status
+        const GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+        if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
         {
-            const GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-            if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
-            {
-                LOG_ERROR("Framebuffer status incomplete: %d %x", status, status);
-            }
+            LOG_ERROR("Framebuffer status incomplete: %d %x", status, status);
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
