@@ -32,8 +32,8 @@
 
 OVRSDK06AppSkeleton::OVRSDK06AppSkeleton()
 : m_Hmd(NULL)
-, m_pMirrorTex(NULL)
 , m_frameIndex(0)
+, m_pMirrorTex(NULL)
 , m_usingDebugHmd(false)
 , m_mirror(MirrorDistorted)
 {

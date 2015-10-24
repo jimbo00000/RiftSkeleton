@@ -56,8 +56,6 @@ public:
 
 protected:
     ovrHmd m_Hmd;
-    ovrTexture* m_pMirrorTex;
-    ovrSwapTextureSet* m_pTexSet[ovrEye_Count];
     ovrEyeRenderDesc m_eyeRenderDescs[ovrEye_Count];
     ovrVector3f m_eyeOffsets[ovrEye_Count];
     glm::mat4 m_eyeProjections[ovrEye_Count];
@@ -66,9 +64,12 @@ protected:
     mutable ovrLayerEyeFov m_layerEyeFov;
     mutable int m_frameIndex;
 
+    ovrTexture* m_pMirrorTex;
+    ovrSwapTextureSet* m_pTexSet[ovrEye_Count];
     FBO m_swapFBO;
     FBO m_mirrorFBO;
     FBO m_undistortedFBO;
+
     ovrSizei m_appWindowSize;
     bool m_usingDebugHmd;
     MirrorType m_mirror;
