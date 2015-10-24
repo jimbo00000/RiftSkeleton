@@ -260,6 +260,22 @@ ovrSizei OVRSDK06AppSkeleton::getHmdResolution() const
     return m_Hmd->Resolution;
 }
 
+void OVRSDK06AppSkeleton::BlitLeftEyeRenderToUndistortedMirrorTexture() const
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_swapFBO.id);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_undistortedFBO.id);
+    glViewport(0, 0, m_undistortedFBO.w, m_undistortedFBO.h);
+    glBlitFramebuffer(
+        0, static_cast<int>(static_cast<float>(m_swapFBO.h)*m_fboScale),
+        static_cast<int>(static_cast<float>(m_swapFBO.w)*m_fboScale), 0, ///@todo Fix for FBO scaling
+        0, 0, m_undistortedFBO.w, m_undistortedFBO.h,
+        GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
+}
+
 void OVRSDK06AppSkeleton::display_sdk() const
 {
     const ovrHmd hmd = m_Hmd;
@@ -316,18 +332,7 @@ void OVRSDK06AppSkeleton::display_sdk() const
         {
             if (eye == ovrEyeType::ovrEye_Left)
             {
-                glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, m_swapFBO.id);
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_undistortedFBO.id);
-                glViewport(0, 0, m_undistortedFBO.w, m_undistortedFBO.h);
-                glBlitFramebuffer(
-                    0, static_cast<int>(static_cast<float>(m_swapFBO.h)*m_fboScale),
-                    static_cast<int>(static_cast<float>(m_swapFBO.w)*m_fboScale), 0, ///@todo Fix for FBO scaling
-                    0, 0, m_undistortedFBO.w, m_undistortedFBO.h,
-                    GL_COLOR_BUFFER_BIT, GL_NEAREST);
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-                glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
+                BlitLeftEyeRenderToUndistortedMirrorTexture();
             }
         }
 

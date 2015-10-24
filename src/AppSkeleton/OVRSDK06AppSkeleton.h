@@ -55,6 +55,8 @@ public:
     void display_client() const { display_sdk(); }
 
 protected:
+    void BlitLeftEyeRenderToUndistortedMirrorTexture() const;
+
     ovrHmd m_Hmd;
     ovrEyeRenderDesc m_eyeRenderDescs[ovrEye_Count];
     ovrVector3f m_eyeOffsets[ovrEye_Count];
