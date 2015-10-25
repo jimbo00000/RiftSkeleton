@@ -64,11 +64,14 @@ protected:
 
     mutable ovrPosef m_eyePoses[ovrEye_Count];
     mutable ovrLayerEyeFov m_layerEyeFov;
+    mutable ovrLayerQuad m_layerQuad;
     mutable int m_frameIndex;
 
     ovrTexture* m_pMirrorTex;
     ovrSwapTextureSet* m_pTexSet[ovrEye_Count];
+    ovrSwapTextureSet* m_pQuadTex;
     FBO m_swapFBO;
+    FBO m_quadFBO;
     FBO m_mirrorFBO;
     FBO m_undistortedFBO;
 

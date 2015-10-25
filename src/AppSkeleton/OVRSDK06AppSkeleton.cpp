@@ -34,6 +34,7 @@ OVRSDK06AppSkeleton::OVRSDK06AppSkeleton()
 : m_Hmd(NULL)
 , m_frameIndex(0)
 , m_pMirrorTex(NULL)
+, m_pQuadTex(NULL)
 , m_usingDebugHmd(false)
 , m_mirror(MirrorDistorted)
 {
@@ -65,6 +66,7 @@ void OVRSDK06AppSkeleton::exitVR()
     {
         ovrHmd_DestroySwapTextureSet(m_Hmd, m_pTexSet[i]);
     }
+    ovrHmd_DestroySwapTextureSet(m_Hmd, m_pQuadTex);
     ovrHmd_Destroy(m_Hmd);
     ovr_Shutdown();
 }
@@ -176,14 +178,67 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_swapFBO.depth);
 
         // Check status
-        const GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-        if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+        const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (status != GL_FRAMEBUFFER_COMPLETE)
         {
             LOG_ERROR("Framebuffer status incomplete: %d %x", status, status);
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         layer.ColorTexture[eye] = m_pTexSet[eye];
+    }
+
+    // Create in-world quad layer
+    {
+        const ovrSizei& size = { 600, 600 };
+        if (!OVR_SUCCESS(ovrHmd_CreateSwapTextureSetGL(m_Hmd, GL_RGBA, size.w, size.h, &m_pQuadTex)))
+        {
+            LOG_ERROR("Unable to create quad layer swap tex");
+            return;
+        }
+
+        const ovrSwapTextureSet& swapSet = *m_pQuadTex;
+        const ovrGLTexture& ovrTex = (ovrGLTexture&)swapSet.Textures[0];
+        glBindTexture(GL_TEXTURE_2D, ovrTex.OGL.TexId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        ovrLayerQuad& layer = m_layerQuad;
+        layer.Header.Type = ovrLayerType_QuadInWorld;
+        layer.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;
+        layer.ColorTexture = m_pQuadTex;
+        layer.Viewport.Pos = { 0, 0 };
+        layer.Viewport.Size = size;
+        layer.QuadPoseCenter.Orientation = { 0.f, 0.f, 0.f, 1.f };
+        layer.QuadPoseCenter.Position = { .3f, .3f, -1.f };
+        layer.QuadSize = { 1.f, 1.f };
+
+        // Manually assemble quad FBO
+        m_quadFBO.w = size.w;
+        m_quadFBO.h = size.h;
+        glGenFramebuffers(1, &m_quadFBO.id);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_quadFBO.id);
+        const int idx = 0;
+        const ovrGLTextureData* pGLData = reinterpret_cast<ovrGLTextureData*>(&swapSet.Textures[0]);
+        m_quadFBO.tex = pGLData->TexId;
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_quadFBO.tex, 0);
+
+        m_quadFBO.depth = 0;
+        glGenRenderbuffers(1, &m_quadFBO.depth);
+        glBindRenderbuffer(GL_RENDERBUFFER, m_quadFBO.depth);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, size.w, size.h);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_quadFBO.depth);
+
+        // Check status
+        const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (status != GL_FRAMEBUFFER_COMPLETE)
+        {
+            LOG_ERROR("Framebuffer status incomplete: %d %x", status, status);
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     // Mirror texture for displaying to desktop window
@@ -213,8 +268,8 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
 
     // Check status
     {
-        const GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-        if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+        const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (status != GL_FRAMEBUFFER_COMPLETE)
         {
             LOG_ERROR("Framebuffer status incomplete: %d %x", status, status);
         }
@@ -340,9 +395,26 @@ void OVRSDK06AppSkeleton::display_sdk() const
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    // Draw to in-world quad
+    {
+        const ovrSwapTextureSet& swapSet = *m_pQuadTex;
+        glBindFramebuffer(GL_FRAMEBUFFER, m_quadFBO.id);
+        const ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
+
+        glClearColor(1, 1, 0, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
     // Submit layers to HMD for display
-    const ovrLayerHeader* layers[1] = { &m_layerEyeFov.Header };
-    const ovrResult result = ovrHmd_SubmitFrame(hmd, m_frameIndex, NULL, layers, 1);
+    const ovrLayerHeader* layers[2] = { &m_layerEyeFov.Header, &m_layerQuad.Header };
+    ovrViewScaleDesc viewScaleDesc;
+    viewScaleDesc.HmdToEyeViewOffset[0] = m_eyeOffsets[0];
+    viewScaleDesc.HmdToEyeViewOffset[1] = m_eyeOffsets[1];
+    viewScaleDesc.HmdSpaceToWorldScaleInMeters = 1.f;
+    const ovrResult result = ovrHmd_SubmitFrame(hmd, m_frameIndex, &viewScaleDesc, layers, 2);
     ++m_frameIndex;
 
     // Increment counters in each swap texture set
@@ -351,6 +423,10 @@ void OVRSDK06AppSkeleton::display_sdk() const
         eye = static_cast<ovrEyeType>(eye + 1))
     {
         ovrSwapTextureSet& swapSet = *m_pTexSet[eye];
+        ++swapSet.CurrentIndex %= swapSet.TextureCount;
+    }
+    {
+        ovrSwapTextureSet& swapSet = *m_pQuadTex;
         ++swapSet.CurrentIndex %= swapSet.TextureCount;
     }
 
