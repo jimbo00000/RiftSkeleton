@@ -37,6 +37,7 @@ OVRSDK06AppSkeleton::OVRSDK06AppSkeleton()
 , m_pQuadTex(NULL)
 , m_usingDebugHmd(false)
 , m_mirror(MirrorDistorted)
+, m_showQuadInWorld(true)
 {
     m_pTexSet[0] = NULL;
     m_pTexSet[1] = NULL;
@@ -409,12 +410,17 @@ void OVRSDK06AppSkeleton::display_sdk() const
     }
 
     // Submit layers to HMD for display
-    const ovrLayerHeader* layers[2] = { &m_layerEyeFov.Header, &m_layerQuad.Header };
+    std::vector<const ovrLayerHeader*> layers;
+    layers.push_back(&m_layerEyeFov.Header);
+    if (m_showQuadInWorld)
+    {
+        layers.push_back(&m_layerQuad.Header);
+    }
     ovrViewScaleDesc viewScaleDesc;
     viewScaleDesc.HmdToEyeViewOffset[0] = m_eyeOffsets[0];
     viewScaleDesc.HmdToEyeViewOffset[1] = m_eyeOffsets[1];
     viewScaleDesc.HmdSpaceToWorldScaleInMeters = 1.f;
-    const ovrResult result = ovrHmd_SubmitFrame(hmd, m_frameIndex, &viewScaleDesc, layers, 2);
+    const ovrResult result = ovrHmd_SubmitFrame(hmd, m_frameIndex, &viewScaleDesc, &layers[0], layers.size());
     ++m_frameIndex;
 
     // Increment counters in each swap texture set
@@ -425,6 +431,7 @@ void OVRSDK06AppSkeleton::display_sdk() const
         ovrSwapTextureSet& swapSet = *m_pTexSet[eye];
         ++swapSet.CurrentIndex %= swapSet.TextureCount;
     }
+    if (m_showQuadInWorld)
     {
         ovrSwapTextureSet& swapSet = *m_pQuadTex;
         ++swapSet.CurrentIndex %= swapSet.TextureCount;

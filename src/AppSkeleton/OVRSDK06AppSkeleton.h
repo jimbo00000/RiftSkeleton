@@ -44,6 +44,7 @@ public:
     void ToggleLowPersistence() {}
     void ToggleDynamicPrediction() {}
     void ToggleMirroringType();
+    void ToggleQuadInWorld() { m_showQuadInWorld = !m_showQuadInWorld; }
 
     void SetAppWindowSize(ovrSizei sz) { m_appWindowSize = sz; }
 
@@ -78,6 +79,7 @@ protected:
     ovrSizei m_appWindowSize;
     bool m_usingDebugHmd;
     MirrorType m_mirror;
+    bool m_showQuadInWorld;
 
 private: // Disallow copy ctor and assignment operator
     OVRSDK06AppSkeleton(const OVRSDK06AppSkeleton&);

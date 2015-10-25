@@ -166,6 +166,10 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
             g_app.RecenterPose();
             break;
 
+        case GLFW_KEY_TAB:
+            g_app.ToggleQuadInWorld();
+            break;
+
         case 'R':
             g_app.ResetChassisTransformations();
             break;
