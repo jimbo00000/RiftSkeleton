@@ -681,6 +681,8 @@ int main(int argc, char** argv)
     //SDL_SetWindowFullscreen(g_pMirrorWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
     //SDL_SetRelativeMouseMode(SDL_TRUE);
     g_app.SetAppWindowSize(sz);
+    g_auxWindow_w = sz.w;
+    g_auxWindow_h = sz.h;
 #else
     g_pMirrorWindow = SDL_CreateWindow(
         "GL Skeleton - SDL2",
@@ -780,6 +782,7 @@ int main(int argc, char** argv)
 
     SetVsync(0); // SDK 0.6 requires vsync OFF
 
+    TwWindowSize(g_auxWindow_w, g_auxWindow_h);
     int quit = 0;
     while (quit == 0)
     {
