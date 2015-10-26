@@ -60,10 +60,9 @@ int oldx, oldy, newx, newy;
 int which_button = -1;
 int modifier_mode = 0;
 
-//ShaderWithVariables g_auxPresent;
-SDL_Window* g_pHMDWindow = NULL;
-SDL_GLContext g_HMDglContext = NULL;
-Uint32 g_HMDWindowID = 0;
+SDL_Window* g_pMirrorWindow = NULL;
+SDL_GLContext g_pMirrorGLContext = NULL;
+Uint32 g_pMirrorWindowID = 0;
 int g_auxWindow_w = 1920 / 2;
 int g_auxWindow_h = 587;
 bool g_drawToAuxWindow = false;
@@ -90,7 +89,7 @@ void destroyAuxiliaryWindow(SDL_Window* pAuxWindow);
 static void SetVsync(int state)
 {
     LOG_INFO("SetVsync(%d)", state);
-    SDL_GL_MakeCurrent(g_pHMDWindow, g_HMDglContext);
+    SDL_GL_MakeCurrent(g_pMirrorWindow, g_pMirrorGLContext);
     int ret = SDL_GL_SetSwapInterval(state);
     if (ret != 0)
     {
@@ -190,10 +189,10 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
         case SDLK_ESCAPE:
             if (event.key.keysym.sym == SDLK_ESCAPE)
             {
-                if (event.key.windowID == g_HMDWindowID)
+                if (event.key.windowID == g_pMirrorWindowID)
                 {
-                    SDL_GL_DeleteContext(g_HMDglContext);
-                    SDL_DestroyWindow(g_pHMDWindow);
+                    SDL_GL_DeleteContext(g_pMirrorGLContext);
+                    SDL_DestroyWindow(g_pMirrorWindow);
 
                     g_app.exitVR();
                     if (g_pJoy != NULL)
@@ -445,12 +444,12 @@ void display()
     {
     case RenderingMode::Mono_Raw:
         g_app.display_raw();
-        SDL_GL_SwapWindow(g_pHMDWindow);
+        SDL_GL_SwapWindow(g_pMirrorWindow);
         break;
 
     case RenderingMode::Mono_Buffered:
         g_app.display_buffered();
-        SDL_GL_SwapWindow(g_pHMDWindow);
+        SDL_GL_SwapWindow(g_pMirrorWindow);
         break;
 
 #if defined(USE_OCULUSSDK)
@@ -461,7 +460,7 @@ void display()
 #ifdef USE_ANTTWEAKBAR
         TwDraw(); ///@todo Should this go first? Will it write to a depth buffer?
 #endif
-        SDL_GL_SwapWindow(g_pHMDWindow);
+        SDL_GL_SwapWindow(g_pMirrorWindow);
         break;
 #endif
 
@@ -502,7 +501,7 @@ void PollEvents()
             }
             else if (event.window.event == SDL_WINDOWEVENT_RESIZED)
             {
-                if (event.window.windowID != g_HMDWindowID)
+                if (event.window.windowID != g_pMirrorWindowID)
                 {
                     const int w = event.window.data1;
                     const int h = event.window.data2;
@@ -674,15 +673,15 @@ int main(int argc, char** argv)
     windowTitle = PROJECT_NAME "-SDL2-Direct";
 
     LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
-    g_pHMDWindow = SDL_CreateWindow(
+    g_pMirrorWindow = SDL_CreateWindow(
         windowTitle.c_str(),
         pos.x, pos.y,
         sz.w, sz.h,
         SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-    //SDL_SetWindowFullscreen(g_pHMDWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    //SDL_SetWindowFullscreen(g_pMirrorWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
     //SDL_SetRelativeMouseMode(SDL_TRUE);
 #else
-    g_pHMDWindow = SDL_CreateWindow(
+    g_pMirrorWindow = SDL_CreateWindow(
         "GL Skeleton - SDL2",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         800, 600,
@@ -690,17 +689,17 @@ int main(int argc, char** argv)
     std::string windowTitle = PROJECT_NAME;
 #endif //OVRSDK06
 
-    if (g_pHMDWindow == NULL)
+    if (g_pMirrorWindow == NULL)
     {
         LOG_ERROR("SDL_CreateWindow failed with error: %s", SDL_GetError());
         SDL_Quit();
     }
 
-    g_HMDWindowID = SDL_GetWindowID(g_pHMDWindow);
+    g_pMirrorWindowID = SDL_GetWindowID(g_pMirrorWindow);
 
     // thank you http://www.brandonfoltz.com/2013/12/example-using-opengl-3-0-with-sdl2-and-glew/
-    g_HMDglContext = SDL_GL_CreateContext(g_pHMDWindow);
-    if (g_HMDglContext == NULL)
+    g_pMirrorGLContext = SDL_GL_CreateContext(g_pMirrorWindow);
+    if (g_pMirrorGLContext == NULL)
     {
         LOG_ERROR("There was an error creating the OpenGL context!");
         return 0;
@@ -742,7 +741,7 @@ int main(int argc, char** argv)
     LOG_INFO("Vendor: %s", (char*)glGetString(GL_VENDOR));
     LOG_INFO("Renderer: %s", (char*)glGetString(GL_RENDERER));
 
-    SDL_GL_MakeCurrent(g_pHMDWindow, g_HMDglContext);
+    SDL_GL_MakeCurrent(g_pMirrorWindow, g_pMirrorGLContext);
 
     // Don't forget to initialize Glew, turn glewExperimental on to
     // avoid problems fetching function pointers...
@@ -807,7 +806,7 @@ int main(int argc, char** argv)
                 << " "
                 << static_cast<int>(g_fps.GetFPS())
                 << " fps";
-            SDL_SetWindowTitle(g_pHMDWindow, oss.str().c_str());
+            SDL_SetWindowTitle(g_pMirrorWindow, oss.str().c_str());
         }
 #endif
 
@@ -819,8 +818,8 @@ int main(int argc, char** argv)
         }
     }
 
-    SDL_GL_DeleteContext(g_HMDglContext);
-    SDL_DestroyWindow(g_pHMDWindow);
+    SDL_GL_DeleteContext(g_pMirrorGLContext);
+    SDL_DestroyWindow(g_pMirrorWindow);
 
     g_app.exitVR();
 
