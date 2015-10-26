@@ -540,10 +540,7 @@ void displayToHMD()
 void GLAPIENTRY myCallback(
     GLenum source, GLenum type, GLuint id, GLenum severity,
     GLsizei length, const GLchar *msg,
-#ifndef _LINUX
-    const
-#endif
-    void *data)
+    const void *data)
 {
     switch (severity)
     {
