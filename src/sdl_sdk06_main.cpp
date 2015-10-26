@@ -680,6 +680,7 @@ int main(int argc, char** argv)
         SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
     //SDL_SetWindowFullscreen(g_pMirrorWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
     //SDL_SetRelativeMouseMode(SDL_TRUE);
+    g_app.SetAppWindowSize(sz);
 #else
     g_pMirrorWindow = SDL_CreateWindow(
         "GL Skeleton - SDL2",
