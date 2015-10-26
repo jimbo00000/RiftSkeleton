@@ -183,6 +183,8 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
         case 't': g_app.ToggleTimeWarp(); break;
         case 'o': g_app.ToggleOverdrive(); break;
         case 'l': g_app.ToggleLowPersistence(); break;
+        case 'm': g_app.ToggleMirroringType(); break;
+        case 'p': g_app.ToggleDynamicPrediction(); break;
 #endif
 
         case SDLK_ESCAPE:
@@ -357,6 +359,23 @@ void joystick()
 
 void mouseDown(int button, int state, int x, int y)
 {
+#ifdef USE_ANTTWEAKBAR
+    TwMouseAction action = TW_MOUSE_RELEASED;
+    if (state == SDL_PRESSED)
+    {
+        action = TW_MOUSE_PRESSED;
+    }
+    TwMouseButtonID buttonID = TW_MOUSE_LEFT;
+    if (button == SDL_BUTTON_LEFT)
+        buttonID = TW_MOUSE_LEFT;
+    else if (button == SDL_BUTTON_MIDDLE)
+        buttonID = TW_MOUSE_MIDDLE;
+    else if (button == SDL_BUTTON_RIGHT)
+        buttonID = TW_MOUSE_RIGHT;
+    const int ant = TwMouseButton(action, buttonID);
+    if (ant != 0)
+        return;
+#endif
     which_button = button;
     oldx = newx = x;
     oldy = newy = y;
@@ -369,6 +388,11 @@ void mouseDown(int button, int state, int x, int y)
 
 void mouseMove(int x, int y)
 {
+#ifdef USE_ANTTWEAKBAR
+    const int ant = TwMouseMotion(x, y);
+    if (ant != 0)
+        return;
+#endif
     oldx = newx;
     oldy = newy;
     newx = x;
@@ -767,6 +791,10 @@ int main(int argc, char** argv)
         {
             DynamicallyScaleFBO();
         }
+
+#ifdef USE_ANTTWEAKBAR
+        TwRefreshBar(g_pTweakbar);
+#endif
 
         display();
 
