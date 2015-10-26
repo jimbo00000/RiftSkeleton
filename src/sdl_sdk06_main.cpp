@@ -1,0 +1,803 @@
+// sdl_main.cpp
+
+#ifdef _WIN32
+#  define WINDOWS_LEAN_AND_MEAN
+#  define NOMINMAX
+#  include <windows.h>
+#endif
+
+#include <sstream>
+#include <algorithm>
+
+#include <GL/glew.h>
+#include <SDL.h>
+#include <SDL_syswm.h>
+#undef main
+
+#include <glm/gtc/type_ptr.hpp>
+
+#ifdef USE_ANTTWEAKBAR
+#  include <AntTweakBar.h>
+#endif
+
+#include <stdio.h>
+#include <string.h>
+#include <sstream>
+#include <algorithm>
+
+#if defined(USE_OCULUSSDK)
+#  include "OVRSDK06AppSkeleton.h"
+#else
+#include "AppSkeleton.h"
+#endif
+
+#include "RenderingMode.h"
+#include "Timer.h"
+#include "FPSTimer.h"
+#include "Logger.h"
+
+#if defined(USE_OCULUSSDK)
+OVRSDK06AppSkeleton g_app;
+#else
+AppSkeleton g_app;
+#endif
+
+#ifndef PROJECT_NAME
+// This macro should be defined in CMakeLists.txt
+#define PROJECT_NAME "RiftSkeleton"
+#endif
+
+RenderingMode g_renderMode;
+Timer g_timer;
+double g_lastFrameTime = 0.0;
+FPSTimer g_fps;
+Timer g_logDumpTimer;
+
+int m_keyStates[4096];
+
+// mouse motion internal state
+int oldx, oldy, newx, newy;
+int which_button = -1;
+int modifier_mode = 0;
+
+//ShaderWithVariables g_auxPresent;
+SDL_Window* g_pHMDWindow = NULL;
+SDL_GLContext g_HMDglContext = NULL;
+Uint32 g_HMDWindowID = 0;
+int g_auxWindow_w = 1920 / 2;
+int g_auxWindow_h = 587;
+bool g_drawToAuxWindow = false;
+
+SDL_Joystick* g_pJoy = NULL;
+
+float g_fpsSmoothingFactor = 0.02f;
+float g_fpsDeltaThreshold = 5.0f;
+bool g_dynamicallyScaleFBO = false;
+int g_targetFPS = 100;
+bool g_allowPitch = false;
+bool g_allowRoll = false;
+
+#ifdef USE_ANTTWEAKBAR
+TwBar* g_pTweakbar = NULL;
+#endif
+
+SDL_Window* initializeAuxiliaryWindow();
+void destroyAuxiliaryWindow(SDL_Window* pAuxWindow);
+
+// Set VSync is framework-dependent and has to come before the include
+///@param state 0=off, 1=on, -1=adaptive
+// Set vsync for both contexts.
+static void SetVsync(int state)
+{
+    LOG_INFO("SetVsync(%d)", state);
+    SDL_GL_MakeCurrent(g_pHMDWindow, g_HMDglContext);
+    int ret = SDL_GL_SetSwapInterval(state);
+    if (ret != 0)
+    {
+        LOG_INFO("Error occurred in SDL_GL_SetSwapInterval: %s", SDL_GetError());
+    }
+}
+
+#include "main_include.cpp"
+
+void timestep()
+{
+    const double absT = g_timer.seconds();
+    const double dt = absT - g_lastFrameTime;
+    g_lastFrameTime = absT;
+    g_app.timestep(absT, dt);
+}
+
+void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
+{
+    (void)codes;
+    (void)mods;
+
+    const int KEYUP = 0;
+    const int KEYDOWN = 1;
+    const int keyMasked = key & 0xfff;
+    if ((key > -1) && (keyMasked <= 4096))
+    {
+        int keystate = KEYUP;
+        if (action == SDL_KEYDOWN)
+            keystate = 1;
+        m_keyStates[keyMasked] = keystate;
+        //printf("key ac  %d %d\n", key, action);
+    }
+
+    const float f = 0.9f;
+    const float ff = 0.99f;
+
+    if (action == SDL_KEYDOWN)
+    {
+        switch (key)
+        {
+        default:
+            g_app.DismissHealthAndSafetyWarning();
+            break;
+
+        case SDLK_F1:
+            if (SDL_GetModState() & KMOD_LCTRL)
+                g_renderMode.toggleRenderingTypeReverse();
+            else
+                g_renderMode.toggleRenderingType();
+            break;
+
+        case SDLK_F2:
+            g_renderMode.toggleRenderingTypeMono();
+            break;
+
+        case SDLK_F3:
+            g_renderMode.toggleRenderingTypeHMD();
+            break;
+
+        case SDLK_F4:
+            g_renderMode.toggleRenderingTypeDistortion();
+            break;
+
+        case SDLK_F5: g_dynamicallyScaleFBO = false; g_app.SetFBOScale(f * g_app.GetFBOScale()); break;
+        case SDLK_F6: g_dynamicallyScaleFBO = false; g_app.SetFBOScale(ff * g_app.GetFBOScale()); break;
+        case SDLK_F7: g_dynamicallyScaleFBO = false; g_app.SetFBOScale((1.f/ff) * g_app.GetFBOScale()); break;
+        case SDLK_F8: g_dynamicallyScaleFBO = false; g_app.SetFBOScale((1.f/f) * g_app.GetFBOScale()); break;
+
+        case SDLK_F9: SetVsync(0); break;
+        case SDLK_F10: SetVsync(1); break;
+        case SDLK_F11: SetVsync(-1); break;
+
+        case SDLK_DELETE: g_dynamicallyScaleFBO = !g_dynamicallyScaleFBO; break;
+
+        case SDLK_SPACE:
+            g_app.RecenterPose();
+            break;
+
+        case SDLK_TAB:
+            g_app.ToggleQuadInWorld();
+            break;
+
+        case 'r':
+            g_app.ResetChassisTransformations();
+            break;
+
+#ifdef USE_OCULUSSDK
+        case 'v': g_app.ToggleVignette(); break;
+        case 't': g_app.ToggleTimeWarp(); break;
+        case 'o': g_app.ToggleOverdrive(); break;
+        case 'l': g_app.ToggleLowPersistence(); break;
+#endif
+
+        case SDLK_ESCAPE:
+            if (event.key.keysym.sym == SDLK_ESCAPE)
+            {
+                if (event.key.windowID == g_HMDWindowID)
+                {
+                    SDL_GL_DeleteContext(g_HMDglContext);
+                    SDL_DestroyWindow(g_pHMDWindow);
+
+                    g_app.exitVR();
+                    if (g_pJoy != NULL)
+                        SDL_JoystickClose(g_pJoy);
+                    SDL_Quit();
+                    exit(0);
+                }
+            }
+            break;
+        }
+    }
+
+    //g_app.keyboard(key, action, 0,0);
+
+    const glm::vec3 forward(0.f, 0.f, -1.f);
+    const glm::vec3 up(0.f, 1.f, 0.f);
+    const glm::vec3 right(1.f, 0.f, 0.f);
+    // Handle keyboard movement(WASD & QE keys)
+    glm::vec3 keyboardMove(0.0f, 0.0f, 0.0f);
+    if (m_keyStates['w'] != KEYUP) { keyboardMove += forward; }
+    if (m_keyStates['s'] != KEYUP) { keyboardMove -= forward; }
+    if (m_keyStates['a'] != KEYUP) { keyboardMove -= right; }
+    if (m_keyStates['d'] != KEYUP) { keyboardMove += right; }
+    if (m_keyStates['q'] != KEYUP) { keyboardMove -= up; }
+    if (m_keyStates['e'] != KEYUP) { keyboardMove += up; }
+    if (m_keyStates[SDLK_UP &0xfff] != KEYUP) { keyboardMove += forward; }
+    if (m_keyStates[SDLK_DOWN &0xfff] != KEYUP) { keyboardMove -= forward; }
+    if (m_keyStates[SDLK_LEFT &0xfff] != KEYUP) { keyboardMove -= right; }
+    if (m_keyStates[SDLK_RIGHT &0xfff] != KEYUP) { keyboardMove += right; }
+
+    float mag = 1.0f;
+    if (SDL_GetModState() & KMOD_LSHIFT)
+        mag *= 0.1f;
+    if (SDL_GetModState() & KMOD_LCTRL)
+        mag *= 10.0f;
+
+    // Yaw keys
+    g_app.m_keyboardYaw = 0.0f;
+    const float dyaw = 0.5f * mag; // radians at 60Hz timestep
+    if (m_keyStates['1'] != KEYUP) { g_app.m_keyboardYaw = -dyaw; }
+    if (m_keyStates['3'] != KEYUP) { g_app.m_keyboardYaw = dyaw; }
+
+    // Pitch and roll controls - if yaw is VR poison,
+    // this is torture and death!
+    g_app.m_keyboardDeltaPitch = 0.0f;
+    g_app.m_keyboardDeltaRoll = 0.0f;
+    if (g_allowPitch)
+    {
+        if (m_keyStates['2'] != KEYUP) { g_app.m_keyboardDeltaPitch = -dyaw; }
+        if (m_keyStates['x'] != KEYUP) { g_app.m_keyboardDeltaPitch = dyaw; }
+    }
+    if (g_allowRoll)
+    {
+        if (m_keyStates['z'] != KEYUP) { g_app.m_keyboardDeltaRoll = -dyaw; }
+        if (m_keyStates['c'] != KEYUP) { g_app.m_keyboardDeltaRoll = dyaw; }
+    }
+
+    g_app.m_keyboardMove = mag * keyboardMove;
+}
+
+// Joystick state is polled here and stored within SDL.
+void joystick()
+{
+    if (g_pJoy == NULL)
+        return;
+
+    if (SDL_JoystickGetAttached(g_pJoy) == SDL_FALSE)
+        return;
+
+    const int MAX_BUTTONS = 32;
+    Uint8 buttonStates[MAX_BUTTONS];
+    const int numButtons = SDL_JoystickNumButtons(g_pJoy);
+    for (int i=0; i<std::min(numButtons, MAX_BUTTONS); ++i)
+    {
+        buttonStates[i] = SDL_JoystickGetButton(g_pJoy, i);
+    }
+
+    // Map joystick buttons to move directions
+    const glm::vec3 moveDirsGravisGamepadPro[8] = {
+        glm::vec3(-1.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  1.f),
+        glm::vec3( 1.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f, -1.f),
+        glm::vec3( 0.f,  1.f,  0.f),
+        glm::vec3( 0.f,  1.f,  0.f),
+        glm::vec3( 0.f, -1.f,  0.f),
+        glm::vec3( 0.f, -1.f,  0.f),
+    };
+
+    ///@note Application must have focus to receive gamepad events!
+    // Xbox controller layout:
+    // numAxes 5, numButtons 14
+    // 0 DPad up
+    // 1 Dpad Down
+    // 2 DPad left
+    // 3 DPad right
+    // 4 Start
+    // 5 Back
+    // 6 Left analog stick click
+    // 7 Right analog stick click
+    // 8 L bumper
+    // 9 R bumper
+    // 10 A (down position)
+    // 11 B (right position)
+    // 12 X (left position)
+    // 13 Y (up position)
+    // Axis 0 1 Left stick x y -32768, 32767
+    // Axis 2 3 right stick x y -32768, 32767
+    // Axis 4 5 triggers, -32768(released), 32767
+    const glm::vec3 moveDirsXboxController[15] = {
+        glm::vec3( 0.f,  1.f,  0.f),
+        glm::vec3( 0.f, -1.f,  0.f),
+        glm::vec3(-1.f,  0.f,  0.f),
+        glm::vec3( 1.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f,  1.f), // 10
+        glm::vec3( 1.f,  0.f,  0.f),
+        glm::vec3(-1.f,  0.f,  0.f),
+        glm::vec3( 0.f,  0.f, -1.f),
+        glm::vec3( 0.f, -1.f,  0.f),
+    };
+
+    ///@todo Different mappings for different controllers.
+    const glm::vec3* moveDirs = moveDirsGravisGamepadPro;
+    const std::string joyName(SDL_JoystickName(g_pJoy));
+    if (!joyName.compare("XInput Controller #1"))
+    {
+        moveDirs = moveDirsXboxController;
+    }
+
+    glm::vec3 joystickMove(0.0f, 0.0f, 0.0f);
+    for (int i=0; i<std::min(32,numButtons); ++i)
+    {
+        if (buttonStates[i] != 0)
+        {
+            joystickMove += moveDirs[i];
+        }
+    }
+
+    const int numAxes = SDL_JoystickNumAxes(g_pJoy);
+    float mag = 1.f;
+    if (numAxes > 5)
+    {
+        const Sint16 axisVal = SDL_JoystickGetAxis(g_pJoy, 5);
+        const int axisVal32 = static_cast<Sint32>(axisVal);
+        const int posval = axisVal32 + -SHRT_MIN;
+        const float normVal = static_cast<float>(posval) / ( static_cast<float>(SHRT_MAX) - static_cast<float>(SHRT_MIN) );
+        mag = pow(10.f, normVal);
+    }
+    g_app.m_joystickMove = mag * joystickMove;
+
+    Sint16 x_move = SDL_JoystickGetAxis(g_pJoy, 0);
+    const int deadZone = 4096;
+    if (abs(x_move) < deadZone)
+        x_move = 0;
+    g_app.m_joystickYaw = 0.00005f * static_cast<float>(x_move);
+}
+
+void mouseDown(int button, int state, int x, int y)
+{
+    which_button = button;
+    oldx = newx = x;
+    oldy = newy = y;
+    if (state == SDL_RELEASED)
+    {
+        which_button = -1;
+    }
+    g_app.OnMouseButton(button, state);
+}
+
+void mouseMove(int x, int y)
+{
+    oldx = newx;
+    oldy = newy;
+    newx = x;
+    newy = y;
+    const int mmx = x-oldx;
+    const int mmy = y-oldy;
+
+    g_app.m_mouseDeltaYaw = 0.0f;
+    g_app.m_mouseMove = glm::vec3(0.0f);
+
+    if (which_button == SDL_BUTTON_LEFT)
+    {
+        const float spinMagnitude = 2.5f;
+        g_app.m_mouseDeltaYaw += static_cast<float>(mmx) * spinMagnitude;
+    }
+    else if (which_button == SDL_BUTTON_RIGHT)
+    {
+        const float moveMagnitude = 0.5f;
+        g_app.m_mouseMove.x += static_cast<float>(mmx) * moveMagnitude;
+        g_app.m_mouseMove.z += static_cast<float>(mmy) * moveMagnitude;
+    }
+    else if (which_button == SDL_BUTTON_MIDDLE)
+    {
+        const float moveMagnitude = 0.5f;
+        g_app.m_mouseMove.x += static_cast<float>(mmx) * moveMagnitude;
+        g_app.m_mouseMove.y -= static_cast<float>(mmy) * moveMagnitude;
+    }
+    else
+    {
+        // Passive motion, no mouse button pressed
+        g_app.OnMouseMove(static_cast<int>(x), static_cast<int>(y));
+    }
+}
+
+void mouseWheel(int x, int y)
+{
+    const int delta = static_cast<int>(y);
+    const float curscale = g_app.GetFBOScale();
+    const float incr = 1.05f;
+    g_app.SetFBOScale(curscale * pow(incr, static_cast<float>(delta)));
+    if (fabs(static_cast<float>(x)) > 0.f)
+    {
+        g_app.OnMouseWheel(x,y);
+    }
+}
+
+void display()
+{
+    switch(g_renderMode.outputType)
+    {
+    case RenderingMode::Mono_Raw:
+        g_app.display_raw();
+        SDL_GL_SwapWindow(g_pHMDWindow);
+        break;
+
+    case RenderingMode::Mono_Buffered:
+        g_app.display_buffered();
+        SDL_GL_SwapWindow(g_pHMDWindow);
+        break;
+
+#if defined(USE_OCULUSSDK)
+    case RenderingMode::SideBySide_Undistorted:
+    case RenderingMode::OVR_SDK:
+    case RenderingMode::OVR_Client:
+        g_app.display_sdk();
+#ifdef USE_ANTTWEAKBAR
+        TwDraw(); ///@todo Should this go first? Will it write to a depth buffer?
+#endif
+        SDL_GL_SwapWindow(g_pHMDWindow);
+        break;
+#endif
+
+    default:
+        LOG_ERROR("Unknown display type: %d", g_renderMode.outputType);
+        break;
+    }
+}
+
+void PollEvents()
+{
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        switch(event.type)
+        {
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
+            keyboard(event, event.key.keysym.sym, 0, event.key.type, 0);
+            break;
+
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
+            mouseDown(event.button.button, event.button.state, event.button.x, event.button.y);
+            break;
+
+        case SDL_MOUSEMOTION:
+            mouseMove(event.motion.x, event.motion.y);
+            break;
+
+        case SDL_MOUSEWHEEL:
+            mouseWheel(event.wheel.x, event.wheel.y);
+            break;
+
+        case SDL_WINDOWEVENT:
+            if (event.window.event == SDL_WINDOWEVENT_CLOSE)
+            {
+            }
+            else if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+            {
+                if (event.window.windowID != g_HMDWindowID)
+                {
+                    const int w = event.window.data1;
+                    const int h = event.window.data2;
+#ifdef USE_ANTTWEAKBAR
+                    TwWindowSize(w,h);
+#endif
+                }
+            }
+            break;
+
+        case SDL_QUIT:
+            exit(0);
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    SDL_JoystickUpdate();
+    joystick();
+}
+
+// OpenGL debug callback
+void GLAPIENTRY myCallback(
+    GLenum source, GLenum type, GLuint id, GLenum severity,
+    GLsizei length, const GLchar *msg,
+    const void *data)
+{
+    switch (severity)
+    {
+    case GL_DEBUG_SEVERITY_HIGH:
+    case GL_DEBUG_SEVERITY_MEDIUM:
+    case GL_DEBUG_SEVERITY_LOW:
+        LOG_INFO("[[GL Debug]] %x %x %x %x %s", source, type, id, severity, msg);
+        break;
+    case GL_DEBUG_SEVERITY_NOTIFICATION:
+        break;
+    }
+}
+
+int main(int argc, char** argv)
+{
+#if defined(_WIN32)
+    LOG_INFO("Windows build.");
+#elif defined(_LINUX)
+    LOG_INFO("Linux build.");
+    LOG_INFO("DISPLAY=%s", getenv("DISPLAY"));
+#elif defined(_MACOS)
+    LOG_INFO("MacOS build.");
+#endif
+
+    bool useOpenGLCoreContext = false;
+
+    g_renderMode.outputType = RenderingMode::OVR_SDK;
+
+#ifdef USE_CORE_CONTEXT
+    useOpenGLCoreContext = true;
+#endif
+
+    LOG_INFO("Using SDL2 backend.");
+    SDL_version compiled;
+    SDL_version linked;
+    SDL_VERSION(&compiled);
+    SDL_GetVersion(&linked);
+    LOG_INFO("Compiled against SDL version %d.%d.%d.",
+        compiled.major, compiled.minor, compiled.patch);
+    LOG_INFO("Linking against SDL version %d.%d.%d.",
+        linked.major, linked.minor, linked.patch);
+
+    // Command line options
+    for (int i = 0; i < argc; ++i)
+    {
+        const std::string a = argv[i];
+        LOG_INFO("argv[%d]: %s", i, a.c_str());
+        if (!a.compare("-sdk"))
+        {
+            g_renderMode.outputType = RenderingMode::OVR_SDK;
+        }
+        else if (!a.compare("-client"))
+        {
+            g_renderMode.outputType = RenderingMode::OVR_Client;
+        }
+        else if (!a.compare("-core"))
+        {
+            useOpenGLCoreContext = true;
+        }
+        else if (!a.compare("-compat"))
+        {
+            useOpenGLCoreContext = false;
+        }
+    }
+
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+    {
+        LOG_INFO("SDL_Init(SDL_INIT_EVERYTHING) failed.");
+        return false;
+    }
+
+
+    // Log system monitor information
+    // Get current display mode of all displays.
+    for (int i = 0; i < SDL_GetNumVideoDisplays(); ++i)
+    {
+        SDL_DisplayMode current;
+        const int should_be_zero = SDL_GetCurrentDisplayMode(i, &current);
+
+        if (should_be_zero != 0)
+        {
+            LOG_ERROR("Could not get display mode for video display #%d: %s", i, SDL_GetError());
+        }
+        else
+        {
+            LOG_INFO("Monitor #%d: %dx%d @ %dHz",
+                i, current.w, current.h, current.refresh_rate);
+        }
+    }
+
+    if (useOpenGLCoreContext)
+    {
+        LOG_INFO("Using OpenGL core context.");
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        //SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute (SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+    }
+    else
+    {
+        LOG_INFO("Using OpenGL compatibility context.");
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+        //SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        //SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    }
+
+#ifdef _DEBUG
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+#endif
+
+    bool swapBackBufferDims = false;
+
+#if defined(USE_OCULUSSDK)
+    LOG_INFO("Initializing HMD...");
+    g_app.initHMD();
+#else
+    g_renderMode.outputType = RenderingMode::Mono_Buffered;
+#endif
+
+#if defined(OVRSDK06)
+    LOG_INFO("OVRSDK06=1");
+    ovrSizei sz;
+    ovrVector2i pos;
+
+    SDL_DisplayMode current;
+    const int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
+    if (should_be_zero == 0)
+    {
+        sz.w = current.w / 2;
+        sz.h = current.h / 2;
+    }
+    else
+    {
+        LOG_ERROR("Error in SDL_GetCurrentDisplayMode");
+    }
+    pos.x = 100;
+    pos.y = 100;
+    std::string windowTitle = "";
+
+    LOG_INFO("Using Direct to Rift mode.");
+    windowTitle = PROJECT_NAME "-SDL2-Direct";
+
+    LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
+    g_pHMDWindow = SDL_CreateWindow(
+        windowTitle.c_str(),
+        pos.x, pos.y,
+        sz.w, sz.h,
+        SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+    //SDL_SetWindowFullscreen(g_pHMDWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    //SDL_SetRelativeMouseMode(SDL_TRUE);
+#else
+    g_pHMDWindow = SDL_CreateWindow(
+        "GL Skeleton - SDL2",
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        800, 600,
+        SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+    std::string windowTitle = PROJECT_NAME;
+#endif //OVRSDK06
+
+    if (g_pHMDWindow == NULL)
+    {
+        LOG_ERROR("SDL_CreateWindow failed with error: %s", SDL_GetError());
+        SDL_Quit();
+    }
+
+    g_HMDWindowID = SDL_GetWindowID(g_pHMDWindow);
+
+    // thank you http://www.brandonfoltz.com/2013/12/example-using-opengl-3-0-with-sdl2-and-glew/
+    g_HMDglContext = SDL_GL_CreateContext(g_pHMDWindow);
+    if (g_HMDglContext == NULL)
+    {
+        LOG_ERROR("There was an error creating the OpenGL context!");
+        return 0;
+    }
+
+    const unsigned char *version = glGetString(GL_VERSION);
+    if (version == NULL) 
+    {
+        LOG_ERROR("There was an error creating the OpenGL context!");
+        return 1;
+    }
+
+    // Joysticks/gamepads
+    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+
+    const int numjoys = SDL_NumJoysticks();
+    for (int i=0; i<numjoys; ++i)
+    {
+        SDL_Joystick* pJoy = SDL_JoystickOpen(i);
+        if (pJoy == NULL)
+            continue;
+
+        LOG_INFO("SDL2 opened Joystick #%d: %s w/ %d axes, %d buttons, %d balls",
+            i,
+            SDL_JoystickName(pJoy),
+            SDL_JoystickNumAxes(pJoy),
+            SDL_JoystickNumButtons(pJoy),
+            SDL_JoystickNumBalls(pJoy));
+
+        SDL_JoystickClose(g_pJoy);
+    }
+
+    if (numjoys > 0)
+    {
+        g_pJoy = SDL_JoystickOpen(0);
+    }
+
+    LOG_INFO("OpenGL: %s", version);
+    LOG_INFO("Vendor: %s", (char*)glGetString(GL_VENDOR));
+    LOG_INFO("Renderer: %s", (char*)glGetString(GL_RENDERER));
+
+    SDL_GL_MakeCurrent(g_pHMDWindow, g_HMDglContext);
+
+    // Don't forget to initialize Glew, turn glewExperimental on to
+    // avoid problems fetching function pointers...
+    glewExperimental = GL_TRUE;
+    const GLenum l_Result = glewInit();
+    if (l_Result != GLEW_OK)
+    {
+        LOG_INFO("glewInit() error.");
+        exit(EXIT_FAILURE);
+    }
+
+#ifdef _DEBUG
+    // Debug callback initialization
+    // Must be done *after* glew initialization.
+    glDebugMessageCallback(myCallback, NULL);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+    glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0,
+        GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Start debugging");
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+#endif
+
+#ifdef USE_ANTTWEAKBAR
+    LOG_INFO("Using AntTweakbar.");
+    TwInit(useOpenGLCoreContext ? TW_OPENGL_CORE : TW_OPENGL, NULL);
+    InitializeBar();
+#endif
+
+    LOG_INFO("Calling initGL...");
+    g_app.initGL();
+    LOG_INFO("Calling initVR...");
+    g_app.initVR(swapBackBufferDims);
+    LOG_INFO("initVR(%d) complete.", swapBackBufferDims);
+
+    memset(m_keyStates, 0, 4096*sizeof(int));
+
+    SetVsync(0); // SDK 0.6 requires vsync OFF
+
+    int quit = 0;
+    while (quit == 0)
+    {
+        g_app.CheckForTapToDismissHealthAndSafetyWarning();
+        PollEvents();
+        timestep();
+        g_fps.OnFrame();
+        if (g_dynamicallyScaleFBO)
+        {
+            DynamicallyScaleFBO();
+        }
+
+        display();
+
+#ifndef _LINUX
+        // Indicate FPS in window title
+        // This is absolute death for performance in Ubuntu Linux 12.04
+        {
+            std::ostringstream oss;
+            oss << windowTitle
+                << " "
+                << static_cast<int>(g_fps.GetFPS())
+                << " fps";
+            SDL_SetWindowTitle(g_pHMDWindow, oss.str().c_str());
+        }
+#endif
+
+        const float dumpInterval = 1.f;
+        if (g_logDumpTimer.seconds() > dumpInterval)
+        {
+            LOG_INFO("Frame rate: %d fps", static_cast<int>(g_fps.GetFPS()));
+            g_logDumpTimer.reset();
+        }
+    }
+
+    SDL_GL_DeleteContext(g_HMDglContext);
+    SDL_DestroyWindow(g_pHMDWindow);
+
+    g_app.exitVR();
+
+    if (g_pJoy != NULL)
+        SDL_JoystickClose(g_pJoy);
+
+    SDL_Quit();
+}
