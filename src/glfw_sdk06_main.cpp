@@ -668,6 +668,8 @@ int main(int argc, char** argv)
     LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
     l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
     g_app.SetAppWindowSize(sz);
+    g_auxWindow_w = sz.w;
+    g_auxWindow_h = sz.h;
 #else
     l_Window = glfwCreateWindow(800, 600, "GLFW Oculus Rift Test", NULL, NULL);
     std::string windowTitle = PROJECT_NAME;
@@ -748,6 +750,7 @@ int main(int argc, char** argv)
 
     SetVsync(0); // SDK 0.6 requires vsync OFF
 
+    TwWindowSize(g_auxWindow_w, g_auxWindow_h);
     while (!glfwWindowShouldClose(l_Window))
     {
         g_app.CheckForTapToDismissHealthAndSafetyWarning();
