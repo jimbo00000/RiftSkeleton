@@ -9,6 +9,10 @@
 #endif
 #include <GL/glew.h>
 
+#ifdef USE_ANTTWEAKBAR
+#  include <AntTweakBar.h>
+#endif
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <algorithm>
@@ -403,8 +407,12 @@ void OVRSDK06AppSkeleton::display_sdk() const
         const ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
 
-        glClearColor(1, 1, 0, 0);
+        glClearColor(0, 0, 0, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#ifdef USE_ANTTWEAKBAR
+        TwDraw();
+#endif
+
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
