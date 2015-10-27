@@ -81,6 +81,9 @@ protected:
     MirrorType m_mirror;
     bool m_showQuadInWorld;
 
+public:
+    glm::vec3 m_quadLocation;
+
 private: // Disallow copy ctor and assignment operator
     OVRSDK06AppSkeleton(const OVRSDK06AppSkeleton&);
     OVRSDK06AppSkeleton& operator=(const OVRSDK06AppSkeleton&);

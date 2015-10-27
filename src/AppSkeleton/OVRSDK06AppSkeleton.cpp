@@ -42,6 +42,7 @@ OVRSDK06AppSkeleton::OVRSDK06AppSkeleton()
 , m_usingDebugHmd(false)
 , m_mirror(MirrorDistorted)
 , m_showQuadInWorld(true)
+, m_quadLocation(.3f, .3f, -1.f)
 {
     m_pTexSet[0] = NULL;
     m_pTexSet[1] = NULL;
@@ -217,7 +218,7 @@ void OVRSDK06AppSkeleton::initVR(bool swapBackBufferDims)
         layer.Viewport.Pos = { 0, 0 };
         layer.Viewport.Size = size;
         layer.QuadPoseCenter.Orientation = { 0.f, 0.f, 0.f, 1.f };
-        layer.QuadPoseCenter.Position = { .3f, .3f, -1.f };
+        layer.QuadPoseCenter.Position = { m_quadLocation.x, m_quadLocation.y, m_quadLocation.z };
         layer.QuadSize = { 1.f, 1.f };
 
         // Manually assemble quad FBO
@@ -422,6 +423,7 @@ void OVRSDK06AppSkeleton::display_sdk() const
     layers.push_back(&m_layerEyeFov.Header);
     if (m_showQuadInWorld)
     {
+        m_layerQuad.QuadPoseCenter.Position = { m_quadLocation.x, m_quadLocation.y, m_quadLocation.z };
         layers.push_back(&m_layerQuad.Header);
     }
     ovrViewScaleDesc viewScaleDesc;
