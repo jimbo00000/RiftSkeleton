@@ -22,7 +22,7 @@ AppSkeleton::AppSkeleton()
 : m_scene()
 , m_hydraScene()
 #ifdef USE_OCULUSSDK
-, m_ovrScene()
+//, m_ovrScene()
 #endif
 , m_scenes()
 
@@ -54,7 +54,7 @@ AppSkeleton::AppSkeleton()
     m_scenes.push_back(&m_scene);
     m_scenes.push_back(&m_hydraScene);
 #ifdef USE_OCULUSSDK
-    m_scenes.push_back(&m_ovrScene);
+   // m_scenes.push_back(&m_ovrScene);
 #endif
 
     // Give this scene a pointer to get live Hydra data for display

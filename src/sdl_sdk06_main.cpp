@@ -25,7 +25,9 @@
 #include <sstream>
 #include <algorithm>
 
-#if defined(USE_OCULUSSDK)
+#if defined(OVRSDK07)
+#  include "OVRSDK07AppSkeleton.h"
+#elif defined(OVRSDK06)
 #  include "OVRSDK06AppSkeleton.h"
 #else
 #include "AppSkeleton.h"
@@ -36,7 +38,9 @@
 #include "FPSTimer.h"
 #include "Logger.h"
 
-#if defined(USE_OCULUSSDK)
+#if defined(OVRSDK07)
+OVRSDK07AppSkeleton g_app;
+#elif defined(OVRSDK06)
 OVRSDK06AppSkeleton g_app;
 #else
 AppSkeleton g_app;

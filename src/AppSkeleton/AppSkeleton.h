@@ -61,7 +61,7 @@ public:
     HydraScene m_hydraScene;
 
 #ifdef USE_OCULUSSDK
-    OVRScene m_ovrScene;
+    //OVRScene m_ovrScene;
 #endif
 
     float GetFBOScale() const { return m_fboScale; }
