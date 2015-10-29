@@ -653,7 +653,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
 
-#if defined(OVRSDK06)
+#if defined(OVRSDK06) || defined(OVRSDK07)
     std::string windowTitle = "";
 
     LOG_INFO("Using SDK 0.6.0.0's direct mode.");

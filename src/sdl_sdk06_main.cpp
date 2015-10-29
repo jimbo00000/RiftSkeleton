@@ -653,8 +653,7 @@ int main(int argc, char** argv)
     g_renderMode.outputType = RenderingMode::Mono_Buffered;
 #endif
 
-#if defined(OVRSDK06)
-    LOG_INFO("OVRSDK06=1");
+#if defined(OVRSDK06) || defined(OVRSDK07)
     ovrSizei sz;
     ovrVector2i pos;
 
