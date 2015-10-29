@@ -29,6 +29,8 @@
 #  include "OVRSDK07AppSkeleton.h"
 #elif defined(OVRSDK06)
 #  include "OVRSDK06AppSkeleton.h"
+#elif defined(OVRSDK08)
+#  include "OVRSDK08AppSkeleton.h"
 #else
 #include "AppSkeleton.h"
 #endif
@@ -42,6 +44,8 @@
 OVRSDK07AppSkeleton g_app;
 #elif defined(OVRSDK06)
 OVRSDK06AppSkeleton g_app;
+#elif defined(OVRSDK08)
+OVRSDK08AppSkeleton g_app;
 #else
 AppSkeleton g_app;
 #endif
@@ -653,7 +657,7 @@ int main(int argc, char** argv)
     g_renderMode.outputType = RenderingMode::Mono_Buffered;
 #endif
 
-#if defined(OVRSDK06) || defined(OVRSDK07)
+#if defined(OVRSDK06) || defined(OVRSDK07) || defined(OVRSDK08)
     ovrSizei sz;
     ovrVector2i pos;
 

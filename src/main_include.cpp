@@ -72,7 +72,7 @@ void InitializeBar()
     TwAddVarRW(g_pTweakbar, "Hydra Location z", TW_TYPE_FLOAT, &g_app.m_fm.m_baseOffset.z,
                " min=-10 max=10 step=0.05 group='HydraScene' ");
 
-#ifdef OVRSDK06
+#if defined(OVRSDK06) || defined(OVRSDK07) || defined(OVRSDK08)
     TwAddVarRW(g_pTweakbar, "Dashboard Quad x", TW_TYPE_FLOAT, &g_app.m_quadLocation.x,
         " min=-1 max=1 step=0.005 group='Dashboard' ");
     TwAddVarRW(g_pTweakbar, "Dashboard Quad y", TW_TYPE_FLOAT, &g_app.m_quadLocation.y,

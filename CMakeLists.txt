@@ -18,7 +18,7 @@ SET( USE_SIXENSE TRUE CACHE BOOL "Use Sixense" )
 SET( USE_OCULUSSDK TRUE CACHE BOOL "Use Oculus SDK" )
 SET( USE_OSVR FALSE CACHE BOOL "Use OSVR SDK" )
 
-SET( OVRSDK_VERSION "05" CACHE STRING "Which version of the OVR SDK to use - 05, 06 or 07" )
+SET( OVRSDK_VERSION "05" CACHE STRING "Which version of the OVR SDK to use - 05, 06, 07, or 08" )
 
 SET( USE_CORE_CONTEXT TRUE CACHE BOOL "Use Core Context" )
 IF( USE_CORE_CONTEXT )
@@ -92,6 +92,9 @@ IF( WIN32 )
         ELSEIF( OVRSDK_VERSION STREQUAL "07" )
             SET( OCULUSSDK_ROOT "${LIBS_HOME}/OculusSDK-0.7.0.0" CACHE STRING "OculusSDK root" )
             ADD_DEFINITIONS( -DOVRSDK07 )
+        ELSEIF( OVRSDK_VERSION STREQUAL "08" )
+            SET( OCULUSSDK_ROOT "${LIBS_HOME}/OculusSDK" CACHE STRING "OculusSDK root" )
+            ADD_DEFINITIONS( -DOVRSDK08 )
         ELSE()
             MESSAGE("Unknown OVR SDK version.")
         ENDIF()
@@ -401,18 +404,31 @@ IF( OVRSDK_VERSION STREQUAL "05" )
     LIST(REMOVE_ITEM APPSKELETON_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK06AppSkeleton.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK07AppSkeleton.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK08AppSkeleton.cpp
         )
 ELSEIF( OVRSDK_VERSION STREQUAL "06" )
     MESSAGE( "Removing non-OVRSDK06 files..." )
     LIST(REMOVE_ITEM APPSKELETON_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK05AppSkeleton.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK07AppSkeleton.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK08AppSkeleton.cpp
         )
 ELSEIF( OVRSDK_VERSION STREQUAL "07" )
     MESSAGE( "Removing non-OVRSDK07 files..." )
     LIST(REMOVE_ITEM APPSKELETON_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK05AppSkeleton.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK06AppSkeleton.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK08AppSkeleton.cpp
+        )
+    LIST(REMOVE_ITEM SCENE_SOURCE_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Scene/OVRScene.cpp
+        )
+ELSEIF( OVRSDK_VERSION STREQUAL "08" )
+    MESSAGE( "Removing non-OVRSDK08 files..." )
+    LIST(REMOVE_ITEM APPSKELETON_SOURCE_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK05AppSkeleton.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK06AppSkeleton.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK07AppSkeleton.cpp
         )
     LIST(REMOVE_ITEM SCENE_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Scene/OVRScene.cpp
@@ -442,6 +458,8 @@ IF( GL_FRAMEWORK STREQUAL "GLFW" )
         ADD_EXECUTABLE( ${PROJECT_NAME} src/glfw_sdk06_main.cpp )
     ELSEIF( OVRSDK_VERSION STREQUAL "07" )
         ADD_EXECUTABLE( ${PROJECT_NAME} src/glfw_sdk06_main.cpp )
+    ELSEIF( OVRSDK_VERSION STREQUAL "08" )
+        ADD_EXECUTABLE( ${PROJECT_NAME} src/glfw_sdk06_main.cpp )
     ENDIF()
 ELSEIF( GL_FRAMEWORK STREQUAL "SDL" )
     IF( OVRSDK_VERSION STREQUAL "05" )
@@ -449,6 +467,8 @@ ELSEIF( GL_FRAMEWORK STREQUAL "SDL" )
     ELSEIF( OVRSDK_VERSION STREQUAL "06" )
         ADD_EXECUTABLE( ${PROJECT_NAME} src/sdl_sdk06_main.cpp )
     ELSEIF( OVRSDK_VERSION STREQUAL "07" )
+        ADD_EXECUTABLE( ${PROJECT_NAME} src/sdl_sdk06_main.cpp )
+    ELSEIF( OVRSDK_VERSION STREQUAL "08" )
         ADD_EXECUTABLE( ${PROJECT_NAME} src/sdl_sdk06_main.cpp )
     ENDIF()
 ELSEIF( GL_FRAMEWORK STREQUAL "SFML" )
