@@ -426,7 +426,8 @@ void OVRSDK08AppSkeleton::display_sdk() const
         const ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
 
-        glClearColor(0, 0, 0, 0);
+        const float lum = .1f;
+        glClearColor(lum, lum, lum, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 #ifdef USE_ANTTWEAKBAR
         TwDraw();
