@@ -381,9 +381,10 @@ void OVRSDK08AppSkeleton::display_sdk() const
             // Cinemascope - letterbox bars scissoring off pixels above and below vp center
             const float hc = .5f * m_cinemaScope;
             const int scisPx = static_cast<int>(hc * static_cast<float>(vp.Size.h));
-            const int ymin = vp.Pos.y + scisPx;
-            const int ymax = vp.Pos.y + vp.Size.h - 2*scisPx;
-            glScissor(vp.Pos.x, ymin, vp.Pos.x + vp.Size.w, ymax);
+            ovrRecti sp(vp);
+            sp.Pos.y += scisPx;
+            sp.Size.h -= 2 * scisPx;
+            glScissor(sp.Pos.x, sp.Pos.y, sp.Size.w, sp.Size.h);
             glEnable(GL_SCISSOR_TEST);
 
 
