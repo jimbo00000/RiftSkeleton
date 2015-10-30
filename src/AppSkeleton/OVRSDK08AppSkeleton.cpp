@@ -373,8 +373,19 @@ void OVRSDK08AppSkeleton::display_sdk() const
 
             glViewport(vp.Pos.x, vp.Pos.y, vp.Size.w, vp.Size.h);
 
+
             glClearColor(0.f, 0.f, 0.f, 0.f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+            // Cinemascope - letterbox bars scissoring off pixels above and below vp center
+            const float hc = .5f * m_cinemaScope;
+            const int scisPx = static_cast<int>(hc * static_cast<float>(vp.Size.h));
+            const int ymin = vp.Pos.y + scisPx;
+            const int ymax = vp.Pos.y + vp.Size.h - 2*scisPx;
+            glScissor(vp.Pos.x, ymin, vp.Pos.x + vp.Size.w, ymax);
+            glEnable(GL_SCISSOR_TEST);
+
 
             // Render the scene for the current eye
             const ovrPosef& eyePose = m_eyePoses[eye];
@@ -388,6 +399,7 @@ void OVRSDK08AppSkeleton::display_sdk() const
 
             m_layerEyeFov.RenderPose[eye] = eyePose;
         }
+        glDisable(GL_SCISSOR_TEST);
 
         // Grab a copy of the left eye's undistorted render output for presentation
         // to the desktop window instead of the barrel distorted mirror texture.

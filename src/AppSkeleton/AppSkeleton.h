@@ -68,6 +68,7 @@ public:
     void SetFBOScale(float s);
 #ifdef USE_ANTTWEAKBAR
     float* GetFBOScalePointer() { return &m_fboScale; }
+    float* GetCinemaScopePointer() { return &m_cinemaScope; }
 #endif
 
 protected:
@@ -83,6 +84,7 @@ protected:
     std::vector<IScene*> m_scenes;
     FBO m_renderBuffer;
     float m_fboScale;
+    float m_cinemaScope;
     ShaderWithVariables m_presentFbo;
     ShaderWithVariables m_presentDistMeshL;
     ShaderWithVariables m_presentDistMeshR;

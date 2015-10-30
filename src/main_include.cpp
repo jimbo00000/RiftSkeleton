@@ -39,7 +39,10 @@ void InitializeBar()
                " min=45 max=200 group='Performance' ");
 
     TwAddVarRW(g_pTweakbar, "FBO Scale", TW_TYPE_FLOAT, g_app.GetFBOScalePointer(),
-               " min=0.05 max=1.0 step=0.005 group='Performance' ");
+        " min=0.05 max=1.0 step=0.005 group='Performance' ");
+    TwAddVarRW(g_pTweakbar, "CinemaScope", TW_TYPE_FLOAT, g_app.GetCinemaScopePointer(),
+        " min=0. max=.95 step=0.005 group='Performance' ");
+
     TwAddVarRW(g_pTweakbar, "Dynamic FBO Scale", TW_TYPE_BOOLCPP, &g_dynamicallyScaleFBO,
                "  group='Performance' ");
     TwAddVarRW(g_pTweakbar, "DynFBO Smooth", TW_TYPE_FLOAT, &g_fpsSmoothingFactor,

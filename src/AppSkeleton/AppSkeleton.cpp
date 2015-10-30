@@ -26,7 +26,8 @@ AppSkeleton::AppSkeleton()
 #endif
 , m_scenes()
 
-, m_fboScale(1.0f)
+, m_fboScale(1.f)
+, m_cinemaScope(0.f)
 , m_presentFbo()
 , m_presentDistMeshL()
 , m_presentDistMeshR()
