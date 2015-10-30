@@ -35,21 +35,20 @@ void InitializeBar()
 
     TwAddVarCB(g_pTweakbar, "Display FPS", TW_TYPE_UINT32, NULL, GetDisplayFPS, NULL, " group='Performance' ");
 
-    TwAddVarRW(g_pTweakbar, "Target FPS", TW_TYPE_INT32, &g_targetFPS,
-               " min=45 max=200 group='Performance' ");
-
     TwAddVarRW(g_pTweakbar, "FBO Scale", TW_TYPE_FLOAT, g_app.GetFBOScalePointer(),
         " min=0.05 max=1.0 step=0.005 group='Performance' ");
     TwAddVarRW(g_pTweakbar, "CinemaScope", TW_TYPE_FLOAT, g_app.GetCinemaScopePointer(),
         " min=0. max=.95 step=0.005 group='Performance' ");
-
+#if 0
+    TwAddVarRW(g_pTweakbar, "Target FPS", TW_TYPE_INT32, &g_targetFPS,
+               " min=45 max=200 group='Performance' ");
     TwAddVarRW(g_pTweakbar, "Dynamic FBO Scale", TW_TYPE_BOOLCPP, &g_dynamicallyScaleFBO,
                "  group='Performance' ");
     TwAddVarRW(g_pTweakbar, "DynFBO Smooth", TW_TYPE_FLOAT, &g_fpsSmoothingFactor,
                " min=0.001 max=1.0 step=0.001 group='Performance' ");
     TwAddVarRW(g_pTweakbar, "FPS Delta Threshold", TW_TYPE_FLOAT, &g_fpsDeltaThreshold,
                " min=0.0 max=100.0 step=1.0 group='Performance' ");
-
+#endif
 
     TwAddButton(g_pTweakbar, "Recenter Pose", RecenterPoseCB, NULL, " group='Position' ");
     TwAddButton(g_pTweakbar, "Standing", StandingCB, NULL, " group='Position' ");
