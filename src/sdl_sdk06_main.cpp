@@ -73,7 +73,6 @@ SDL_GLContext g_pMirrorGLContext = NULL;
 Uint32 g_pMirrorWindowID = 0;
 int g_auxWindow_w = 1920 / 2;
 int g_auxWindow_h = 587;
-bool g_drawToAuxWindow = false;
 
 SDL_Joystick* g_pJoy = NULL;
 

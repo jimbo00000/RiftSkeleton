@@ -79,7 +79,6 @@ float g_fpsSmoothingFactor = 0.02f;
 float g_fpsDeltaThreshold = 5.0f;
 bool g_dynamicallyScaleFBO = false;
 int g_targetFPS = 100;
-bool g_drawToAuxWindow = false;
 bool g_allowPitch = false;
 bool g_allowRoll = false;
 
