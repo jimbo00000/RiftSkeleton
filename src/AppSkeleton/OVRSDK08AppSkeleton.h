@@ -83,6 +83,7 @@ protected:
 
 public:
     glm::vec3 m_quadLocation;
+    glm::vec3 m_quadRotation;
 
 private: // Disallow copy ctor and assignment operator
     OVRSDK08AppSkeleton(const OVRSDK08AppSkeleton&);

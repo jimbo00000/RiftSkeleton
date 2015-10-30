@@ -43,6 +43,7 @@ OVRSDK08AppSkeleton::OVRSDK08AppSkeleton()
 , m_mirror(MirrorDistorted)
 , m_showQuadInWorld(true)
 , m_quadLocation(.3f, .3f, -1.f)
+, m_quadRotation(0.f)
 {
     m_pTexSet[0] = NULL;
     m_pTexSet[1] = NULL;
@@ -440,7 +441,12 @@ void OVRSDK08AppSkeleton::display_sdk() const
     layers.push_back(&m_layerEyeFov.Header);
     if (m_showQuadInWorld)
     {
-        m_layerQuad.QuadPoseCenter.Position = { m_quadLocation.x, m_quadLocation.y, m_quadLocation.z };
+        ovrPosef& qpc = m_layerQuad.QuadPoseCenter;
+        qpc.Position = { m_quadLocation.x, m_quadLocation.y, m_quadLocation.z };
+        glm::quat qo = glm::quat();
+        qo = glm::rotate(qo, m_quadRotation.x, glm::vec3(1.f, 0.f, 0.f));
+        qo = glm::rotate(qo, m_quadRotation.y, glm::vec3(0.f, 1.f, 0.f));
+        qpc.Orientation = { qo.x, qo.y, qo.z, qo.w };
         layers.push_back(&m_layerQuad.Header);
     }
     ovrViewScaleDesc viewScaleDesc;

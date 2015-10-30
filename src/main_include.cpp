@@ -79,6 +79,10 @@ void InitializeBar()
         " min=-1 max=1 step=0.005 group='Dashboard' ");
     TwAddVarRW(g_pTweakbar, "Dashboard Quad z", TW_TYPE_FLOAT, &g_app.m_quadLocation.z,
         " min=-2 max=-.5 step=0.005 group='Dashboard' ");
+    TwAddVarRW(g_pTweakbar, "Dashboard Quad Rot x", TW_TYPE_FLOAT, &g_app.m_quadRotation.x,
+        " min=-20 max=20 step=0.005 group='Dashboard' ");
+    TwAddVarRW(g_pTweakbar, "Dashboard Quad Rot y", TW_TYPE_FLOAT, &g_app.m_quadRotation.y,
+        " min=-20 max=20 step=0.005 group='Dashboard' ");
 #endif
 }
 #endif
