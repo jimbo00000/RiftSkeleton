@@ -25,28 +25,22 @@
 #include <sstream>
 #include <algorithm>
 
-#if defined(OVRSDK07)
-#  include "OVRSDK07AppSkeleton.h"
-#elif defined(OVRSDK06)
-#  include "OVRSDK06AppSkeleton.h"
-#elif defined(OVRSDK08)
-#  include "OVRSDK08AppSkeleton.h"
-#else
-#include "AppSkeleton.h"
-#endif
-
 #include "RenderingMode.h"
 #include "Timer.h"
 #include "FPSTimer.h"
 #include "Logger.h"
 
-#if defined(OVRSDK07)
-OVRSDK07AppSkeleton g_app;
-#elif defined(OVRSDK06)
+#if defined(OVRSDK06)
+#  include "OVRSDK06AppSkeleton.h"
 OVRSDK06AppSkeleton g_app;
+#elif defined(OVRSDK07)
+#include "OVRSDK07AppSkeleton.h"
+OVRSDK07AppSkeleton g_app;
 #elif defined(OVRSDK08)
+#include "OVRSDK08AppSkeleton.h"
 OVRSDK08AppSkeleton g_app;
 #else
+#include "AppSkeleton.h"
 AppSkeleton g_app;
 #endif
 
