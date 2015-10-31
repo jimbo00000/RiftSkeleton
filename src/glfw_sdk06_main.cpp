@@ -181,7 +181,7 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
         case 'O': g_app.ToggleOverdrive(); break;
         case 'L': g_app.ToggleLowPersistence(); break;
         case 'M': g_app.ToggleMirroringType(); break;
-        case 'P': g_app.ToggleDynamicPrediction(); break;
+        case 'P': g_app.TogglePerfHud(); break;
 #endif
 
         case GLFW_KEY_ESCAPE:

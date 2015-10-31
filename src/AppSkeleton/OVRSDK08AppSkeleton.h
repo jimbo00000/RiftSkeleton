@@ -45,6 +45,7 @@ public:
     void ToggleDynamicPrediction() {}
     void ToggleMirroringType();
     void ToggleQuadInWorld() { m_showQuadInWorld = !m_showQuadInWorld; }
+    void TogglePerfHud();
 
     void SetAppWindowSize(ovrSizei sz) { m_appWindowSize = sz; }
 
@@ -80,6 +81,7 @@ protected:
     bool m_usingDebugHmd;
     MirrorType m_mirror;
     bool m_showQuadInWorld;
+    ovrPerfHudMode m_perfHudMode;
 
 public:
     glm::vec3 m_quadLocation;

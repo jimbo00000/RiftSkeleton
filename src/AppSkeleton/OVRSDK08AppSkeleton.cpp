@@ -42,6 +42,7 @@ OVRSDK08AppSkeleton::OVRSDK08AppSkeleton()
 , m_usingDebugHmd(false)
 , m_mirror(MirrorDistorted)
 , m_showQuadInWorld(true)
+, m_perfHudMode(ovrPerfHud_Off)
 , m_quadLocation(.3f, .3f, -1.f)
 , m_quadRotation(0.f)
 {
@@ -65,6 +66,14 @@ void OVRSDK08AppSkeleton::ToggleMirroringType()
     int m = static_cast<int>(m_mirror);
     ++m %= NumMirrorTypes;
     m_mirror = static_cast<MirrorType>(m);
+}
+
+void OVRSDK08AppSkeleton::TogglePerfHud()
+{
+    int phm = static_cast<int>(m_perfHudMode);
+    ++phm %= static_cast<int>(ovrPerfHud_Count);
+    m_perfHudMode = static_cast<ovrPerfHudMode>(phm);
+    ovr_SetInt(m_Hmd, OVR_PERF_HUD_MODE, m_perfHudMode);
 }
 
 void OVRSDK08AppSkeleton::exitVR()

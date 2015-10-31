@@ -184,7 +184,7 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
         case 'o': g_app.ToggleOverdrive(); break;
         case 'l': g_app.ToggleLowPersistence(); break;
         case 'm': g_app.ToggleMirroringType(); break;
-        case 'p': g_app.ToggleDynamicPrediction(); break;
+        case 'p': g_app.TogglePerfHud(); break;
 #endif
 
         case SDLK_ESCAPE:
