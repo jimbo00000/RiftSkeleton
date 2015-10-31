@@ -386,6 +386,8 @@ IF( NOT USE_OCULUSSDK )
     LIST(REMOVE_ITEM APPSKELETON_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK05AppSkeleton.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK06AppSkeleton.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK07AppSkeleton.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/AppSkeleton/OVRSDK08AppSkeleton.cpp
         )
 
     LIST(REMOVE_ITEM SCENE_SOURCE_FILES

@@ -170,15 +170,15 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
             g_app.RecenterPose();
             break;
 
-        case SDLK_TAB:
-            g_app.ToggleQuadInWorld();
-            break;
-
         case 'r':
             g_app.ResetChassisTransformations();
             break;
 
 #ifdef USE_OCULUSSDK
+        case SDLK_TAB:
+            g_app.ToggleQuadInWorld();
+            break;
+
         case 'v': g_app.ToggleVignette(); break;
         case 't': g_app.ToggleTimeWarp(); break;
         case 'o': g_app.ToggleOverdrive(); break;
@@ -650,47 +650,20 @@ int main(int argc, char** argv)
     g_renderMode.outputType = RenderingMode::Mono_Buffered;
 #endif
 
-#if defined(OVRSDK06) || defined(OVRSDK07) || defined(OVRSDK08)
-    ovrSizei sz;
-    ovrVector2i pos;
-
-    SDL_DisplayMode current;
-    const int should_be_zero = SDL_GetCurrentDisplayMode(0, &current);
-    if (should_be_zero == 0)
-    {
-        sz.w = current.w / 2;
-        sz.h = current.h / 2;
-    }
-    else
-    {
-        LOG_ERROR("Error in SDL_GetCurrentDisplayMode");
-    }
-    pos.x = 100;
-    pos.y = 100;
-    std::string windowTitle = "";
-
     LOG_INFO("Using Direct to Rift mode.");
-    windowTitle = PROJECT_NAME "-SDL2-Direct";
-
-    LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
+    const std::string windowTitle = PROJECT_NAME "-SDL2-Direct";
+    glm::ivec2 sz(1000, 800);
     g_pMirrorWindow = SDL_CreateWindow(
         windowTitle.c_str(),
-        pos.x, pos.y,
-        sz.w, sz.h,
+        100, 100,
+        sz.x, sz.y,
         SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-    //SDL_SetWindowFullscreen(g_pMirrorWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    //SDL_SetRelativeMouseMode(SDL_TRUE);
-    g_app.SetAppWindowSize(sz);
-    g_auxWindow_w = sz.w;
-    g_auxWindow_h = sz.h;
-#else
-    g_pMirrorWindow = SDL_CreateWindow(
-        "GL Skeleton - SDL2",
-        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        800, 600,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-    std::string windowTitle = PROJECT_NAME;
-#endif //OVRSDK06
+    g_auxWindow_w = sz.x;
+    g_auxWindow_h = sz.y;
+#ifdef USE_OCULUSSDK
+    const ovrSizei osz = { sz.x, sz.y };
+    g_app.SetAppWindowSize(osz);
+#endif
 
     if (g_pMirrorWindow == NULL)
     {

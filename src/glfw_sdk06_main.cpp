@@ -167,15 +167,15 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
             g_app.RecenterPose();
             break;
 
-        case GLFW_KEY_TAB:
-            g_app.ToggleQuadInWorld();
-            break;
-
         case 'R':
             g_app.ResetChassisTransformations();
             break;
 
 #ifdef USE_OCULUSSDK
+        case GLFW_KEY_TAB:
+            g_app.ToggleQuadInWorld();
+            break;
+
         case 'V': g_app.ToggleVignette(); break;
         case 'T': g_app.ToggleTimeWarp(); break;
         case 'O': g_app.ToggleOverdrive(); break;
@@ -470,8 +470,10 @@ void resize_Aux(GLFWwindow* pWindow, int w, int h)
     TwWindowSize(w, h);
 #endif
 
+#ifdef USE_OCULUSSDK
     ovrSizei sz = { w, h };
     g_app.SetAppWindowSize(sz);
+#endif
 }
 
 void timestep()
@@ -650,30 +652,15 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
 
-#if defined(OVRSDK06) || defined(OVRSDK07) || defined(OVRSDK08)
-    std::string windowTitle = "";
-
-    LOG_INFO("Using SDK 0.6.0.0's direct mode.");
-    windowTitle = PROJECT_NAME "-GLFW-06-Direct";
-
-    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-    ovrSizei sz;
-    ovrVector2i pos;
-    sz.w = mode->width/2;
-    sz.h = mode->height/2;
-    pos.x = 100;
-    pos.y = 100;
-    // Create just a regular window for presenting OVR SDK 0.6's mirror texture
-    ///@todo Is it any faster with no mirror at all?
-    LOG_INFO("Creating window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
-    l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
-    g_app.SetAppWindowSize(sz);
-    g_auxWindow_w = sz.w;
-    g_auxWindow_h = sz.h;
-#else
-    l_Window = glfwCreateWindow(800, 600, "GLFW Oculus Rift Test", NULL, NULL);
-    std::string windowTitle = PROJECT_NAME;
+    LOG_INFO("Using OVRSDK direct mode.");
+    const std::string windowTitle = PROJECT_NAME "-GLFW-Direct";
+    glm::ivec2 sz(1000, 800);
+    l_Window = glfwCreateWindow(sz.x, sz.y, windowTitle.c_str(), NULL, NULL);
+    g_auxWindow_w = sz.x;
+    g_auxWindow_h = sz.y;
+#ifdef USE_OCULUSSDK
+    const ovrSizei osz = { sz.x, sz.y };
+    g_app.SetAppWindowSize(osz);
 #endif
 
     if (!l_Window)
