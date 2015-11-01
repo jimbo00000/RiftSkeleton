@@ -357,6 +357,25 @@ void OVRSDK08AppSkeleton::BlitLeftEyeRenderToUndistortedMirrorTexture() const
     glBindFramebuffer(GL_FRAMEBUFFER, m_swapFBO.id);
 }
 
+// Draw to in-world quad
+void OVRSDK08AppSkeleton::_DrawToTweakbarQuad() const
+{
+    const ovrSwapTextureSet& swapSet = *m_pQuadTex;
+    glBindFramebuffer(GL_FRAMEBUFFER, m_quadFBO.id);
+    const ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
+
+    const float lum = .1f;
+    glClearColor(lum, lum, lum, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#ifdef USE_ANTTWEAKBAR
+    TwDraw();
+#endif
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void OVRSDK08AppSkeleton::display_sdk() const
 {
     const ovrHmd hmd = m_Hmd;
@@ -434,29 +453,12 @@ void OVRSDK08AppSkeleton::display_sdk() const
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    // Draw to in-world quad
-    {
-        const ovrSwapTextureSet& swapSet = *m_pQuadTex;
-        glBindFramebuffer(GL_FRAMEBUFFER, m_quadFBO.id);
-        const ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
-
-        const float lum = .1f;
-        glClearColor(lum, lum, lum, 0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#ifdef USE_ANTTWEAKBAR
-        TwDraw();
-#endif
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-
     // Submit layers to HMD for display
     std::vector<const ovrLayerHeader*> layers;
     layers.push_back(&m_layerEyeFov.Header);
     if (m_showQuadInWorld)
     {
+        _DrawToTweakbarQuad();
         ovrPosef& qpc = m_layerQuad.QuadPoseCenter;
         qpc.Position = { m_quadLocation.x, m_quadLocation.y, m_quadLocation.z };
         glm::quat qo = glm::quat();

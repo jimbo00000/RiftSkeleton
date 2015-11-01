@@ -63,6 +63,7 @@ protected:
         ovrSwapTextureSet** pQuadTex,
         ovrLayerQuad& layer,
         FBO& quadFBO);
+    void _DrawToTweakbarQuad() const;
     void BlitLeftEyeRenderToUndistortedMirrorTexture() const;
 
     ovrHmd m_Hmd;
