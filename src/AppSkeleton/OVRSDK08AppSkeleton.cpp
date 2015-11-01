@@ -464,6 +464,16 @@ void OVRSDK08AppSkeleton::display_sdk() const
     viewScaleDesc.HmdToEyeViewOffset[1] = m_eyeOffsets[1];
     viewScaleDesc.HmdSpaceToWorldScaleInMeters = 1.f;
     const ovrResult result = ovr_SubmitFrame(hmd, m_frameIndex, &viewScaleDesc, &layers[0], layers.size());
+    if (result == ovrSuccess_NotVisible)
+    {
+        LOG_INFO("ovr_SubmitFrame returned ovrSuccess_NotVisible");
+        ///@todo Enter a lower-power, polling "no focus" mode
+    }
+    else if (result == ovrError_DisplayLost)
+    {
+        LOG_INFO("ovr_SubmitFrame returned ovrError_DisplayLost");
+        ///@todo Tear down textures and session and re-create
+    }
     ++m_frameIndex;
 
     // Increment counters in each swap texture set
