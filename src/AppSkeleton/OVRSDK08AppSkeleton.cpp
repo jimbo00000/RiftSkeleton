@@ -78,13 +78,23 @@ void OVRSDK08AppSkeleton::TogglePerfHud()
 
 void OVRSDK08AppSkeleton::exitVR()
 {
-    for (int i = 0; i < 2; ++i)
-    {
-        ovr_DestroySwapTextureSet(m_Hmd, m_pTexSet[i]);
-    }
-    ovr_DestroySwapTextureSet(m_Hmd, m_pQuadTex);
+    _DestroySwapTextures();
     ovr_Destroy(m_Hmd);
     ovr_Shutdown();
+}
+
+void OVRSDK08AppSkeleton::_DestroySwapTextures()
+{
+    for (int i = 0; i < 2; ++i)
+    {
+        if (m_pTexSet[i])
+        {
+            ovr_DestroySwapTextureSet(m_Hmd, m_pTexSet[i]);
+            m_pTexSet[i] = nullptr;
+        }
+    }
+    ovr_DestroySwapTextureSet(m_Hmd, m_pQuadTex);
+    m_pQuadTex = nullptr;
 }
 
 void OVRSDK08AppSkeleton::initHMD()
@@ -135,15 +145,8 @@ void OVRSDK08AppSkeleton::initVR(bool swapBackBufferDims)
         m_eyeProjections[eye] = glm::transpose(glm::make_mat4(&ovrPerspectiveProjection.M[0][0]));
     }
 
+    _DestroySwapTextures();
     // Create eye render target textures and FBOs
-    for (int i = 0; i < 2; ++i)
-    {
-        if (m_pTexSet[i])
-        {
-            ovr_DestroySwapTextureSet(m_Hmd, m_pTexSet[i]);
-            m_pTexSet[i] = nullptr;
-        }
-    }
 
     ovrLayerEyeFov& layer = m_layerEyeFov;
     layer.Header.Type = ovrLayerType_EyeFov;

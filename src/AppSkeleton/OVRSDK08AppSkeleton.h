@@ -57,6 +57,7 @@ public:
     void display_client() const { display_sdk(); }
 
 protected:
+    void _DestroySwapTextures();
     void BlitLeftEyeRenderToUndistortedMirrorTexture() const;
 
     ovrHmd m_Hmd;
