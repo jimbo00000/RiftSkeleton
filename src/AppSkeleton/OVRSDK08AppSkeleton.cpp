@@ -380,7 +380,10 @@ void OVRSDK08AppSkeleton::display_sdk() const
 {
     const ovrHmd hmd = m_Hmd;
     if (hmd == NULL)
+    {
+        display_buffered();
         return;
+    }
 
     ovrTrackingState outHmdTrackingState = { 0 };
     ovr_GetEyePoses(hmd, m_frameIndex, false, m_eyeOffsets,

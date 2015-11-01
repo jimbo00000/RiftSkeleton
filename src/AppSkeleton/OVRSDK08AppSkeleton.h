@@ -47,7 +47,7 @@ public:
     void ToggleQuadInWorld() { m_showQuadInWorld = !m_showQuadInWorld; }
     void TogglePerfHud();
 
-    void SetAppWindowSize(ovrSizei sz) { m_appWindowSize = sz; }
+    void SetAppWindowSize(ovrSizei sz) { m_appWindowSize = sz; AppSkeleton::resize(sz.w, sz.h); }
 
     ovrSizei getHmdResolution() const;
     bool UsingDebugHmd() const { return m_usingDebugHmd; }
