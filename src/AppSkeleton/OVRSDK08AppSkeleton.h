@@ -58,7 +58,11 @@ public:
 
 protected:
     void _DestroySwapTextures();
-    void _InitQuadLayer();
+    void _InitQuadLayer(
+        const ovrSizei size,
+        ovrSwapTextureSet** pQuadTex,
+        ovrLayerQuad& layer,
+        FBO& quadFBO);
     void BlitLeftEyeRenderToUndistortedMirrorTexture() const;
 
     ovrHmd m_Hmd;
