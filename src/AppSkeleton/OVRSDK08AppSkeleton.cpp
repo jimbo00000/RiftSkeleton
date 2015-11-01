@@ -206,58 +206,7 @@ void OVRSDK08AppSkeleton::initVR(bool swapBackBufferDims)
         layer.ColorTexture[eye] = m_pTexSet[eye];
     }
 
-    // Create in-world quad layer
-    {
-        const ovrSizei& size = { 600, 600 };
-        if (!OVR_SUCCESS(ovr_CreateSwapTextureSetGL(m_Hmd, GL_RGBA, size.w, size.h, &m_pQuadTex)))
-        {
-            LOG_ERROR("Unable to create quad layer swap tex");
-            return;
-        }
-
-        const ovrSwapTextureSet& swapSet = *m_pQuadTex;
-        const ovrGLTexture& ovrTex = (ovrGLTexture&)swapSet.Textures[0];
-        glBindTexture(GL_TEXTURE_2D, ovrTex.OGL.TexId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        ovrLayerQuad& layer = m_layerQuad;
-        layer.Header.Type = ovrLayerType_Quad;
-        layer.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;
-        layer.ColorTexture = m_pQuadTex;
-        layer.Viewport.Pos = { 0, 0 };
-        layer.Viewport.Size = size;
-        layer.QuadPoseCenter.Orientation = { 0.f, 0.f, 0.f, 1.f };
-        layer.QuadPoseCenter.Position = { m_quadLocation.x, m_quadLocation.y, m_quadLocation.z };
-        layer.QuadSize = { 1.f, 1.f };
-
-        // Manually assemble quad FBO
-        m_quadFBO.w = size.w;
-        m_quadFBO.h = size.h;
-        glGenFramebuffers(1, &m_quadFBO.id);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_quadFBO.id);
-        const int idx = 0;
-        const ovrGLTextureData* pGLData = reinterpret_cast<ovrGLTextureData*>(&swapSet.Textures[0]);
-        m_quadFBO.tex = pGLData->TexId;
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_quadFBO.tex, 0);
-
-        m_quadFBO.depth = 0;
-        glGenRenderbuffers(1, &m_quadFBO.depth);
-        glBindRenderbuffer(GL_RENDERBUFFER, m_quadFBO.depth);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, size.w, size.h);
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_quadFBO.depth);
-
-        // Check status
-        const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        if (status != GL_FRAMEBUFFER_COMPLETE)
-        {
-            LOG_ERROR("Framebuffer status incomplete: %d %x", status, status);
-        }
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
+    _InitQuadLayer();
 
     // Mirror texture for displaying to desktop window
     if (m_pMirrorTex)
@@ -323,6 +272,60 @@ void OVRSDK08AppSkeleton::initVR(bool swapBackBufferDims)
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glEnable(GL_DEPTH_TEST);
+}
+
+// Create in-world quad layer for tweakbar display
+void OVRSDK08AppSkeleton::_InitQuadLayer()
+{
+    const ovrSizei size = { 600, 600 };
+    if (!OVR_SUCCESS(ovr_CreateSwapTextureSetGL(m_Hmd, GL_RGBA, size.w, size.h, &m_pQuadTex)))
+    {
+        LOG_ERROR("Unable to create quad layer swap tex");
+        return;
+    }
+
+    const ovrSwapTextureSet& swapSet = *m_pQuadTex;
+    const ovrGLTexture& ovrTex = (ovrGLTexture&)swapSet.Textures[0];
+    glBindTexture(GL_TEXTURE_2D, ovrTex.OGL.TexId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    ovrLayerQuad& layer = m_layerQuad;
+    layer.Header.Type = ovrLayerType_Quad;
+    layer.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;
+    layer.ColorTexture = m_pQuadTex;
+    layer.Viewport.Pos = { 0, 0 };
+    layer.Viewport.Size = size;
+    layer.QuadPoseCenter.Orientation = { 0.f, 0.f, 0.f, 1.f };
+    layer.QuadPoseCenter.Position = { m_quadLocation.x, m_quadLocation.y, m_quadLocation.z };
+    layer.QuadSize = { 1.f, 1.f };
+
+    // Manually assemble quad FBO
+    m_quadFBO.w = size.w;
+    m_quadFBO.h = size.h;
+    glGenFramebuffers(1, &m_quadFBO.id);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_quadFBO.id);
+    const int idx = 0;
+    const ovrGLTextureData* pGLData = reinterpret_cast<ovrGLTextureData*>(&swapSet.Textures[0]);
+    m_quadFBO.tex = pGLData->TexId;
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_quadFBO.tex, 0);
+
+    m_quadFBO.depth = 0;
+    glGenRenderbuffers(1, &m_quadFBO.depth);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_quadFBO.depth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, size.w, size.h);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_quadFBO.depth);
+
+    // Check status
+    const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        LOG_ERROR("Framebuffer status incomplete: %d %x", status, status);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 ovrSizei OVRSDK08AppSkeleton::getHmdResolution() const
