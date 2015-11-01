@@ -99,7 +99,7 @@ void OVRSDK08AppSkeleton::_DestroySwapTextures()
 
 void OVRSDK08AppSkeleton::initHMD()
 {
-    ovrResult res = ovr_Initialize(NULL);
+    const ovrResult res = ovr_Initialize(NULL);
     if (ovrSuccess != res)
     {
         LOG_INFO("Failed to initialize the Oculus SDK");
@@ -109,13 +109,10 @@ void OVRSDK08AppSkeleton::initHMD()
     if (ovrSuccess != ovr_Create(&m_Hmd, &luid))
     {
         LOG_INFO("Could not create HMD");
-        {
-            LOG_ERROR("Could not create Debug HMD");
-        }
         m_usingDebugHmd = true;
     }
 
-    const ovrBool ret = ovr_ConfigureTracking(m_Hmd,
+    const ovrResult ret = ovr_ConfigureTracking(m_Hmd,
         ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position,
         ovrTrackingCap_Orientation);
     if (!OVR_SUCCESS(ret))
