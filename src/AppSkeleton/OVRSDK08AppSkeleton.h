@@ -75,7 +75,7 @@ protected:
     FBO m_mirrorFBO;
     FBO m_undistortedFBO;
 
-    mutable ovrLayerQuad m_layerQuad;
+    ovrLayerQuad m_layerQuad;
     ovrSwapTextureSet* m_pQuadTex;
     FBO m_quadFBO;
     bool m_showQuadInWorld;

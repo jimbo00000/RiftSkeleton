@@ -460,12 +460,18 @@ void OVRSDK08AppSkeleton::display_sdk() const
     if (m_showQuadInWorld)
     {
         _DrawToTweakbarQuad();
-        ovrPosef& qpc = m_layerQuad.QuadPoseCenter;
+
+        // Display is a const function, but we cast that away to
+        // be able to write quad's in-world pose each frame.
+        ///@todo Update this in a separate non-const function -
+        // it doesn't have to be as fresh as head pose does.
+        ovrPosef& qpc = const_cast<ovrPosef&>(m_layerQuad.QuadPoseCenter);
         qpc.Position = { m_quadLocation.x, m_quadLocation.y, m_quadLocation.z };
         glm::quat qo = glm::quat();
         qo = glm::rotate(qo, m_quadRotation.x, glm::vec3(1.f, 0.f, 0.f));
         qo = glm::rotate(qo, m_quadRotation.y, glm::vec3(0.f, 1.f, 0.f));
         qpc.Orientation = { qo.x, qo.y, qo.z, qo.w };
+
         layers.push_back(&m_layerQuad.Header);
     }
     ovrViewScaleDesc viewScaleDesc;
