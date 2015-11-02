@@ -40,7 +40,6 @@ OVRSDK08AppSkeleton::OVRSDK08AppSkeleton()
 , m_pMirrorTex(NULL)
 , m_pQuadTex(NULL)
 , m_showQuadInWorld(true)
-, m_usingDebugHmd(false)
 , m_mirror(MirrorDistorted)
 , m_perfHudMode(ovrPerfHud_Off)
 , m_quadLocation(.3f, .3f, -1.f)
@@ -102,14 +101,13 @@ void OVRSDK08AppSkeleton::initHMD()
     const ovrResult res = ovr_Initialize(NULL);
     if (ovrSuccess != res)
     {
-        LOG_INFO("Failed to initialize the Oculus SDK");
+        LOG_ERROR("ovr_Initialize failed with code %d", res);
     }
 
     ovrGraphicsLuid luid;
     if (ovrSuccess != ovr_Create(&m_Hmd, &luid))
     {
-        LOG_INFO("Could not create HMD");
-        m_usingDebugHmd = true;
+        LOG_ERROR("ovr_Create failed with code %d", res);
     }
 
     const ovrResult ret = ovr_ConfigureTracking(m_Hmd,
