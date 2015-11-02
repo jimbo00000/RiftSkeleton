@@ -38,11 +38,6 @@ public:
     void RecenterPose();
     void exitVR();
 
-    void ToggleVignette() {}
-    void ToggleTimeWarp() {}
-    void ToggleOverdrive() {}
-    void ToggleLowPersistence() {}
-    void ToggleDynamicPrediction() {}
     void ToggleMirroringType();
     void ToggleQuadInWorld() { m_showQuadInWorld = !m_showQuadInWorld; }
     void TogglePerfHud();

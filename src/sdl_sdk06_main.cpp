@@ -179,10 +179,6 @@ void keyboard(const SDL_Event& event, int key, int codes, int action, int mods)
             g_app.ToggleQuadInWorld();
             break;
 
-        case 'v': g_app.ToggleVignette(); break;
-        case 't': g_app.ToggleTimeWarp(); break;
-        case 'o': g_app.ToggleOverdrive(); break;
-        case 'l': g_app.ToggleLowPersistence(); break;
         case 'm': g_app.ToggleMirroringType(); break;
         case 'p': g_app.TogglePerfHud(); break;
 #endif
