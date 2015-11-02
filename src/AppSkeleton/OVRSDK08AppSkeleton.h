@@ -18,6 +18,14 @@
 #include <OVR_CAPI.h>
 #include <OVR_CAPI_GL.h>
 
+// A surface displayed by OVR compositor in-world and an FBO to draw to it.
+struct worldQuad {
+    ovrLayerQuad m_layerQuad;
+    ovrSwapTextureSet* m_pQuadTex;
+    FBO fbo;
+    bool m_showQuadInWorld;
+};
+
 ///@brief Encapsulates as much of the VR viewer state as possible,
 /// pushing all viewer-independent stuff to Scene.
 class OVRSDK08AppSkeleton : public AppSkeleton
@@ -39,7 +47,7 @@ public:
     void exitVR();
 
     void ToggleMirroringType();
-    void ToggleQuadInWorld() { m_showQuadInWorld = !m_showQuadInWorld; }
+    void ToggleQuadInWorld() { m_tweakbarQuad.m_showQuadInWorld = !m_tweakbarQuad.m_showQuadInWorld; }
     void TogglePerfHud();
 
     void SetAppWindowSize(ovrSizei sz) { m_appWindowSize = sz; AppSkeleton::resize(sz.w, sz.h); }
@@ -53,10 +61,8 @@ public:
 protected:
     void _DestroySwapTextures();
     void _InitQuadLayer(
-        const ovrSizei size,
-        ovrSwapTextureSet** pQuadTex,
-        ovrLayerQuad& layer,
-        FBO& quadFBO);
+        worldQuad& quad,
+        const ovrSizei size);
     void _DrawToTweakbarQuad() const;
     void BlitLeftEyeRenderToUndistortedMirrorTexture() const;
 
@@ -75,10 +81,7 @@ protected:
     FBO m_mirrorFBO;
     FBO m_undistortedFBO;
 
-    ovrLayerQuad m_layerQuad;
-    ovrSwapTextureSet* m_pQuadTex;
-    FBO m_quadFBO;
-    bool m_showQuadInWorld;
+    worldQuad m_tweakbarQuad;
 
     ovrSizei m_appWindowSize;
     MirrorType m_mirror;

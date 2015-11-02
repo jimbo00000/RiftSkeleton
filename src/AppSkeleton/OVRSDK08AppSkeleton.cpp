@@ -38,8 +38,6 @@ OVRSDK08AppSkeleton::OVRSDK08AppSkeleton()
 : m_Hmd(NULL)
 , m_frameIndex(0)
 , m_pMirrorTex(NULL)
-, m_pQuadTex(NULL)
-, m_showQuadInWorld(true)
 , m_mirror(MirrorDistorted)
 , m_perfHudMode(ovrPerfHud_Off)
 , m_quadLocation(.3f, .3f, -1.f)
@@ -47,6 +45,9 @@ OVRSDK08AppSkeleton::OVRSDK08AppSkeleton()
 {
     m_pTexSet[0] = NULL;
     m_pTexSet[1] = NULL;
+
+    memset((void*)&m_tweakbarQuad, 0, sizeof(worldQuad));
+    m_tweakbarQuad.m_showQuadInWorld = true;
 }
 
 OVRSDK08AppSkeleton::~OVRSDK08AppSkeleton()
@@ -92,8 +93,8 @@ void OVRSDK08AppSkeleton::_DestroySwapTextures()
             m_pTexSet[i] = nullptr;
         }
     }
-    ovr_DestroySwapTextureSet(m_Hmd, m_pQuadTex);
-    m_pQuadTex = nullptr;
+    ovr_DestroySwapTextureSet(m_Hmd, m_tweakbarQuad.m_pQuadTex);
+    m_tweakbarQuad.m_pQuadTex = nullptr;
 }
 
 void OVRSDK08AppSkeleton::initHMD()
@@ -141,8 +142,8 @@ void OVRSDK08AppSkeleton::initVR(bool swapBackBufferDims)
     }
 
     _DestroySwapTextures();
-    // Create eye render target textures and FBOs
 
+    // Create eye render target textures and FBOs
     ovrLayerEyeFov& layer = m_layerEyeFov;
     layer.Header.Type = ovrLayerType_EyeFov;
     layer.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;
@@ -204,8 +205,9 @@ void OVRSDK08AppSkeleton::initVR(bool swapBackBufferDims)
         layer.ColorTexture[eye] = m_pTexSet[eye];
     }
 
+    // In-world quads
     const ovrSizei qsz = { 600, 600 };
-    _InitQuadLayer(qsz, &m_pQuadTex, m_layerQuad, m_quadFBO);
+    _InitQuadLayer(m_tweakbarQuad, qsz);
 
     // Mirror texture for displaying to desktop window
     if (m_pMirrorTex)
@@ -275,18 +277,16 @@ void OVRSDK08AppSkeleton::initVR(bool swapBackBufferDims)
 
 // Create in-world quad layer for display of a 2d texture.
 void OVRSDK08AppSkeleton::_InitQuadLayer(
-    const ovrSizei size,
-    ovrSwapTextureSet** pQuadTex,
-    ovrLayerQuad& layer,
-    FBO& quadFBO)
+    worldQuad& quad,
+    const ovrSizei size)
 {
-    if (!OVR_SUCCESS(ovr_CreateSwapTextureSetGL(m_Hmd, GL_RGBA, size.w, size.h, pQuadTex)))
+    if (!OVR_SUCCESS(ovr_CreateSwapTextureSetGL(m_Hmd, GL_RGBA, size.w, size.h, &quad.m_pQuadTex)))
     {
         LOG_ERROR("Unable to create quad layer swap tex");
         return;
     }
 
-    const ovrSwapTextureSet& swapSet = **pQuadTex;
+    const ovrSwapTextureSet& swapSet = *quad.m_pQuadTex;
     const ovrGLTexture& ovrTex = (ovrGLTexture&)swapSet.Textures[0];
     glBindTexture(GL_TEXTURE_2D, ovrTex.OGL.TexId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -294,9 +294,10 @@ void OVRSDK08AppSkeleton::_InitQuadLayer(
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+    ovrLayerQuad& layer = quad.m_layerQuad;
     layer.Header.Type = ovrLayerType_Quad;
     layer.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;
-    layer.ColorTexture = *pQuadTex;
+    layer.ColorTexture = quad.m_pQuadTex;
     layer.Viewport.Pos = { 0, 0 };
     layer.Viewport.Size = size;
     layer.QuadPoseCenter.Orientation = { 0.f, 0.f, 0.f, 1.f };
@@ -304,21 +305,21 @@ void OVRSDK08AppSkeleton::_InitQuadLayer(
     layer.QuadSize = { 1.f, 1.f };
 
     // Manually assemble quad FBO
-    quadFBO.w = size.w;
-    quadFBO.h = size.h;
-    glGenFramebuffers(1, &quadFBO.id);
-    glBindFramebuffer(GL_FRAMEBUFFER, quadFBO.id);
+    quad.fbo.w = size.w;
+    quad.fbo.h = size.h;
+    glGenFramebuffers(1, &quad.fbo.id);
+    glBindFramebuffer(GL_FRAMEBUFFER, quad.fbo.id);
     const int idx = 0;
     const ovrGLTextureData* pGLData = reinterpret_cast<ovrGLTextureData*>(&swapSet.Textures[0]);
-    quadFBO.tex = pGLData->TexId;
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, quadFBO.tex, 0);
+    quad.fbo.tex = pGLData->TexId;
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, quad.fbo.tex, 0);
 
-    quadFBO.depth = 0;
-    glGenRenderbuffers(1, &quadFBO.depth);
-    glBindRenderbuffer(GL_RENDERBUFFER, quadFBO.depth);
+    quad.fbo.depth = 0;
+    glGenRenderbuffers(1, &quad.fbo.depth);
+    glBindRenderbuffer(GL_RENDERBUFFER, quad.fbo.depth);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, size.w, size.h);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, quadFBO.depth);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, quad.fbo.depth);
 
     // Check status
     const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -358,8 +359,8 @@ void OVRSDK08AppSkeleton::BlitLeftEyeRenderToUndistortedMirrorTexture() const
 // Draw to in-world quad
 void OVRSDK08AppSkeleton::_DrawToTweakbarQuad() const
 {
-    const ovrSwapTextureSet& swapSet = *m_pQuadTex;
-    glBindFramebuffer(GL_FRAMEBUFFER, m_quadFBO.id);
+    const ovrSwapTextureSet& swapSet = *m_tweakbarQuad.m_pQuadTex;
+    glBindFramebuffer(GL_FRAMEBUFFER, m_tweakbarQuad.fbo.id);
     const ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
 
@@ -457,7 +458,7 @@ void OVRSDK08AppSkeleton::display_sdk() const
     // Submit layers to HMD for display
     std::vector<const ovrLayerHeader*> layers;
     layers.push_back(&m_layerEyeFov.Header);
-    if (m_showQuadInWorld)
+    if (m_tweakbarQuad.m_showQuadInWorld)
     {
         _DrawToTweakbarQuad();
 
@@ -465,14 +466,14 @@ void OVRSDK08AppSkeleton::display_sdk() const
         // be able to write quad's in-world pose each frame.
         ///@todo Update this in a separate non-const function -
         // it doesn't have to be as fresh as head pose does.
-        ovrPosef& qpc = const_cast<ovrPosef&>(m_layerQuad.QuadPoseCenter);
+        ovrPosef& qpc = const_cast<ovrPosef&>(m_tweakbarQuad.m_layerQuad.QuadPoseCenter);
         qpc.Position = { m_quadLocation.x, m_quadLocation.y, m_quadLocation.z };
         glm::quat qo = glm::quat();
         qo = glm::rotate(qo, m_quadRotation.x, glm::vec3(1.f, 0.f, 0.f));
         qo = glm::rotate(qo, m_quadRotation.y, glm::vec3(0.f, 1.f, 0.f));
         qpc.Orientation = { qo.x, qo.y, qo.z, qo.w };
 
-        layers.push_back(&m_layerQuad.Header);
+        layers.push_back(&m_tweakbarQuad.m_layerQuad.Header);
     }
     ovrViewScaleDesc viewScaleDesc;
     viewScaleDesc.HmdToEyeViewOffset[0] = m_eyeOffsets[0];
@@ -499,9 +500,9 @@ void OVRSDK08AppSkeleton::display_sdk() const
         ovrSwapTextureSet& swapSet = *m_pTexSet[eye];
         ++swapSet.CurrentIndex %= swapSet.TextureCount;
     }
-    if (m_showQuadInWorld)
+    if (m_tweakbarQuad.m_showQuadInWorld)
     {
-        ovrSwapTextureSet& swapSet = *m_pQuadTex;
+        ovrSwapTextureSet& swapSet = *m_tweakbarQuad.m_pQuadTex;
         ++swapSet.CurrentIndex %= swapSet.TextureCount;
     }
 
