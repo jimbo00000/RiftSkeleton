@@ -24,6 +24,8 @@ struct worldQuad {
     ovrSwapTextureSet* m_pQuadTex;
     FBO fbo;
     bool m_showQuadInWorld;
+    glm::vec3 m_quadLocation;
+    glm::vec3 m_quadRotation;
 };
 
 ///@brief Encapsulates as much of the VR viewer state as possible,
@@ -81,15 +83,12 @@ protected:
     FBO m_mirrorFBO;
     FBO m_undistortedFBO;
 
-    worldQuad m_tweakbarQuad;
-
     ovrSizei m_appWindowSize;
     MirrorType m_mirror;
     ovrPerfHudMode m_perfHudMode;
 
 public:
-    glm::vec3 m_quadLocation;
-    glm::vec3 m_quadRotation;
+    worldQuad m_tweakbarQuad;
 
 private: // Disallow copy ctor and assignment operator
     OVRSDK08AppSkeleton(const OVRSDK08AppSkeleton&);

@@ -40,14 +40,14 @@ OVRSDK08AppSkeleton::OVRSDK08AppSkeleton()
 , m_pMirrorTex(NULL)
 , m_mirror(MirrorDistorted)
 , m_perfHudMode(ovrPerfHud_Off)
-, m_quadLocation(.3f, .3f, -1.f)
-, m_quadRotation(0.f)
 {
     m_pTexSet[0] = NULL;
     m_pTexSet[1] = NULL;
 
     memset((void*)&m_tweakbarQuad, 0, sizeof(worldQuad));
     m_tweakbarQuad.m_showQuadInWorld = true;
+    m_tweakbarQuad.m_quadLocation = glm::vec3(.3f, .3f, -1.f);
+    m_tweakbarQuad.m_quadRotation = glm::vec3(0.f);
 }
 
 OVRSDK08AppSkeleton::~OVRSDK08AppSkeleton()
@@ -467,10 +467,11 @@ void OVRSDK08AppSkeleton::display_sdk() const
         ///@todo Update this in a separate non-const function -
         // it doesn't have to be as fresh as head pose does.
         ovrPosef& qpc = const_cast<ovrPosef&>(m_tweakbarQuad.m_layerQuad.QuadPoseCenter);
-        qpc.Position = { m_quadLocation.x, m_quadLocation.y, m_quadLocation.z };
+        const glm::vec3& qp = m_tweakbarQuad.m_quadLocation;
+        qpc.Position = { qp.x, qp.y, qp.z };
         glm::quat qo = glm::quat();
-        qo = glm::rotate(qo, m_quadRotation.x, glm::vec3(1.f, 0.f, 0.f));
-        qo = glm::rotate(qo, m_quadRotation.y, glm::vec3(0.f, 1.f, 0.f));
+        qo = glm::rotate(qo, m_tweakbarQuad.m_quadRotation.x, glm::vec3(1.f, 0.f, 0.f));
+        qo = glm::rotate(qo, m_tweakbarQuad.m_quadRotation.y, glm::vec3(0.f, 1.f, 0.f));
         qpc.Orientation = { qo.x, qo.y, qo.z, qo.w };
 
         layers.push_back(&m_tweakbarQuad.m_layerQuad.Header);
