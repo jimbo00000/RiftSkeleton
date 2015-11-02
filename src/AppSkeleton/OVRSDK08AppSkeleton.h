@@ -50,7 +50,6 @@ public:
     void SetAppWindowSize(ovrSizei sz) { m_appWindowSize = sz; AppSkeleton::resize(sz.w, sz.h); }
 
     ovrSizei getHmdResolution() const;
-    bool UsingDebugHmd() const { return false; }
 
     void display_stereo_undistorted() { display_sdk(); }
     void display_sdk() const;

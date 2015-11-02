@@ -49,7 +49,6 @@ public:
     void SetAppWindowSize(ovrSizei sz) { m_appWindowSize = sz; }
 
     ovrSizei getHmdResolution() const;
-    bool UsingDebugHmd() const { return m_usingDebugHmd; }
 
     void display_stereo_undistorted() { display_sdk(); }
     void display_sdk() const;
@@ -77,7 +76,6 @@ protected:
     FBO m_undistortedFBO;
 
     ovrSizei m_appWindowSize;
-    bool m_usingDebugHmd;
     MirrorType m_mirror;
     bool m_showQuadInWorld;
 
