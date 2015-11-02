@@ -49,8 +49,12 @@ public:
     void exitVR();
 
     void ToggleMirroringType();
-    void ToggleQuadInWorld() { m_tweakbarQuad.m_showQuadInWorld = !m_tweakbarQuad.m_showQuadInWorld; }
     void TogglePerfHud();
+    void ToggleQuadInWorld()
+    {
+        m_tweakbarQuad.m_showQuadInWorld = !m_tweakbarQuad.m_showQuadInWorld;
+        m_secondQuad.m_showQuadInWorld = m_tweakbarQuad.m_showQuadInWorld;
+    }
 
     void SetAppWindowSize(ovrSizei sz) { m_appWindowSize = sz; AppSkeleton::resize(sz.w, sz.h); }
 
@@ -66,6 +70,7 @@ protected:
         worldQuad& quad,
         const ovrSizei size);
     void _DrawToTweakbarQuad() const;
+    void _DrawToSecondQuad() const;
     void BlitLeftEyeRenderToUndistortedMirrorTexture() const;
 
     ovrHmd m_Hmd;
@@ -89,6 +94,7 @@ protected:
 
 public:
     worldQuad m_tweakbarQuad;
+    worldQuad m_secondQuad;
 
 private: // Disallow copy ctor and assignment operator
     OVRSDK08AppSkeleton(const OVRSDK08AppSkeleton&);

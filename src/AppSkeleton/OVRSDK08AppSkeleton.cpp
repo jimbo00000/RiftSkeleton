@@ -46,8 +46,13 @@ OVRSDK08AppSkeleton::OVRSDK08AppSkeleton()
 
     memset((void*)&m_tweakbarQuad, 0, sizeof(worldQuad));
     m_tweakbarQuad.m_showQuadInWorld = true;
-    m_tweakbarQuad.m_quadLocation = glm::vec3(.3f, .3f, -1.f);
+    m_tweakbarQuad.m_quadLocation = glm::vec3(-.5f, .3f, -1.f);
     m_tweakbarQuad.m_quadRotation = glm::vec3(0.f);
+
+    memset((void*)&m_secondQuad, 0, sizeof(worldQuad));
+    m_secondQuad.m_showQuadInWorld = true;
+    m_secondQuad.m_quadLocation = glm::vec3(.5f, .3f, -1.f);
+    m_secondQuad.m_quadRotation = glm::vec3(0.f);
 }
 
 OVRSDK08AppSkeleton::~OVRSDK08AppSkeleton()
@@ -95,6 +100,8 @@ void OVRSDK08AppSkeleton::_DestroySwapTextures()
     }
     ovr_DestroySwapTextureSet(m_Hmd, m_tweakbarQuad.m_pQuadTex);
     m_tweakbarQuad.m_pQuadTex = nullptr;
+    ovr_DestroySwapTextureSet(m_Hmd, m_secondQuad.m_pQuadTex);
+    m_secondQuad.m_pQuadTex = nullptr;
 }
 
 void OVRSDK08AppSkeleton::initHMD()
@@ -208,6 +215,7 @@ void OVRSDK08AppSkeleton::initVR(bool swapBackBufferDims)
     // In-world quads
     const ovrSizei qsz = { 600, 600 };
     _InitQuadLayer(m_tweakbarQuad, qsz);
+    _InitQuadLayer(m_secondQuad, qsz);
 
     // Mirror texture for displaying to desktop window
     if (m_pMirrorTex)
@@ -375,6 +383,21 @@ void OVRSDK08AppSkeleton::_DrawToTweakbarQuad() const
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void OVRSDK08AppSkeleton::_DrawToSecondQuad() const
+{
+    const ovrSwapTextureSet& swapSet = *m_secondQuad.m_pQuadTex;
+    glBindFramebuffer(GL_FRAMEBUFFER, m_secondQuad.fbo.id);
+    const ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
+
+    const float lum = .1f;
+    glClearColor(lum, .8f, lum, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void OVRSDK08AppSkeleton::display_sdk() const
 {
     const ovrHmd hmd = m_Hmd;
@@ -476,6 +499,22 @@ void OVRSDK08AppSkeleton::display_sdk() const
 
         layers.push_back(&m_tweakbarQuad.m_layerQuad.Header);
     }
+
+    if (m_secondQuad.m_showQuadInWorld)
+    {
+        _DrawToSecondQuad();
+        ovrPosef& qpc = const_cast<ovrPosef&>(m_secondQuad.m_layerQuad.QuadPoseCenter);
+        const glm::vec3& qp = m_secondQuad.m_quadLocation;
+        qpc.Position = { qp.x, qp.y, qp.z };
+        glm::quat qo = glm::quat();
+        qo = glm::rotate(qo, m_secondQuad.m_quadRotation.x, glm::vec3(1.f, 0.f, 0.f));
+        qo = glm::rotate(qo, m_secondQuad.m_quadRotation.y, glm::vec3(0.f, 1.f, 0.f));
+        qpc.Orientation = { qo.x, qo.y, qo.z, qo.w };
+
+        layers.push_back(&m_secondQuad.m_layerQuad.Header);
+    }
+
+
     ovrViewScaleDesc viewScaleDesc;
     viewScaleDesc.HmdToEyeViewOffset[0] = m_eyeOffsets[0];
     viewScaleDesc.HmdToEyeViewOffset[1] = m_eyeOffsets[1];
@@ -504,6 +543,11 @@ void OVRSDK08AppSkeleton::display_sdk() const
     if (m_tweakbarQuad.m_showQuadInWorld)
     {
         ovrSwapTextureSet& swapSet = *m_tweakbarQuad.m_pQuadTex;
+        ++swapSet.CurrentIndex %= swapSet.TextureCount;
+    }
+    if (m_secondQuad.m_showQuadInWorld)
+    {
+        ovrSwapTextureSet& swapSet = *m_secondQuad.m_pQuadTex;
         ++swapSet.CurrentIndex %= swapSet.TextureCount;
     }
 
