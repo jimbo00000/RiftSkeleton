@@ -45,12 +45,12 @@ OVRSDK08AppSkeleton::OVRSDK08AppSkeleton()
     m_pTexSet[1] = NULL;
 
     memset((void*)&m_tweakbarQuad, 0, sizeof(worldQuad));
-    m_tweakbarQuad.m_showQuadInWorld = true;
+    m_tweakbarQuad.m_showQuadInWorld = false;
     m_tweakbarQuad.m_quadLocation = glm::vec3(-.5f, .3f, -1.f);
     m_tweakbarQuad.m_quadRotation = glm::vec3(0.f);
 
     memset((void*)&m_secondQuad, 0, sizeof(worldQuad));
-    m_secondQuad.m_showQuadInWorld = true;
+    m_secondQuad.m_showQuadInWorld = false;
     m_secondQuad.m_quadLocation = glm::vec3(.5f, .3f, -1.f);
     m_secondQuad.m_quadRotation = glm::vec3(0.f);
 }
@@ -85,6 +85,13 @@ void OVRSDK08AppSkeleton::ToggleQuadInWorld()
 {
     m_tweakbarQuad.m_showQuadInWorld = !m_tweakbarQuad.m_showQuadInWorld;
     m_secondQuad.m_showQuadInWorld = m_tweakbarQuad.m_showQuadInWorld;
+    if (m_tweakbarQuad.m_showQuadInWorld)
+    {
+        const FBO& f = m_tweakbarQuad.fbo;
+#ifdef USE_ANTTWEAKBAR
+        TwWindowSize(f.w, f.h);
+#endif
+    }
 }
 
 void OVRSDK08AppSkeleton::exitVR()

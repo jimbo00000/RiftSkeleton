@@ -174,6 +174,12 @@ void keyboard(GLFWwindow* pWindow, int key, int codes, int action, int mods)
 #ifdef USE_OCULUSSDK
         case GLFW_KEY_TAB:
             g_app.ToggleQuadInWorld();
+            if (g_app.m_tweakbarQuad.m_showQuadInWorld == false)
+            {
+#ifdef USE_ANTTWEAKBAR
+                TwWindowSize(g_auxWindow_w, g_auxWindow_h);
+#endif
+            }
             break;
 
         case 'M': g_app.ToggleMirroringType(); break;
@@ -461,10 +467,12 @@ void resize_Aux(GLFWwindow* pWindow, int w, int h)
     g_auxWindow_w = w;
     g_auxWindow_h = h;
 
+    if (g_app.m_tweakbarQuad.m_showQuadInWorld == false)
+    {
 #ifdef USE_ANTTWEAKBAR
-    ///@note This will break PaneScene's tweakbar positioning
-    TwWindowSize(w, h);
+        TwWindowSize(w, h);
 #endif
+    }
 
 #ifdef USE_OCULUSSDK
     ovrSizei sz = { w, h };
@@ -522,9 +530,12 @@ void displayToHMD()
     case RenderingMode::OVR_SDK:
     case RenderingMode::OVR_Client:
         g_app.display_sdk();
+        if (g_app.m_tweakbarQuad.m_showQuadInWorld == false)
+        {
 #ifdef USE_ANTTWEAKBAR
-        TwDraw(); ///@todo Should this go first? Will it write to a depth buffer?
+            TwDraw(); ///@todo Should this go first? Will it write to a depth buffer?
 #endif
+        }
         glfwSwapBuffers(g_pMirrorWindow);
         break;
 #endif //USE_OCULUSSDK
