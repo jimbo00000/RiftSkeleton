@@ -81,6 +81,12 @@ void OVRSDK08AppSkeleton::TogglePerfHud()
     ovr_SetInt(m_Hmd, OVR_PERF_HUD_MODE, m_perfHudMode);
 }
 
+void OVRSDK08AppSkeleton::ToggleQuadInWorld()
+{
+    m_tweakbarQuad.m_showQuadInWorld = !m_tweakbarQuad.m_showQuadInWorld;
+    m_secondQuad.m_showQuadInWorld = m_tweakbarQuad.m_showQuadInWorld;
+}
+
 void OVRSDK08AppSkeleton::exitVR()
 {
     _DestroySwapTextures();

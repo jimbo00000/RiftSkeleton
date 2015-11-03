@@ -50,11 +50,7 @@ public:
 
     void ToggleMirroringType();
     void TogglePerfHud();
-    void ToggleQuadInWorld()
-    {
-        m_tweakbarQuad.m_showQuadInWorld = !m_tweakbarQuad.m_showQuadInWorld;
-        m_secondQuad.m_showQuadInWorld = m_tweakbarQuad.m_showQuadInWorld;
-    }
+    void ToggleQuadInWorld();
 
     void SetAppWindowSize(ovrSizei sz) { m_appWindowSize = sz; AppSkeleton::resize(sz.w, sz.h); }
 
