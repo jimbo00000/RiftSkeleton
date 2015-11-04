@@ -13,6 +13,7 @@
 #endif
 
 #include "AppSkeleton.h"
+#include "ShaderWithVariables.h"
 
 #include <Kernel/OVR_Types.h> // Pull in OVR_OS_* defines 
 #include <OVR_CAPI.h>
@@ -69,7 +70,9 @@ protected:
     void _InitQuadLayer(
         worldQuad& quad,
         const ovrSizei size);
+    void _InitPointerAttributes();
     void _DrawToTweakbarQuad() const;
+    void _DrawCursor() const;
     void _DrawToSecondQuad() const;
     void BlitLeftEyeRenderToUndistortedMirrorTexture() const;
 
@@ -92,6 +95,8 @@ protected:
     MirrorType m_mirror;
     ovrPerfHudMode m_perfHudMode;
 
+    glm::vec2 m_pointerCoords;
+    ShaderWithVariables m_cursorShader;
 public:
     worldQuad m_tweakbarQuad;
     worldQuad m_secondQuad;

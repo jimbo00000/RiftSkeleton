@@ -77,6 +77,10 @@ void OVRSDK08AppSkeleton::OnMouseButton(int button, int action)
 
 void OVRSDK08AppSkeleton::OnMouseMove(int x, int y)
 {
+    const FBO& f = m_tweakbarQuad.fbo;
+    m_pointerCoords.x = static_cast<float>(x) / static_cast<float>(f.w);
+    m_pointerCoords.y = static_cast<float>(y) / static_cast<float>(f.h);
+
 #ifdef USE_ANTTWEAKBAR
     int ant = TwEventMousePosGLFW(x, y);
     if (ant != 0)
@@ -259,6 +263,11 @@ void OVRSDK08AppSkeleton::initVR(bool swapBackBufferDims)
     _InitQuadLayer(m_tweakbarQuad, qsz);
     _InitQuadLayer(m_secondQuad, qsz);
 
+    m_cursorShader.initProgram("basic");
+    m_cursorShader.bindVAO();
+    _InitPointerAttributes();
+    glBindVertexArray(0);
+
     // Mirror texture for displaying to desktop window
     if (m_pMirrorTex)
     {
@@ -380,6 +389,38 @@ void OVRSDK08AppSkeleton::_InitQuadLayer(
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void OVRSDK08AppSkeleton::_InitPointerAttributes()
+{
+    const glm::vec3 verts[] = {
+        glm::vec3(0.f),
+        glm::vec3(.05f, .025f, .0f),
+        glm::vec3(.025f, .05f, .0f),
+    };
+
+    const glm::vec3 cols[] = {
+        glm::vec3(1.f, 0.f, 0.f),
+        glm::vec3(0.f, 1.f, 0.f),
+        glm::vec3(0.f, 0.f, 1.f),
+    };
+
+    GLuint vertVbo = 0;
+    glGenBuffers(1, &vertVbo);
+    m_cursorShader.AddVbo("vPosition", vertVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vertVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+    glVertexAttribPointer(m_cursorShader.GetAttrLoc("vPosition"), 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+    GLuint colVbo = 0;
+    glGenBuffers(1, &colVbo);
+    m_cursorShader.AddVbo("vColor", colVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, colVbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cols), cols, GL_STATIC_DRAW);
+    glVertexAttribPointer(m_cursorShader.GetAttrLoc("vColor"), 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+    glEnableVertexAttribArray(m_cursorShader.GetAttrLoc("vPosition"));
+    glEnableVertexAttribArray(m_cursorShader.GetAttrLoc("vColor"));
+}
+
 ovrSizei OVRSDK08AppSkeleton::getHmdResolution() const
 {
     if (m_Hmd == NULL)
@@ -410,10 +451,12 @@ void OVRSDK08AppSkeleton::BlitLeftEyeRenderToUndistortedMirrorTexture() const
 void OVRSDK08AppSkeleton::_DrawToTweakbarQuad() const
 {
     const ovrSwapTextureSet& swapSet = *m_tweakbarQuad.m_pQuadTex;
-    glBindFramebuffer(GL_FRAMEBUFFER, m_tweakbarQuad.fbo.id);
+    const FBO& f = m_tweakbarQuad.fbo;
+    glBindFramebuffer(GL_FRAMEBUFFER, f.id);
     const ovrGLTexture& tex = (ovrGLTexture&)(swapSet.Textures[swapSet.CurrentIndex]);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex.OGL.TexId, 0);
 
+    glViewport(0, 0, f.w, f.h);
     const float lum = .1f;
     glClearColor(lum, lum, lum, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -421,8 +464,33 @@ void OVRSDK08AppSkeleton::_DrawToTweakbarQuad() const
     TwDraw();
 #endif
 
+    _DrawCursor();
+
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void OVRSDK08AppSkeleton::_DrawCursor() const
+{
+    // Restore current program when we're done; we are rendering to FBO
+    GLint prog = 0;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &prog);
+
+    glUseProgram(m_cursorShader.prog());
+    {
+        const glm::mat4 modelview = glm::translate(glm::mat4(1.f), glm::vec3(m_pointerCoords, 0.f));
+        const glm::mat4 projection = glm::ortho(0.f, 1.f, 1.f, 0.f, -1.f, 1.f);
+
+        glUniformMatrix4fv(m_cursorShader.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(modelview));
+        glUniformMatrix4fv(m_cursorShader.GetUniLoc("prmtx"), 1, false, glm::value_ptr(projection));
+
+        m_cursorShader.bindVAO();
+        {
+            glDrawArrays(GL_TRIANGLE_FAN, 0, 3);
+        }
+        glBindVertexArray(0);
+    }
+    glUseProgram(prog);
 }
 
 void OVRSDK08AppSkeleton::_DrawToSecondQuad() const
