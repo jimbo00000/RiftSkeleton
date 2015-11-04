@@ -369,6 +369,13 @@ void mouseMove(GLFWwindow* pWindow, double xd, double yd)
     g_app.m_mouseDeltaYaw = 0.0f;
     g_app.m_mouseMove = glm::vec3(0.0f);
 
+    // Tweakbar takes over all mouse input
+    if (g_app.m_tweakbarQuad.m_showQuadInWorld == true)
+    {
+        g_app.OnMouseMove(x, y);
+        return;
+    }
+
     if (which_button == GLFW_MOUSE_BUTTON_1)
     {
         const float spinMagnitude = 0.05f;
@@ -389,7 +396,7 @@ void mouseMove(GLFWwindow* pWindow, double xd, double yd)
     else
     {
         // Passive motion, no mouse button pressed
-        g_app.OnMouseMove(static_cast<int>(x), static_cast<int>(y));
+        g_app.OnMouseMove(x, y);
     }
 }
 
@@ -416,11 +423,15 @@ void resize(GLFWwindow* pWindow, int w, int h)
 
 void keyboard_Aux(GLFWwindow* pWindow, int key, int codes, int action, int mods)
 {
+    if (g_app.m_tweakbarQuad.m_showQuadInWorld == false)
+    {
 #ifdef USE_ANTTWEAKBAR
-    int ant = TwEventKeyGLFW(key, action);
-    if (ant != 0)
-        return;
+        int ant = TwEventKeyGLFW(key, action);
+        if (ant != 0)
+            return;
 #endif
+    }
+
     keyboard(pWindow, key, codes, action, mods);
 }
 
@@ -429,36 +440,54 @@ void mouseDown_Aux(GLFWwindow* pWindow, int button, int action, int mods)
     (void)pWindow;
     (void)mods;
 
+    if (g_app.m_tweakbarQuad.m_showQuadInWorld == false)
+    {
 #ifdef USE_ANTTWEAKBAR
-    int ant = TwEventMouseButtonGLFW(button, action);
-    if (ant != 0)
-        return;
+        int ant = TwEventMouseButtonGLFW(button, action);
+        if (ant != 0)
+            return;
 #endif
-    mouseDown(pWindow, button, action, mods);
+    }
+    else
+    {
+        mouseDown(pWindow, button, action, mods);
+    }
 }
 
 void mouseMove_Aux(GLFWwindow* pWindow, double xd, double yd)
 {
     (void)pWindow;
 
+    if (g_app.m_tweakbarQuad.m_showQuadInWorld == false)
+    {
 #ifdef USE_ANTTWEAKBAR
-    int ant = TwEventMousePosGLFW(static_cast<int>(xd), static_cast<int>(yd));
-    if (ant != 0)
-        return;
+        int ant = TwEventMousePosGLFW(static_cast<int>(xd), static_cast<int>(yd));
+        if (ant != 0)
+            return;
 #endif
-    mouseMove(pWindow, xd, yd);
+    }
+    else
+    {
+        mouseMove(pWindow, xd, yd);
+    }
 }
 
 void mouseWheel_Aux(GLFWwindow* pWindow, double x, double y)
 {
+    if (g_app.m_tweakbarQuad.m_showQuadInWorld == false)
+    {
 #ifdef USE_ANTTWEAKBAR
-    static int scrollpos = 0;
-    scrollpos += static_cast<int>(y);
-    int ant = TwEventMouseWheelGLFW(scrollpos);
-    if (ant != 0)
-        return;
+        static int scrollpos = 0;
+        scrollpos += static_cast<int>(y);
+        int ant = TwEventMouseWheelGLFW(scrollpos);
+        if (ant != 0)
+            return;
 #endif
-    mouseWheel(pWindow, x, y);
+    }
+    else
+    {
+        mouseWheel(pWindow, x, y);
+    }
 }
 
 void resize_Aux(GLFWwindow* pWindow, int w, int h)

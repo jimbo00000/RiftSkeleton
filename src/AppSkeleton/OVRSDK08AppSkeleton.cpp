@@ -66,6 +66,35 @@ void OVRSDK08AppSkeleton::RecenterPose()
     ovr_RecenterPose(m_Hmd);
 }
 
+void OVRSDK08AppSkeleton::OnMouseButton(int button, int action)
+{
+#ifdef USE_ANTTWEAKBAR
+    int ant = TwEventMouseButtonGLFW(button, action);
+    if (ant != 0)
+        return;
+#endif
+}
+
+void OVRSDK08AppSkeleton::OnMouseMove(int x, int y)
+{
+#ifdef USE_ANTTWEAKBAR
+    int ant = TwEventMousePosGLFW(x, y);
+    if (ant != 0)
+        return;
+#endif
+}
+
+void OVRSDK08AppSkeleton::OnMouseWheel(double xd, double yd)
+{
+#ifdef USE_ANTTWEAKBAR
+    static int scrollpos = 0;
+    scrollpos += static_cast<int>(yd);
+    int ant = TwEventMouseWheelGLFW(scrollpos);
+    if (ant != 0)
+        return;
+#endif
+}
+
 void OVRSDK08AppSkeleton::ToggleMirroringType()
 {
     int m = static_cast<int>(m_mirror);

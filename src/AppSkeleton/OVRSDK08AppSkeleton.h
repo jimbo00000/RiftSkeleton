@@ -48,6 +48,10 @@ public:
     void RecenterPose();
     void exitVR();
 
+    virtual void OnMouseButton(int, int);
+    virtual void OnMouseMove(int, int);
+    virtual void OnMouseWheel(double, double);
+
     void ToggleMirroringType();
     void TogglePerfHud();
     void ToggleQuadInWorld();
