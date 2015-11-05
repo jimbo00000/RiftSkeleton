@@ -68,11 +68,8 @@ void OVRSDK08AppSkeleton::RecenterPose()
 
 void OVRSDK08AppSkeleton::OnMouseButton(int button, int action)
 {
-#ifdef USE_ANTTWEAKBAR
-    int ant = TwEventMouseButtonGLFW(button, action);
-    if (ant != 0)
-        return;
-#endif
+    // Tweakbar clicks are handled in main with
+    // windowing-framework-specific calls that alter Ant state.
 }
 
 void OVRSDK08AppSkeleton::OnMouseMove(int x, int y)
@@ -80,23 +77,10 @@ void OVRSDK08AppSkeleton::OnMouseMove(int x, int y)
     const FBO& f = m_tweakbarQuad.fbo;
     m_pointerCoords.x = static_cast<float>(x) / static_cast<float>(f.w);
     m_pointerCoords.y = static_cast<float>(y) / static_cast<float>(f.h);
-
-#ifdef USE_ANTTWEAKBAR
-    int ant = TwEventMousePosGLFW(x, y);
-    if (ant != 0)
-        return;
-#endif
 }
 
 void OVRSDK08AppSkeleton::OnMouseWheel(double xd, double yd)
 {
-#ifdef USE_ANTTWEAKBAR
-    static int scrollpos = 0;
-    scrollpos += static_cast<int>(yd);
-    int ant = TwEventMouseWheelGLFW(scrollpos);
-    if (ant != 0)
-        return;
-#endif
 }
 
 void OVRSDK08AppSkeleton::ToggleMirroringType()
