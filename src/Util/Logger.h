@@ -22,8 +22,8 @@
 #  endif
 
 #else
-#define LOG_INFO(string, ...)
-#define LOG_ERROR(string, ...)
+#  define LOG_INFO(string, args...) Logger::Instance().Write(string, ## args)
+#  define LOG_ERROR(string, args...) Logger::Instance().Write(string, ## args)
 #endif
 
 /// Writes log messages to output stream.

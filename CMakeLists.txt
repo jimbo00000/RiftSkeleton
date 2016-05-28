@@ -220,6 +220,19 @@ ELSEIF( APPLE )
     INCLUDE_DIRECTORIES( "${GLM_ROOT}" )
     ADD_DEFINITIONS( -DGLM_FORCE_RADIANS )
 
+    IF( GL_FRAMEWORK STREQUAL "GLFW" )
+        MESSAGE("Using GLFW Framework.")
+        INCLUDE_DIRECTORIES( "/usr/local/include/GLFW" )
+        SET( FRAMEWORK_LIBS -lglfw3 )
+    ELSEIF( GL_FRAMEWORK STREQUAL "SDL" )
+        MESSAGE("Using SDL2 Framework.")
+        INCLUDE_DIRECTORIES( "/usr/local/include/SDL2" "/usr/include/SDL2/" )
+        LINK_DIRECTORIES   ( "/usr/local/lib/" )
+        SET( FRAMEWORK_LIBS -lSDL2 )
+    ELSE()
+        MESSAGE("Unknown GL_FRAMEWORK: choose GLFW or SDL.")
+    ENDIF()
+
     IF( USE_OCULUSSDK )
         SET( OCULUSSDK_ROOT "${LIBS_HOME}/OculusSDK" )
         INCLUDE_DIRECTORIES( "${OCULUSSDK_ROOT}/LibOVR/Include" )
@@ -253,7 +266,7 @@ ELSEIF( APPLE )
         ${OpenGL_LIBRARY}
         ${OVR_LIBRARY}
         -lGLEW
-        -lglfw
+        ${FRAMEWORK_LIBS}
         ${HYDRA_LIBS}
         ${ANT_LIBS}
         )
