@@ -43,3 +43,4 @@ I set up my local build environment with libraries installed under a single dire
  - [Simple OVR GLFW Example](https://forums.oculus.com/viewtopic.php?t=17842) - DoZo1971
  - [jovr](https://github.com/jherico/jovr) - Java bindings for OVR SDK - Brad Davis  
  - [python-ovrsdk](https://github.com/jherico/python-ovrsdk) - Python bindings for OVR SDK - Brad Davis  
+ - [OpenGL Sample Code](http://casual-effects.blogspot.com/2016/03/opengl-sample-codeand-openvr-sample-code.html) - OpenGL Sample Code (including VR samples) - Morgan McGuire  
